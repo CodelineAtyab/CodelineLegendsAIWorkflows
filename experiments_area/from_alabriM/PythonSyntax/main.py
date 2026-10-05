@@ -28,16 +28,16 @@ list_of_words = sentence.split()
 new_sentence = "-".join(list_of_words)
 
 print(new_sentence)
-# counter = 0
-# while counter < len(name_of_team_members):
-#   print(name_of_team_members[counter])
-#   counter += 1
 
-# for name in name_of_team_members:
-#   print(name)
+counter = 0
+while counter < len(name_of_team_members):
+  print(name_of_team_members[counter])
+  counter += 1
+
+for name in name_of_team_members:
+  print(name)
 
 print(list(filter(lambda curr_name: "e" in curr_name, name_of_team_members)))
 
-
-# for i in range(0, 5):
-#   print(i)
+for i in range(0, 5):
+  print(i)
