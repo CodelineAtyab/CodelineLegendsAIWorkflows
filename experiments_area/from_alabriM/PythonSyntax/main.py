@@ -34,5 +34,7 @@ for name in name_of_team_members:
 
 print(list(filter(lambda curr_name: "e" in curr_name, name_of_team_members)))
 
+print(list(map(lambda curr_name: curr_name.upper(), name_of_team_members)))
+
 for i in range(0, 5):
   print(i)
