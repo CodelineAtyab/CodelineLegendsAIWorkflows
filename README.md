@@ -47,7 +47,7 @@ Add Reviewers and Click on "Create pull request"
 Move the ticket to "Ready for Review"
 
 ### Step 11
-Wait for atleast 3 approvals from the team
+Wait for atleast 2 approvals from the team
 
 ### Step 12
 After approvals, Please "SQUASH MERGE"
