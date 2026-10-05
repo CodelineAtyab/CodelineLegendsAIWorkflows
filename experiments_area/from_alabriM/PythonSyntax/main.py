@@ -2,7 +2,7 @@
 number_one = 23
 div_result = 4.5
 is_active = True
-name = 'Mr.A'
+name = 'Mr. Mohammed'
 a_char = 'a'
 
 if is_active:
@@ -19,7 +19,7 @@ else:
   print("World")
 
 
-name_of_team_members: list = ["Hydaya", "Shaheen", "Ikhlas", "Mohammed"]
+name_of_team_members: list = ["Hidaya", "Shaheen", "Ikhlas", "Mohammed"]
 team_member_info: dict = {"status": "OK", "ip_address": "192.168.1.10", "active": True}
 
 
