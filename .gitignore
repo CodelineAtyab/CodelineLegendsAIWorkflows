@@ -1,0 +1,191 @@
+# =============================================================================
+# CodelineLegendsAIWorkflows
+# Multi-project (uv) monorepo: FastAPI, LangGraph, Temporal, Qdrant, n8n
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Python / uv
+# -----------------------------------------------------------------------------
+# Bytecode & caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+.eggs/
+
+# Build artifacts
+build/
+dist/
+wheels/
+*.whl
+pip-wheel-metadata/
+MANIFEST
+
+# uv / virtual environments
+# NOTE: uv.lock is intentionally NOT ignored - commit lock files per project.
+.venv/
+venv/
+env/
+ENV/
+.python-version
+uv-cache/
+.uv/
+
+# NOTE: pyproject.toml and uv.lock are tracked.
+
+# -----------------------------------------------------------------------------
+# Environment & secrets
+# -----------------------------------------------------------------------------
+# Keep .env.example / .env.sample tracked, ignore real secrets.
+.env
+.env.*
+!.env.example
+!.env.sample
+*.pem
+*.key
+secrets/
+.secrets/
+
+# -----------------------------------------------------------------------------
+# Testing & coverage
+# -----------------------------------------------------------------------------
+.pytest_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+*.cover
+.hypothesis/
+nosetests.xml
+junit*.xml
+
+# -----------------------------------------------------------------------------
+# Linting / typing
+# -----------------------------------------------------------------------------
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.ruff_cache/
+.pytype/
+.pyre/
+
+# -----------------------------------------------------------------------------
+# FastAPI / web
+# -----------------------------------------------------------------------------
+# Local runtime data
+*.db
+*.sqlite
+*.sqlite3
+!**/migrations/**/*.sqlite3
+instance/
+staticfiles/
+
+# -----------------------------------------------------------------------------
+# LangGraph / LangChain
+# -----------------------------------------------------------------------------
+.langgraph/
+.langgraph_api/
+.langgraph_cli/
+langgraph_checkpoints/
+*.lgcheckpoint
+.chroma/
+
+# -----------------------------------------------------------------------------
+# Temporal
+# -----------------------------------------------------------------------------
+# Local Temporal dev server / worker artifacts
+temporal.db
+temporal.data
+.temporal/
+temporal-data/
+dynamicconfig/
+*.temporal
+
+# -----------------------------------------------------------------------------
+# Qdrant
+# -----------------------------------------------------------------------------
+qdrant_storage/
+qdrant_storage_*/
+.qdrant/
+qdrant_data/
+snapshots/
+
+# -----------------------------------------------------------------------------
+# n8n
+# -----------------------------------------------------------------------------
+.n8n/
+n8n_data/
+n8n-data/
+n8n.db
+database.sqlite
+*.n8n
+
+# -----------------------------------------------------------------------------
+# Jupyter notebooks
+# -----------------------------------------------------------------------------
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+
+# -----------------------------------------------------------------------------
+# Logs & runtime
+# -----------------------------------------------------------------------------
+logs/
+*.log
+*.pid
+*.pid.lock
+*.seed
+*.tmp
+tmp/
+temp/
+
+# -----------------------------------------------------------------------------
+# Docker / infra local state
+# -----------------------------------------------------------------------------
+docker-compose.override.yml
+data/
+volumes/
+
+# -----------------------------------------------------------------------------
+# ML models / caches (HuggingFace, etc.)
+# -----------------------------------------------------------------------------
+.cache/
+models/
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.safetensors
+*.h5
+*.pkl
+*.pickle
+
+# -----------------------------------------------------------------------------
+# OS files
+# -----------------------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# -----------------------------------------------------------------------------
+# Editors / IDEs
+# -----------------------------------------------------------------------------
+.idea/
+*.swp
+*.swo
+*~
+
+# =============================================================================
+# Team note:
+#   Each uv project must keep pyproject.toml and uv.lock committed.
+#   If you scaffold a new project, its own .gitignore is respected on top of
+#   this root file.
+# =============================================================================
