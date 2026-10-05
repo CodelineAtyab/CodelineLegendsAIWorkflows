@@ -1,4 +1,3 @@
-# DYNAMICALLY TYPED LANGUAGE VS C# STATIC TYPED LANGUAGE
 number_one = 23
 div_result = 4.5
 is_active = True
