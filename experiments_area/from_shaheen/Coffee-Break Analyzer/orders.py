@@ -1,6 +1,5 @@
 from functools import reduce
 
-
 orders: list[dict] = [
     {"name": "Alex", "drink": "Latte", "size_oz": 16},
     {"name": "Shaheen", "drink": "Latte", "size_oz": 10},
@@ -11,10 +10,7 @@ orders: list[dict] = [
 
 
 def is_large(order: dict):
-    if order["size_oz"] >= 16:
-        return True
-    else:
-        return False
+        return order["size_oz"] >= 16
 
 
 large_orders = list[dict](filter(is_large, orders))
@@ -23,7 +19,7 @@ print(large_orders)
 
 result = map(
     lambda test: f"{test['name']} - {test['drink']} ({test['size_oz']} oz)",
-    large_orders,
+    large_orders
 )
 
 print(list(result))
