@@ -4,6 +4,7 @@ from coffee import make_coffee
 
 
 class TestMakeCoffee(unittest.TestCase):
+    # Test an order without extras or options
     def test_default_order(self):
         result = make_coffee(101, "espresso", "Wajdan")
 
@@ -14,6 +15,7 @@ class TestMakeCoffee(unittest.TestCase):
             "extras": (),
             "options": {},
         })
+    # Test an order with extras and options
 
     def test_extras_and_options(self):
         result = make_coffee(
