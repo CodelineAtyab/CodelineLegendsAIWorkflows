@@ -1,7 +1,7 @@
 from coffee import make_coffee
 
-# Check an order without extras or options
-result = make_coffee(101, "espresso", "Wajdan")
+# Order without extras
+order = make_coffee(101, "espresso", "Wajdan")
 
 expected = {
     "order_id": 101,
@@ -11,17 +11,17 @@ expected = {
     "options": {},
 }
 
-if result == expected:
-    print("Basic order: Passed")
+if order == expected:
+    print("First test passed")
 else:
-    print("Basic order: Failed")
+    print("First test failed")
 
 
-# Check an order with extras and options
-result = make_coffee(
+# Order with extras and options
+order = make_coffee(
     101,
-    "latte",
-    "Alice",
+    "espresso",
+    "Wajdan",
     "soy_milk",
     "extra_shot",
     size="large",
@@ -30,16 +30,13 @@ result = make_coffee(
 
 expected = {
     "order_id": 101,
-    "coffee_type": "latte",
-    "customer_name": "Alice",
+    "coffee_type": "espresso",
+    "customer_name": "Wajdan",
     "extras": ("soy_milk", "extra_shot"),
-    "options": {
-        "size": "large",
-        "takeaway": True,
-    },
+    "options": {"size": "large", "takeaway": True},
 }
 
-if result == expected:
-    print("Order with extras: Passed")
+if order == expected:
+    print("Second test passed")
 else:
-    print("Order with extras: Failed")
+    print("Second test failed")
