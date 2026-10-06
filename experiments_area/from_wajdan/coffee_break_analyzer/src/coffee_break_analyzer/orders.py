@@ -14,3 +14,6 @@ def is_large(order: dict) -> bool:
 # Filter large orders
 large_orders = list(filter(is_large, orders))
 print(large_orders)
+
+
+# Format large orders
