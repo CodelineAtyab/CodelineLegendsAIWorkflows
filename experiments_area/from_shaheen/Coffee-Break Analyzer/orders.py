@@ -19,7 +19,7 @@ def is_large(order: dict):
 
 large_orders = list[dict](filter(is_large, orders))
 
-print (large_orders)
+print(large_orders)
 
 result = map(
     lambda test: f"{test['name']} - {test['drink']} ({test['size_oz']} oz)",
