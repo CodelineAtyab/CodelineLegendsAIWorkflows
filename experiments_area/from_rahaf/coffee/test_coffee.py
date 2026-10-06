@@ -1,4 +1,3 @@
-import pytest
 
 from coffee import make_coffee
 
@@ -49,13 +48,11 @@ def test_coffee_with_extras_and_options():
 
 def test_invalid_argument_order():
 
-    invalid_code = '''
-make_coffee(
-    order_id=101,
-    "V60",
-    "rahaf"
-)
-'''
+    invalid_code = 'make_coffee ( order_id=101 , "V60" , "rahaf")'
 
-    with pytest.raises(SyntaxError):
+    try:
         exec(invalid_code)
+        assert False
+
+    except SyntaxError:
+        pass
