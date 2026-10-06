@@ -12,4 +12,4 @@ total_volume = reduce(lambda total, order:total + order["size_oz"],orders,0)
 print("Large orders:")
 for order in formatted_orders:
     print(order)
-print(f"Total volume of all orders: {total_volume}oz")
+print("Total volume:", total_volume, "oz")
