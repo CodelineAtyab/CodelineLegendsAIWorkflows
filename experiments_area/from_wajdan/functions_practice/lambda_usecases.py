@@ -13,9 +13,19 @@ for num in data:
         filtered_list.append(num)
         print(filtered_list)
         
-        
+ #----------------------------------------
+       
 def my_custom_filter(num):
    return num %2 == 0
 filtered_list = filter(my_custom_filter, data)
 print(filtered_list)
+#----------------------------------------
+def my_custom_filter(num):
+   return num %2 == 0
+filtered_list = filter(my_custom_filter, data)
+print(filtered_list)
+#----------------------------------------
+filtered_list = filter(lambda num: num %2 == 0, data)
+print(filtered_list)
+     
                   
