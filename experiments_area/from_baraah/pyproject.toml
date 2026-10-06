@@ -5,3 +5,9 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.1"
 dependencies = []
+
+[dependency-groups]
+dev = [
+    "mypy>=0.720",
+    "ruff>=0.0.17",
+]
