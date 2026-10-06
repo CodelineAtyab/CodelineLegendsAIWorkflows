@@ -25,4 +25,11 @@ print("\nFormatted Large Orders:" , formatted_orders )
 
 # Calculate the total volume of all drinks
 total_volume = reduce(lambda x, y: x + y["size_oz"], orders, 0)
-print(f"Total volume: {total_volume} oz")
+print(f"\nTotal volume: {total_volume} oz")
+
+# Select large orders and format them using one list comprehension
+large_orders_lc: list[str] = [f"{order['name']} – {order['drink']} ({order['size_oz']}oz)" for order in orders if order["size_oz"] >= 16]
+print("\nLarge Orders (List Comprehension):" , large_orders_lc)
+
+
+
