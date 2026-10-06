@@ -1,3 +1,6 @@
+from functools import reduce
+
+
 orders: list[dict] = [
     {"name": "Alex", "drink": "Latte", "size_oz": 16},
     {"name": "Alzulaikha", "drink": "Americano", "size_oz": 10},
@@ -20,3 +23,10 @@ result = list(
 )
 
 print(result)
+
+total_volume = reduce(
+    lambda total, order: total + order["size_oz"],
+    orders,
+    0
+)
+print(f"Total volume: {total_volume} oz")
