@@ -17,7 +17,7 @@ class TestMakeCoffee(unittest.TestCase):
 
     def test_extras_and_options(self):
         result = make_coffee(
-            101, "latte", "Wajdan",
+            101, "espresso", "Wajdan",
             "soy_milk", "extra_shot",
             size="large", takeaway=True,
         )
