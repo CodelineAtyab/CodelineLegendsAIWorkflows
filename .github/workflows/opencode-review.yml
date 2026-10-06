@@ -48,12 +48,19 @@ jobs:
             The goal is "close to production ready for their stage", not fully
             production ready.
 
-            Pull request metadata to check first:
+            Repository conventions: read the root README.md "Contribution Guidelines"
+            and check this pull request against them. These are recommendations only:
+            politely mention any mismatch, but do not treat it as a blocker.
+            - Branch name: ${{ github.event.pull_request.head.ref }}. The README example
+              is "feature/<ticket-id>-<your-id>-ticket-title".
             - The title of the pull request is: ${{ github.event.pull_request.title }}.
               It should start with a clickup ticket id (e.g., "86ex6r17g") followed by
               a ": " and then the clickup ticket title (e.g., "86ex6r17g: Implement user authentication").
             - The description of the pull request is: ${{ github.event.pull_request.body }}.
               It should reflect the changes actually made in the pull request.
+
+            Present any branch-naming, title, or description suggestions as
+            recommendations, not requirements.
 
             Always check, at every stage:
             - Obvious logical errors, bugs, or edge cases the code does not handle.
