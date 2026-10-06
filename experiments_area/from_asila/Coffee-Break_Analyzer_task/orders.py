@@ -1,3 +1,5 @@
+from functools import reduce
+
 def main():
     print("Hello from coffee-break-analyzer-task!")
 
