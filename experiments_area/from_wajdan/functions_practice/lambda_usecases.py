@@ -25,7 +25,7 @@ def my_custom_filter(num):
 filtered_list = filter(my_custom_filter, data)
 print(filtered_list)
 #----------------------------------------
-filtered_list = filter(lambda num: num %2 == 0, data)
+filtered_list = list(filter(lambda num: num %2 == 0, data))
 print(filtered_list)
      
                   
