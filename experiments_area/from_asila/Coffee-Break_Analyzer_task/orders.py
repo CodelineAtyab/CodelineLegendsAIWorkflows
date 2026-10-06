@@ -8,7 +8,9 @@ if __name__ == "__main__":
     main()
 
 #list dictionary
-orders: list[dict] = [{"name": "ALex" , "drink":"latte" , "size_oz":16} ]
+orders: list[dict] = [{"name": "ALex" , "drink":"latte" , "size_oz":16} ,
+                      {"name": "Asila" , "drink":"Matcha" , "size_oz":20},
+                      {"name": "Suad" , "drink":"Americano" , "size_oz":12}]
 
 
 def is_large(order:dict) -> bool:
@@ -25,4 +27,6 @@ format_string: list[str] = list (
     lambda order: order["name"] +"-" + order["drink"] + str(order["size_oz"]) + "oz)", large_orders,
     )  # i used str(order["size_oz"]) becuase size_oz is a number, and (+) can only join strings with strings.
 )
+
+#total_ounces : int = reduce( lambda total ,)
 
