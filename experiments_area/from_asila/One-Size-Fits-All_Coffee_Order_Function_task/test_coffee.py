@@ -31,7 +31,7 @@ class MakeCoffeeTests(unittest.TestCase): #The tests will be written inside this
         size="large",
         takeaway=True
     )
-        print(result)
+        
         self.assertEqual(
         result,
         {
@@ -46,4 +46,12 @@ class MakeCoffeeTests(unittest.TestCase): #The tests will be written inside this
         }
     ) #This test checks that the extra coffee choices are saved correctly
     
-    
+    def test_invalid_order(self): #here to test the invalid and if there error syntax
+        invalid_call = 'make_coffee(order_id=100, "Matcha", "As")'
+        
+        print(invalid_call)
+        
+        with self.assertRaises(SyntaxError):
+            compile(invalid_call, "<invalid_call>", "exec")
+            
+        
