@@ -1,10 +1,11 @@
 import unittest
+
 from coffee import make_coffee
 
 
-class TestMakeCoffee(unittest.TestCase):
+class TestMakeCoffee(unittest.TestCase): 
 
-    # Only the three required arguments
+    # Only The three required arguments
     def test_default_order(self):
         result = make_coffee(101, "latte", "Alice")
         expected = {
