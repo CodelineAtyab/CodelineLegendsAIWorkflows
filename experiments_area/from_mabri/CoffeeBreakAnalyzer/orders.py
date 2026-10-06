@@ -1,9 +1,17 @@
 from functools import reduce
+from typing import TypedDict
 
-orders = [{"name": "Mohammed", "drink": "Tea", "size_oz": 12}]
+
+class Order(TypedDict):
+    name: str
+    drink: str
+    size_oz: int
 
 
-def is_large(order: dict) -> bool:
+orders: list[Order] = [{"name": "Mohammed", "drink": "Tea", "size_oz": 12}]
+
+
+def is_large(order: Order) -> bool:
     return order["size_oz"] > 16
 
 
