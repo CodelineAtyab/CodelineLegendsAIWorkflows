@@ -5,4 +5,4 @@ orders: list[dict] = [
 ]
 def is_large(order: dict) -> bool:
     return order["size_oz"] >= 16
-    
+large_orders = list(filter(is_large, orders))
