@@ -32,3 +32,10 @@ print(format_string)
 #calculated total ounces ordered across all drinks and printed
 total_ounces : int = reduce( lambda total , order:total + order ["size_oz"],orders,0)
 print("Total volume: " + str(total_ounces) + " oz")
+
+large_orders_lc: list[str] =[order["name"] + "-" + order["drink"] +"(" + str(order["size_oz"]) + "oz)"
+    for order in orders
+    if order["size_oz"]>= 16      
+]
+
+print(large_orders_lc)
