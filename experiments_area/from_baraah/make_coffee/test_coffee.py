@@ -1,6 +1,6 @@
 import pytest
-
 from coffee import make_coffee
+
 
 # Test coffee with only required arguments
 def test_coffee():
