@@ -1,45 +1,57 @@
 # Coffee Order Function
 
 ## About
-This project practices Python functions using `*extras` and `**options`.
+A simple Python function that returns coffee order details.
 
-## How It Works
-The `make_coffee` function requires:
-- Order ID
-- Coffee type
-- Customer name
+## Function
+```python
+make_coffee(order_id, coffee_type, customer_name, *extras, **options)
+```
 
-It returns a dictionary containing the order details.
-Extra positional arguments are stored in a tuple.
-Extra keyword arguments are stored in a dictionary.
-
-Without extras or options, the function returns an empty tuple and dictionary.
+- `order_id`: the order number.
+- `coffee_type`: the type of coffee.
+- `customer_name`: the customer's name.
+- `extras`: extra positional arguments stored in a tuple.
+- `options`: extra keyword arguments stored in a dictionary.
 
 ## Example
 ```python
-make_coffee(
-    101, "latte", "Alice",
+from coffee import make_coffee
+
+order = make_coffee(
+    101, "espresso", "Wajdan",
     "soy_milk", "extra_shot",
     size="large", takeaway=True
 )
+
+print(order)
+```
+
+Result:
+```python
+{
+    "order_id": 101,
+    "coffee_type": "espresso",
+    "customer_name": "Wajdan",
+    "extras": ("soy_milk", "extra_shot"),
+    "options": {"size": "large", "takeaway": True}
+}
 ```
 
 ## Design and Trade-offs
-- Extras and options are kept unchanged.
-- New extras and options can be added without changing the function signature.
-- Option names and values are not validated, so spelling mistakes are accepted.
+The function keeps extras and options unchanged.
+Without them, it returns an empty tuple and dictionary.
+
+Using `*extras` and `**options` allows new additions without changing the signature.
+However, option names and values are not validated, so misspelled options are accepted.
 
 ## Tests
-The tests check:
+The tests use Python's built-in `unittest` library to check:
 - An order without extras or options.
 - An order with extras and options.
-- A positional argument after a keyword argument raises SyntaxError.
+- An invalid argument order that raises `SyntaxError`.
 
-Run the tests from this folder:
+Run from the project folder:
 ```bash
 uv run python -m unittest -v
 ```
-
-## Training References
-- [Repository contribution guidelines](../../../README.md)
-- Python function examples shared in Slack #material.
