@@ -3,17 +3,9 @@ from functools import reduce
 
 
 orders: list[dict] = [
-    {
-        "name": "Hidaya",
-        "drink": "Cappuccino",
-        "size_oz": 12,
-    },
+    {"name": "Hidaya","drink": "Cappuccino","size_oz": 12,},
     {"name": "Rahaf", "drink": "Espresso", "size_oz": 8},
-    {
-        "name": "Alex",
-        "drink": "Latte",
-        "size_oz": 16,
-    },
+    {"name": "Alex","drink": "Latte","size_oz": 16,},
 ]
 
 
