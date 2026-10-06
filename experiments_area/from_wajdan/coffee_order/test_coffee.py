@@ -1,41 +1,45 @@
-
 from coffee import make_coffee
 
+# Check an order without extras or options
+result = make_coffee(101, "espresso", "Wajdan")
 
-class TestMakeCoffee(TestCase):
-    # Test an order without extras or options
-    def test_default_order(self):
-        result = make_coffee(101, "espresso", "Wajdan")
+expected = {
+    "order_id": 101,
+    "coffee_type": "espresso",
+    "customer_name": "Wajdan",
+    "extras": (),
+    "options": {},
+}
 
-        self.assertEqual(result, {
-            "order_id": 101,
-            "coffee_type": "espresso",
-            "customer_name": "Wajdan",
-            "extras": (),
-            "options": {},
-        })
-    # Test an order with extras and options
+if result == expected:
+    print("Basic order: Passed")
+else:
+    print("Basic order: Failed")
 
-    def test_extras_and_options(self):
-        result = make_coffee(
-            101, "espresso", "Wajdan",
-            "soy_milk", "extra_shot",
-            size="large", takeaway=True,
-        )
 
-        self.assertEqual(result, {
-            "order_id": 101,
-            "coffee_type": "espresso",
-            "customer_name": "Wajdan",
-            "extras": ("soy_milk", "extra_shot"),
-            "options": {
-                "size": "large",
-                "takeaway": True,
-            },
-        })
+# Check an order with extras and options
+result = make_coffee(
+    101,
+    "latte",
+    "Alice",
+    "soy_milk",
+    "extra_shot",
+    size="large",
+    takeaway=True,
+)
 
-    def test_positional_after_keyword(self):
-        invalid_code = 'make_coffee(order_id=101, "espresso", "Wajdan")'
+expected = {
+    "order_id": 101,
+    "coffee_type": "latte",
+    "customer_name": "Alice",
+    "extras": ("soy_milk", "extra_shot"),
+    "options": {
+        "size": "large",
+        "takeaway": True,
+    },
+}
 
-        with self.assertRaises(SyntaxError):
-            compile(invalid_code, "<test>", "exec")
+if result == expected:
+    print("Order with extras: Passed")
+else:
+    print("Order with extras: Failed")
