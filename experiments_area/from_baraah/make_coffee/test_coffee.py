@@ -2,6 +2,8 @@ from coffee import make_coffee
 
 import pytest
 
+
+# Test coffee with only required arguments
 def test_coffee():
 
     result = make_coffee(
@@ -21,6 +23,7 @@ def test_coffee():
     assert result == expected
 
 
+# Test coffee with extras and options
 
 def test_coffee_with_extras_and_options():
 
@@ -47,13 +50,10 @@ def test_coffee_with_extras_and_options():
 
     assert result == expected
 
-invalid_code = '''
-make_coffee(
-    order_id=101,
-    "Ice Americano",
-    "Baraah"
-)
-'''
+
+
+
+# Test that invalid argument order raises a SyntaxError
 
 def test_invalid():
     with pytest.raises(SyntaxError):
