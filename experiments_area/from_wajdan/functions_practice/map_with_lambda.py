@@ -6,3 +6,6 @@ result=[]
 #print(result)   
 result = list(map(lambda num: num*num, data))
 print(result)
+
+# data = [onum * onum for onum in [num * num for num in range(1, 11)]]
+# print(data)
