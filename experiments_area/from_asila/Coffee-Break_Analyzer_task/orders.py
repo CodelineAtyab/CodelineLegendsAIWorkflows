@@ -28,5 +28,7 @@ format_string: list[str] = list (
     )  # i used str(order["size_oz"]) becuase size_oz is a number, and (+) can only join strings with strings.
 )
 print(format_string)
-#total_ounces : int = reduce( lambda total ,)
 
+#calculated total ounces ordered across all drinks and printed
+total_ounces : int = reduce( lambda total , order:total + order ["size_oz"],orders,0)
+print("Total volume: " + str(total_ounces) + " oz")
