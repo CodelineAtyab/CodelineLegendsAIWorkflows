@@ -22,12 +22,10 @@ def is_large(order: Order) -> bool:
 
 large_orders = list(filter(is_large, orders))
 
-large_orders_strings = list(
-    map(
-        lambda order: f"{order['name']} - {order['drink']} ({order['size_oz']} oz)",
-        large_orders,
-    )
-)
+large_orders_strings = [
+    f"{order['name']} - {order['drink']} ({order['size_oz']} oz)"
+    for order in large_orders
+]
 print(f"Large orders: {large_orders_strings}")
 
 total_ounces = reduce(lambda total, order: total + order["size_oz"], orders, 0)
