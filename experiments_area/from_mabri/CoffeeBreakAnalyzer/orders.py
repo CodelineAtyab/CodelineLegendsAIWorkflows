@@ -8,7 +8,11 @@ class Order(TypedDict):
     size_oz: int
 
 
-orders: list[Order] = [{"name": "Mohammed", "drink": "Tea", "size_oz": 12}]
+orders: list[Order] = [
+    {"name": "Mohammed", "drink": "Tea", "size_oz": 12},
+    {"name": "Omar", "drink": "Soda", "size_oz": 16},
+    {"name": "Huda", "drink": "Orange Juice", "size_oz": 20},
+]
 
 
 def is_large(order: Order) -> bool:
@@ -23,6 +27,7 @@ large_orders_strings = list(
         large_orders,
     )
 )
+print(f"Large orders: {large_orders_strings}")
 
 total_ounces = reduce(lambda total, order: total + order["size_oz"], orders, 0)
 print(f"Total volume: {total_ounces} oz")
