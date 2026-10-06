@@ -8,5 +8,3 @@ def some_other_function(y, a,b,c):
     y("33.45.66.112", "5432", "appdb", "postgres://appdb")
     return None
     
-some_other_fun(connect_to_database, 1, 2, 3)
-   
