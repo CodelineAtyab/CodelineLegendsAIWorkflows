@@ -19,3 +19,5 @@ print("\nLarge Orders:" , large_orders )
 # Convert large orders into formatted strings
 formatted_orders: list[str] = list(map(lambda order: f"{order['name']} – {order['drink']} ({order['size_oz']}oz)", large_orders))
 print("\nFormatted Large Orders:" , formatted_orders )
+
+# Calculate the total volume of all drinks
