@@ -1,5 +1,6 @@
 from coffee import make_coffee
 
+import pytest
 
 def test_coffee():
 
@@ -19,3 +20,42 @@ def test_coffee():
 
     assert result == expected
 
+
+
+def test_coffee_with_extras_and_options():
+
+    result = make_coffee(
+        101,
+        "Ice Americano",
+        "Baraah",
+        "soy_milk",
+        "extra_shot",
+        size="large",
+        takeaway=True
+    )
+
+    expected = {
+        "order_id": 101,
+        "coffee_type": "Ice Americano",
+        "customer_name": "Baraah",
+        "extras": ("soy_milk", "extra_shot"),
+        "options": {
+            "size": "large",
+            "takeaway": True
+        }
+    }
+
+    assert result == expected
+
+def test_invalid_argument_order():
+
+    invalid_code = '''
+make_coffee(
+    order_id=101,
+    "latte",
+    "Alice"
+)
+'''
+
+    with pytest.raises(SyntaxError):
+        compile(invalid_code, "<string>", "exec")
