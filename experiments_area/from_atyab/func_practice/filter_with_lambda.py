@@ -1,4 +1,4 @@
-connect_to_db = lambda : None
+connect_to_db = lambda: None
 
 sum = lambda num1, num2: num1 + num2
 
@@ -14,4 +14,3 @@ data = [11, 2, 3, 12, 6, 7, 3, 9, 45, 100]
 
 filtered_list = list(filter(lambda num: num % 2 == 0, data))
 print(filtered_list)
-
