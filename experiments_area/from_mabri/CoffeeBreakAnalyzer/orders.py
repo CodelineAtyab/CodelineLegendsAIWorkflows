@@ -12,6 +12,7 @@ orders: list[Order] = [
     {"name": "Mohammed", "drink": "Tea", "size_oz": 12},
     {"name": "Omar", "drink": "Soda", "size_oz": 16},
     {"name": "Huda", "drink": "Orange Juice", "size_oz": 20},
+    {"name": "Fatima", "drink": "Zatar Laban Drink", "size_oz": 22},
 ]
 
 
