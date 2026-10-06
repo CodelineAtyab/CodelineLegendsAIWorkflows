@@ -1,5 +1,8 @@
 
+from functools import reduce
+
 # Coffee orders
+
 orders: list[dict] = [
     {"name": "Wajdan", "drink": "Latte", "size_oz": 16},
     {"name": "Hidaya", "drink": "Espresso", "size_oz": 8},
@@ -21,3 +24,5 @@ formatted_orders: list[str] = list(map(lambda order: f"{order['name']} – {orde
 print("\nFormatted Large Orders:" , formatted_orders )
 
 # Calculate the total volume of all drinks
+total_volume = reduce(lambda x, y: x + y["size_oz"], orders, 0)
+print(f"Total volume: {total_volume} oz")
