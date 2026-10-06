@@ -20,6 +20,7 @@ large_orders : list[dict] = list(filter(is_large, orders))
 #inline lambda with map() to convert each order in large_orders into the string format
 format_string: list[str] = list (
     map(
-    lambda order: order["name"] + order["drink"] + str(order["size_oz"]) + "oz)", large_orders,
+    lambda order: order["name"] +"-" + order["drink"] + str(order["size_oz"]) + "oz)", large_orders,
     )  # i used str(order["size_oz"]) becuase size_oz is a number, and (+) can only join strings with strings.
 )
+
