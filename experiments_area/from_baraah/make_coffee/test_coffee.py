@@ -17,13 +17,14 @@ def test_coffee():
         "coffee_type": "Ice Americano",
         "customer_name": "Baraah",
         "extras": (),
-        "options": {}
+        "options": {},
     }
 
     assert result == expected
 
 
 # Test coffee with extras and options
+
 
 def test_coffee_with_extras_and_options():
 
@@ -34,7 +35,7 @@ def test_coffee_with_extras_and_options():
         "soy_milk",
         "extra_shot",
         size="large",
-        takeaway=True
+        takeaway=True,
     )
 
     expected = {
@@ -42,19 +43,23 @@ def test_coffee_with_extras_and_options():
         "coffee_type": "Ice Americano",
         "customer_name": "Baraah",
         "extras": ("soy_milk", "extra_shot"),
-        "options": {
-            "size": "large",
-            "takeaway": True
-        }
+        "options": {"size": "large", "takeaway": True},
     }
 
     assert result == expected
 
 
-
-
 # Test that invalid argument order raises a SyntaxError
 
+# Test invalid argument order
 def test_invalid():
+    invalid_code = '''
+make_coffee(
+    order_id=101,
+    "Ice Americano",
+    "Baraah"
+)
+'''
+
     with pytest.raises(SyntaxError):
-        exec('make_coffee(order_id=101, "Ice Americano", "Baraah")')
+        compile(invalid_code, "<string>", "exec")
