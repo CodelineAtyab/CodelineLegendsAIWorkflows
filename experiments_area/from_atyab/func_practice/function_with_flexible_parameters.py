@@ -23,14 +23,16 @@ get_branch_info(
 )
 
 
-def get_branch_info(commit_id, name, owner_name, *args, **kwargs):
+def get_branch_info_with_fixed_and_dynamic_params(
+    commit_id, name, owner_name, *args, **kwargs
+):
     print("This is the commit id: " + str(commit_id))
     print("This is the name: " + name)
     print("This is the owner_name: " + owner_name)
     print(kwargs)
 
 
-get_branch_info(
+get_branch_info_with_fixed_and_dynamic_params(
     123,
     "feature/something",
     "CodelineAtyab",
@@ -41,14 +43,14 @@ get_branch_info(
 )
 
 
-def get_branch_info(commit_id, name, owner_name, **kwargs):
+def get_branch_info_with_keyword_args(commit_id, name, owner_name, **kwargs):
     print("This is the commit id: " + str(commit_id))
     print("This is the name: " + name)
     print("This is the owner_name: " + owner_name)
     print(kwargs)
 
 
-get_branch_info(
+get_branch_info_with_keyword_args(
     owner_name="CodelineAtyab",
     name="feature/something",
     commit_id=123,
@@ -56,7 +58,7 @@ get_branch_info(
     duplicate_branch_name="bugfix/anotherthing",
 )
 
-get_branch_info(123, "feature/func", "CodelineAtyab")
+get_branch_info_with_keyword_args(123, "feature/func", "CodelineAtyab")
 
 
 def my_sum(num_1, num_2, num_3, *args):
