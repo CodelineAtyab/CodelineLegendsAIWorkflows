@@ -47,15 +47,14 @@ def test_coffee_with_extras_and_options():
 
     assert result == expected
 
-def test_invalid_argument_order():
-
-    invalid_code = '''
+invalid_code = '''
 make_coffee(
     order_id=101,
-    "latte",
-    "Alice"
+    "Ice Americano",
+    "Baraah"
 )
 '''
 
+def test_invalid():
     with pytest.raises(SyntaxError):
-        compile(invalid_code, "<string>", "exec")
+        exec('make_coffee(order_id=101, "Ice Americano", "Baraah")')
