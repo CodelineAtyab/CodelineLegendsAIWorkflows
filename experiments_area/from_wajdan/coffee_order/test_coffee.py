@@ -1,9 +1,8 @@
-import unittest
 
 from coffee import make_coffee
 
 
-class TestMakeCoffee(unittest.TestCase):
+class TestMakeCoffee(TestCase):
     # Test an order without extras or options
     def test_default_order(self):
         result = make_coffee(101, "espresso", "Wajdan")
