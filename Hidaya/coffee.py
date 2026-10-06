@@ -6,3 +6,4 @@ def make_coffee(order_id, coffee_type, customer_name, *extras, **options):
     "extras": extras,
     "options": options
 }
+
