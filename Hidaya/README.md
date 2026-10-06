@@ -13,9 +13,7 @@ The make_coffee function stores a coffee order in a dictionary.
 ## Example
 ```python
 make_coffee(
-    101, "latte", "Alice",
-    "soy_milk", "extra_shot",
-    size="large", takeaway=True
+    101, "latte", "Alice", "soy_milk", "extra_shot", size="large", takeaway=True
 )
 ```
 
