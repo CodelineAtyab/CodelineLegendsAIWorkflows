@@ -8,9 +8,9 @@ orders: list[dict] = [
 #print(orders)
 
 # Check if the drink is large
-def is_large_order(order: dict) -> bool:
+def is_large(order: dict) -> bool:
     return order["size_oz"] >= 16
 
 # Filter large orders
-large_orders = list(filter(is_large_order, orders))
+large_orders = list(filter(is_large, orders))
 print(large_orders)
