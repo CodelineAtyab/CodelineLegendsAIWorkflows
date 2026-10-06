@@ -10,3 +10,8 @@ def get_branch_info(commit_id, name, owner_name):
 
 received_data = {"owner_name": "Mr.A", "commit_id": 123, "name": "release/0.0.1"}
 get_branch_info(**received_data)
+
+
+def add_just_for_testing(*args, **kwargs):
+    print(args)
+    print(kwargs)
