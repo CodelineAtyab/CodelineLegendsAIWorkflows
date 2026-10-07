@@ -13,21 +13,6 @@ def uppercase(text):
     return len(list(filter(lambda char: char.isupper(), text)))
 
 
-def add_text_stats(func):
-
-    def wrapper(*args, **kwargs):
-        text = func(*args, **kwargs)
-
-        return (
-            f"[No. of Words: {words(text)}, "
-            f"No. of Spaces: {spaces(text)}, "
-            f"No. of Uppercase Chars: {uppercase(text)}] "
-            + text
-        )
-
-    return wrapper
-
-
 def analyze_text(
     count_words=True,
     count_spaces=True,
@@ -36,8 +21,8 @@ def analyze_text(
 
     def decorator(func):
 
-        def wrapper(*args, **kwargs):
-            text = func(*args, **kwargs)
+        def wrapper():
+            text = func()
             result = []
 
             if count_words:
@@ -47,7 +32,9 @@ def analyze_text(
                 result.append(f"No. of Spaces: {spaces(text)}")
 
             if count_uppercase_chars:
-                result.append(f"No. of Uppercase Chars: {uppercase(text)}")
+                result.append(
+                    f"No. of Uppercase Chars: {uppercase(text)}"
+                )
 
             if len(result) == 0:
                 return text
@@ -59,13 +46,8 @@ def analyze_text(
     return decorator
 
 
-@add_text_stats
-def get_news():
-    return sentence
-
-
 @analyze_text()
-def get_news_all():
+def get_news():
     return sentence
 
 
@@ -82,17 +64,6 @@ def get_news_uppercase():
     return sentence
 
 
-@analyze_text(
-    count_words=False,
-    count_spaces=False,
-    count_uppercase_chars=False
-)
-def get_news_original():
-    return sentence
-
-
 print(get_news())
-print(get_news_all())
 print(get_news_no_spaces())
 print(get_news_uppercase())
-print(get_news_original())
