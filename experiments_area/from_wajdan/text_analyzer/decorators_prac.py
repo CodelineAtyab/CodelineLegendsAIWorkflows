@@ -1,5 +1,14 @@
+def add_text_stats(given_fun):
+    def decorated_func(*args, **kwargs):
+        text = given_fun(*args, **kwargs)
+        return text
 
-def get_message():
-    return "Hello, Wajdan!"
+    return decorated_func
 
-print(get_message())
+
+@add_text_stats
+def get_message(message):
+    return message
+
+
+print(get_message("Hello Wajdan"))
