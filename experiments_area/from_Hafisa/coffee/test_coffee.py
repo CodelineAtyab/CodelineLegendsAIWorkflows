@@ -1,47 +1,68 @@
-import pytest
-
 from coffee import make_coffee
 
 
-def test_coffee():
-
-    result = make_coffee(101, "Ice Americano", "Hafisa")
-
-    assert result["order_id"] == 101
-    assert result["coffee_type"] == "Ice Americano"
-    assert result["customer_name"] == "Hafisa"
-    assert result["extras"] == ()
-    assert result["options"] == {}
-
-
-def test_make_coffee():
+def test_basic_coffee():
 
     result = make_coffee(
         101,
         "latte",
-        "Hafisa",
-        "normal_milk",
-        "single_shot",
-        size="large",
-        takeaway=True,
+        "Alice"
     )
 
-    assert result["order_id"] == 101
-    assert result["coffee_type"] == "latte"
-    assert result["customer_name"] == "Hafisa"
-    assert result["extras"] == ("normal_milk", "single_shot")
-    assert result["options"] == {"size": "large", "takeaway": True}
+    expected = {
+        "order_id": 101,
+        "coffee_type": "latte",
+        "customer_name": "Alice",
+        "extras": (),
+        "options": {}
+    }
+
+    assert result == expected
+
+
+def test_coffee_with_extras():
+
+    result = make_coffee(
+        101,
+        "latte",
+        "Alice",
+        "soy_milk",
+        "extra_shot",
+        size="large",
+        takeaway=True
+    )
+
+    expected = {
+        "order_id": 101,
+        "coffee_type": "latte",
+        "customer_name": "Alice",
+        "extras": ("soy_milk", "extra_shot"),
+        "options": {
+            "size": "large",
+            "takeaway": True
+        }
+    }
+
+    assert result == expected
 
 
 def test_invalid_argument_order():
 
-    invalid_code = """
+    invalid_code = '''
 make_coffee(
     order_id=101,
     "latte",
-    "Hafisa"
+    "Alice"
 )
-"""
+'''
 
-    with pytest.raises(SyntaxError):
-        compile(invalid_code, "<string>", "exec")
+    try:
+        exec(invalid_code)
+        assert False
+    except SyntaxError:
+        print("SyntaxError found")
+
+
+test_basic_coffee()
+test_coffee_with_extras()
+test_invalid_argument_order()
