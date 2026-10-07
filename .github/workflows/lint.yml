@@ -1,0 +1,112 @@
+name: Lint & Type Check
+
+# Runs on every pull request. Only the uv projects whose files changed in the
+# PR are checked, each in isolation (its own working directory, its own locked
+# environment) so that one member's experiments can never break another
+# project's check, and unchanged projects cost no CI time.
+
+on:
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  # Find the uv projects that changed in this PR. Projects live at any depth
+  # under experiments_area/from_<name>/... so we walk the whole tree, then keep
+  # only those with at least one changed file. Add a new project folder -> it
+  # is picked up automatically, no workflow edits required.
+  discover:
+    name: Discover changed uv projects
+    runs-on: ubuntu-latest
+    outputs:
+      projects: ${{ steps.discover.outputs.projects }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Full history so we can diff against the base branch merge-base.
+          fetch-depth: 0
+
+      - name: Find changed projects
+        id: discover
+        shell: bash
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, os, subprocess
+
+          skip = {
+              ".git", ".venv", "venv", "node_modules",
+              "__pycache__", ".mypy_cache", ".ruff_cache", ".pytest_cache",
+          }
+
+          base_ref = os.environ.get("BASE_REF", "").strip()
+
+          def changed_files():
+              # Three-dot diff = changes on this branch since it diverged from base.
+              out = subprocess.run(
+                  ["git", "diff", "--name-only", f"origin/{base_ref}...HEAD"],
+                  capture_output=True, text=True, check=True,
+              ).stdout
+              return {line.strip() for line in out.splitlines() if line.strip()}
+
+          # If we can't determine a base (manual run), check every project.
+          try:
+              changed = changed_files() if base_ref else None
+          except subprocess.CalledProcessError:
+              changed = None
+
+          projects = []
+          for root, dirs, files in os.walk("."):
+              # Never descend into hidden dirs (e.g. .venv) or tool caches.
+              dirs[:] = [d for d in dirs if d not in skip and not d.startswith(".")]
+              if "pyproject.toml" not in files:
+                  continue
+              project = os.path.relpath(root, ".").replace(os.sep, "/")
+              if changed is None or any(
+                  f == project or f.startswith(project + "/") for f in changed
+              ):
+                  projects.append(project)
+
+          print("projects=" + json.dumps(sorted(projects)))
+          PY
+
+  lint:
+    name: ${{ matrix.project }}
+    needs: discover
+    if: needs.discover.outputs.projects != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      # Check every project even if one fails, so the whole picture is visible.
+      fail-fast: false
+      matrix:
+        project: ${{ fromJSON(needs.discover.outputs.projects) }}
+    defaults:
+      run:
+        working-directory: ${{ matrix.project }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      # Pinned for reproducible CI. Bump these when you're ready to adopt a
+      # newer ruff/mypy release.
+      # Ruff runs in an isolated environment (uvx) and does not need the
+      # project's dependencies. It still reads the local pyproject.toml.
+      - name: Ruff
+        run: uvx ruff@0.16.10 check .
+
+      # Mypy runs inside the project's own environment so third-party imports
+      # resolve against that project's locked dependencies. --frozen keeps the
+      # committed uv.lock untouched; --ignore-missing-imports avoids failures
+      # caused only by a dependency not shipping type stubs.
+      - name: Mypy
+        run: uv run --frozen --with 'mypy==2.4.0' mypy --ignore-missing-imports .
