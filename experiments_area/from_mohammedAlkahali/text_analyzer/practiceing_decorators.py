@@ -8,4 +8,8 @@ def add_text_stats(func):
         return f"{summary} {text}"
     return wrapper
 
+@add_text_stats
+def get_news():
+    return "The Codeline Legends team is learning Python decorators in Muscat this week."
 
+print(get_news())
