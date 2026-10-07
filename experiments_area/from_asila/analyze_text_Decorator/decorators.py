@@ -58,7 +58,7 @@ def analyze_text(count_words=True, count_spaces=True, count_uppercase_chars=True
                 words = get_word_count(result)
                 text_stats.append("No. of Words: " + str(words))
             
-            if count_words:
+            if count_spaces:
                 spaces = get_space_count(result)
                 text_stats.append("No. of Spaces: " + str(spaces))
             
@@ -66,10 +66,44 @@ def analyze_text(count_words=True, count_spaces=True, count_uppercase_chars=True
                 uppercase_chars = get_uppercase_count(result)
                 text_stats.append("No. of Uppercase Chars: " + str(uppercase_chars))
                 
-                summary = ", ".join(text_stats)  #here join to combines all items in text_stats into one sentence with commas
+                
+            if len(text_stats) == 0:
+                return result
 
-                return "[" + summary + "] " + result
+                
+            summary = ", ".join(text_stats)  #here join to combines all items in text_stats into one sentence with commas
+
+            return "[" + summary + "] " + result
             
-            return wrapper
+        return wrapper
         
     return decorator
+
+
+@analyze_text()
+def get_news_all():
+    return "The Codeline Legends team is learning Python decorators in Muscat this week."
+
+
+@analyze_text(count_spaces=False) # output should be without number of uppercase
+def get_news_without_spaces():
+    return "The Codeline Legends team is learning Python decorators in Muscat this week."
+
+
+@analyze_text(count_words=False, count_spaces=False) # so the output should be only number of uppercase
+def get_news_uppercase_only():
+    return "The Codeline Legends team is learning Python decorators in Muscat this week."
+
+# all three options are False
+@analyze_text(
+    count_words=False,
+    count_spaces=False,
+    count_uppercase_chars=False,
+)
+def get_news_empty():
+    return "The Codeline Legends team is learning Python decorators in Muscat this week."
+
+print(get_news_all())
+print(get_news_without_spaces())
+print(get_news_uppercase_only())
+print(get_news_empty())
