@@ -1,0 +1,7 @@
+[project]
+name = "from-baraah"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.1"
+dependencies = []

@@ -1,0 +1,8 @@
+version = 1
+revision = 5
+requires-python = ">=3.1"
+
+[[package]]
+name = "from-baraah"
+version = "0.1.0"
+source = { virtual = "." }
