@@ -44,41 +44,43 @@ def analyze_text(count_words=True, count_spaces=True, count_uppercase_chars=True
     return decorator
 
 
+NEWS_TEXT = (
+    "The Codeline Legends team is learning Python decorators in Muscat this week."
+)
+
+
+# Part 1: the plain decorator always shows all three counts
+@add_text_stats
+def get_news_with_all_stats():
+    return NEWS_TEXT
+
+
+# Part 2: every option defaults to True, so this matches Part 1
 @analyze_text()
-def get_news():
-    return (
-        "The Codeline Legends team is learning Python decorators in Muscat this week."
-    )
+def get_news_with_defaults():
+    return NEWS_TEXT
 
 
-print(get_news() + "\n")
-
-
+# Part 2: spaces switched off
 @analyze_text(count_spaces=False)
-def get_news():
-    return (
-        "The Codeline Legends team is learning Python decorators in Muscat this week."
-    )
+def get_news_without_spaces():
+    return NEWS_TEXT
 
 
-print(get_news() + "\n")
-
-
+# Part 2: only uppercase chars left on
 @analyze_text(count_words=False, count_spaces=False)
-def get_news():
-    return (
-        "The Codeline Legends team is learning Python decorators in Muscat this week."
-    )
+def get_news_uppercase_only():
+    return NEWS_TEXT
 
 
-print(get_news() + "\n")
-
-
+# Part 2 edge case: all options off, so the text comes back unchanged
 @analyze_text(count_words=False, count_spaces=False, count_uppercase_chars=False)
-def get_news():
-    return (
-        "The Codeline Legends team is learning Python decorators in Muscat this week."
-    )
+def get_news_without_stats():
+    return NEWS_TEXT
 
 
-print(get_news() + "\n")
+print(get_news_with_all_stats())
+print(get_news_with_defaults())
+print(get_news_without_spaces())
+print(get_news_uppercase_only())
+print(get_news_without_stats())
