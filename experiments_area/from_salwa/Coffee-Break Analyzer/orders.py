@@ -10,10 +10,12 @@ orders: list[dict[str,str,]   | int ]= [
 
 print(orders)
 
-#is larage function
-def is_large(orders: dict[str,str | int ]) ->bool:
 
-   return int(orders["size_oz"]) >= 16
+
+#is larage function
+def is_large(order: dict) -> bool:
+    return order["size_oz"] >= 16
+
 
 print(is_large(orders[0]))
 print(is_large(orders[1]))
@@ -22,29 +24,22 @@ print(is_large(orders[3]))
 
 
 #filters
-large_orders:filter(dict[str,str | int ])=filter(is_large, orders)
-
-# print(list(large_orders))
+large_orders = filter(is_large, orders)
 
 
-
-
-
-# map with lambda
-
-formatted_orders = list(  # noqa: C417
+# Format the large orders
+formatted_orders = list(
     map(
-        lambda order: f"{order['name']} – {order['drink']} ({order['size_oz']}oz)",
+        lambda order: f"{order['name']} - {order['drink']} ({order['size_oz']}oz)",
         large_orders,
     )
 )
-
 print(formatted_orders)
 
-# reduce
 
-total_volume: int = reduce(lambda total, order: total + int(order["size_oz"]),
-    orders,
-    0,
-)
-print(total_volume)
+# reduce
+# Calculate the total volume
+total_volume = reduce( lambda total, order: total + order["size_oz"],  orders, 0,)
+
+
+print(f"Total volume: {total_volume} oz")
