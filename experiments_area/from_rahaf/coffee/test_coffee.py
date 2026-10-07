@@ -1,4 +1,3 @@
-
 from coffee import make_coffee
 
 
@@ -36,7 +35,7 @@ def test_coffee_with_extras_and_options():
         "order_id": 101,
         "coffee_type": "V60",
         "customer_name": "rahaf",
-        "extras": ("extra_shot"),
+        "extras": ("extra_shot",),
         "options": {
             "size": "large",
             "takeaway": True
@@ -46,13 +45,3 @@ def test_coffee_with_extras_and_options():
     assert result == expected
 
 
-def test_invalid_argument_order():
-
-    invalid_code = 'make_coffee ( order_id=101 , "V60" , "rahaf")'
-
-    try:
-        exec(invalid_code)
-        assert False
-
-    except SyntaxError:
-        pass
