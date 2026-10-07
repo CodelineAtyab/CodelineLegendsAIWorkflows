@@ -63,17 +63,17 @@ def get_news1(msg):
     return msg
 
 
-@analyze_text(words=False)
+@analyze_text(count_words=False)
 def get_news2(msg):
     return msg
 
 
-@analyze_text(words=False, uppercase=False)
+@analyze_text(count_words=False, count_uppercase_chars=False)
 def get_news3(msg):
     return msg
 
 
-@analyze_text(words=False, spaces=False, uppercase=False)
+@analyze_text(count_words=False, count_spaces=False, count_uppercase_chars=False)
 def get_news4(msg):
     return msg
 
