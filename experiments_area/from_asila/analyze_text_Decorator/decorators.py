@@ -65,6 +65,11 @@ def analyze_text(count_words=True, count_spaces=True, count_uppercase_chars=True
             if count_uppercase_chars:
                 uppercase_chars = get_uppercase_count(result)
                 text_stats.append("No. of Uppercase Chars: " + str(uppercase_chars))
+                
+                summary = ", ".join(text_stats)  #here join to combines all items in text_stats into one sentence with commas
+
+                return "[" + summary + "] " + result
+            
             return wrapper
         
     return decorator
