@@ -11,7 +11,7 @@ def test_basic_coffee():
     expected = {
         "order_id": 101,
         "coffee_type": "latte",
-        "customer_name": "Alice",
+        "customer_name": "Baraah",
         "extras": (),
         "options": {}
     }
@@ -23,7 +23,7 @@ def test_coffee_with_extras():
     result = make_coffee(
         101,
         "latte",
-        "Alice",
+        "Baraah",
         "soy_milk",
         "extra_shot",
         size="large",
@@ -33,7 +33,7 @@ def test_coffee_with_extras():
     expected = {
         "order_id": 101,
         "coffee_type": "latte",
-        "customer_name": "Alice",
+        "customer_name": "Baraah",
         "extras": ("soy_milk", "extra_shot"),
         "options": {
             "size": "large",
@@ -49,7 +49,7 @@ def test_invalid_argument_order():
 make_coffee(
     order_id=101,
     "latte",
-    "Alice"
+    "Baraah"
 )
 '''
 
