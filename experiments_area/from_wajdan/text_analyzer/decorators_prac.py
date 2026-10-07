@@ -29,4 +29,4 @@ def get_message(message):
     return message
 
 
-print(get_message("Hello Wajdan"))
+print(get_message(message="Hello Wajdan"))
