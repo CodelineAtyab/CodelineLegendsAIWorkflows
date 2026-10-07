@@ -12,7 +12,6 @@ def is_large(order: dict) -> bool:
     return order["size_oz"] >= 16
 
 large_orders = list(filter(is_large, orders))
-
 result = [f"{order['name']} - {order['size_oz']} oz {order['drink']}" for order in large_orders]
 
 for i in result:
