@@ -54,3 +54,17 @@ def analyze_text(count_words=True, count_spaces=True, count_uppercase_chars=True
             result = func(*args,**kwargs)
             text_stats=[]
         
+            if count_words:
+                words = get_word_count(result)
+                text_stats.append("No. of Words: " + str(words))
+            
+            if count_words:
+                spaces = get_space_count(result)
+                text_stats.append("No. of Spaces: " + str(spaces))
+            
+            if count_uppercase_chars:
+                uppercase_chars = get_uppercase_count(result)
+                text_stats.append("No. of Uppercase Chars: " + str(uppercase_chars))
+            return wrapper
+        
+    return decorator
