@@ -47,3 +47,10 @@ def get_news():
 
 print(get_news())    
     
+    
+def analyze_text(count_words=True, count_spaces=True, count_uppercase_chars=True,):
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            result = func(*args,**kwargs)
+            text_stats=[]
+        
