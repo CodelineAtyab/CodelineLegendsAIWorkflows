@@ -1,7 +1,25 @@
 def add_text_stats(given_fun):
     def decorated_func(*args, **kwargs):
         text = given_fun(*args, **kwargs)
-        return text
+        
+        # Count words
+        words = len(text.split())
+        # Count spaces
+        spaces = text.count(" ")
+        
+        # Count uppercase letters A-Z
+        uppercase = 0
+        for char in text:
+            if "A" <= char <= "Z":
+                uppercase += 1
+
+        final_msg = (
+            f"[No. of Words: {words}, "
+            f"No. of Spaces: {spaces}, "
+            f"No. of Uppercase Chars: {uppercase}] "
+        )
+        final_msg = final_msg + text
+        return final_msg
 
     return decorated_func
 
