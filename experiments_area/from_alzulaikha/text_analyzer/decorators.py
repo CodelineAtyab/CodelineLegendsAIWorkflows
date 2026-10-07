@@ -67,3 +67,24 @@ def analyze_text(
         return wrapper
 
     return decorator
+
+    #Testing
+@analyze_text()
+def get_news_all():
+    return "The Codeline Legends team is learning Python decorators in Muscat this week."
+
+print(get_news_all())
+
+
+@analyze_text(count_spaces=False)
+def get_news_no_spaces():
+    return "The Codeline Legends team is learning Python decorators in Muscat this week."
+
+print(get_news_no_spaces())
+
+
+@analyze_text(count_words=False, count_spaces=False)
+def get_news_uppercase_only():
+    return "The Codeline Legends team is learning Python decorators in Muscat this week."
+
+print(get_news_uppercase_only())
