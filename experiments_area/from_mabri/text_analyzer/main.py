@@ -1,6 +1,6 @@
 def add_text_stats(func):
-    def wrapper():
-        text = func()
+    def wrapper(*args, **kwargs):
+        text = func(*args, **kwargs)
         words_num = len(text.split())
         spaces_num = text.count(' ')
         uppercase_num = sum(1 for c in text if c.isupper())
