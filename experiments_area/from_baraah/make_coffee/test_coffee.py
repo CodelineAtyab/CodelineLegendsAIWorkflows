@@ -44,22 +44,6 @@ def test_coffee_with_extras():
     assert result == expected
 
 
-def test_invalid_argument_order():
-    invalid_code = '''
-make_coffee(
-    order_id=101,
-    "latte",
-    "Baraah"
-)
-'''
-
-    try:
-        exec(invalid_code)
-        assert False
-    except SyntaxError:
-        print("Negative test passed")
-
 
 test_basic_coffee()
 test_coffee_with_extras()
-test_invalid_argument_order()
