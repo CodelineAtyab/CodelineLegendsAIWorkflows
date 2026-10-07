@@ -26,10 +26,10 @@ print("-----------------------------------")
 #what is decorator in python? 
 #the function that takes another function as an argument and extends the behavior of the latter function without explicitly modifying it.
 def decorator(func):
-    def decorated_func():
+    def decorated_func(*args, **kwargs):
         final_msg = " "
         final_msg = final_msg + " ---------------- "
-        final_msg = final_msg + func()
+        final_msg = final_msg + func(*args, **kwargs)
         final_msg = final_msg + " ---------------- "
         return final_msg
     return decorated_func
@@ -41,3 +41,17 @@ new_func3 = decorator(get_feedback_about_python)
 print(new_func())
 print(new_func2())
 print(new_func3())
+
+
+#we can also use the @ symbol to apply a decorator to a function. 
+#This is called "decorator syntax" and it is a shorthand way of applying a decorator to a function.
+@decorator
+def greet_opal__2(message):
+    return message
+print(greet_opal__2("Hello Opal 2!"))
+
+#also we can use the @ symbol to apply a decorator to a function with multiple arguments.
+@decorator
+def greet_opal2(pre_message, message, post_message):
+    return pre_message + message + post_message
+print(greet_opal2("START! ","Opal 2 do great! ","DONE!"))
