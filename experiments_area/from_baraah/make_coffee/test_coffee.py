@@ -1,64 +1,65 @@
-import pytest
 from coffee import make_coffee
 
 
-# Test coffee with only required arguments
-def test_coffee():
-
+def test_basic_coffee():
     result = make_coffee(
         101,
-        "Ice Americano",
-        "Baraah",
+        "latte",
+        "Alice"
     )
 
     expected = {
         "order_id": 101,
-        "coffee_type": "Ice Americano",
-        "customer_name": "Baraah",
+        "coffee_type": "latte",
+        "customer_name": "Alice",
         "extras": (),
-        "options": {},
+        "options": {}
     }
 
     assert result == expected
 
 
-# Test coffee with extras and options
-
-
-def test_coffee_with_extras_and_options():
-
+def test_coffee_with_extras():
     result = make_coffee(
         101,
-        "Ice Americano",
-        "Baraah",
+        "latte",
+        "Alice",
         "soy_milk",
         "extra_shot",
         size="large",
-        takeaway=True,
+        takeaway=True
     )
 
     expected = {
         "order_id": 101,
-        "coffee_type": "Ice Americano",
-        "customer_name": "Baraah",
+        "coffee_type": "latte",
+        "customer_name": "Alice",
         "extras": ("soy_milk", "extra_shot"),
-        "options": {"size": "large", "takeaway": True},
+        "options": {
+            "size": "large",
+            "takeaway": True
+        }
     }
 
     assert result == expected
 
 
-# Test that invalid argument order raises a SyntaxError
-
-# Test invalid argument order
-def test_invalid():
+def test_invalid_argument_order():
     invalid_code = '''
 make_coffee(
     order_id=101,
-    "Ice Americano",
-    "Baraah"
+    "latte",
+    "Alice"
 )
 '''
 
-    with pytest.raises(SyntaxError):
-        compile(invalid_code, "<string>", "exec")
+    try:
+        exec(invalid_code)
+        assert False
+    except SyntaxError:
+        print("Negative test passed")
+
+
+test_basic_coffee()
+test_coffee_with_extras()
+test_invalid_argument_order()
