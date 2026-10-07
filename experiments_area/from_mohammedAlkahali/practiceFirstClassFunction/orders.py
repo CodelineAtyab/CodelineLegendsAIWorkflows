@@ -4,3 +4,6 @@ orders: list[dict] = [
 {"name": "Ahmed", "drink": "SpanishLatte", "size_oz": 15}]
 
 
+def is_larger(order: dict) -> bool:
+    return order["size_oz"] > 16
+
