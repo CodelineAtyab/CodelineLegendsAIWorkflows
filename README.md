@@ -19,11 +19,11 @@ git pull (Make sure you are up to date)
 
 ### Step 4
 Create a new branch (replica of main) from the main branch and check it out (switch to the new branch)
-Example: `git branch feature/<ticket-id>-ticket-title`
+Example: `git branch feature/<ticket-id>-<your-id>-ticket-title`
 
 ### Step 5
 Checkout the new branch using git checkout 
-Example: `git checkout feature/<ticket-id>-ticket-title`
+Example: `git checkout feature/<ticket-id>-<your-id>-ticket-title`
 
 ### Step 6
 Now do your task
