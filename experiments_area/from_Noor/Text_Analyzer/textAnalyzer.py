@@ -25,7 +25,9 @@ def text_analyzer(count_words=True, count_spaces=True, count_uppercase_chars=Tru
             if count_uppercase_chars:
                 uppercase_chars = num_uppercase_chars(news)
                 data.append(f"No. of Uppercase Chars: {uppercase_chars}")
-
+            else:
+                return news
+               
             summary = "[ " + ", ".join(data) + "] "
 
             return summary + news
