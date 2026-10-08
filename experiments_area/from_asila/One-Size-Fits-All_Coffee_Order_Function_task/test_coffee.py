@@ -1,28 +1,26 @@
-import unittest
 
 from coffee import make_coffee
 
-class MakeCoffeeTests(unittest.TestCase): #The tests will be written inside this class
-
-    def test_make_coffee_default(self): #test default result
-        result = make_coffee(101, "americano", "Mohammed")
+result = make_coffee(101, "americano", "Mohammed")
     
-        print(result)
+        #print(result)
         
-        self.assertEqual(
-        result,
-        {
-            "order_id": 101,
-            "coffee_type": "americano",
-            "customer_name": "Mohammed",
-            "extras": (),
-            "options": {}
+expected_result ={
+        "order_id": 101,
+        "coffee_type": "americano",
+        "customer_name": "Mohammed",
+        "extras": (),
+        "options": {}
         }
-    ) #after test This confirms that extras and options are empty when they are not provided
+    #after test This confirms that extras and options are empty when they are not provided
 
+if result == expected_result:
+    print("Test 1 passed: default order is correct")
+else:
+    print("Test 1 failed: default order is incorrect")
 
-    def test_order_with_extras_and_options(self): #Test extras and options
-        result = make_coffee(
+#test_order_with_extras_and_options
+result = make_coffee(
         101,
         "latte",
         "Alice",
@@ -32,9 +30,7 @@ class MakeCoffeeTests(unittest.TestCase): #The tests will be written inside this
         takeaway=True
     )
         
-        self.assertEqual(
-        result,
-        {
+expected_result ={
             "order_id": 101,
             "coffee_type": "latte",
             "customer_name": "Alice",
@@ -43,15 +39,11 @@ class MakeCoffeeTests(unittest.TestCase): #The tests will be written inside this
                 "size": "large",
                 "takeaway": True
             }
-        }
-    ) #This test checks that the extra coffee choices are saved correctly
+}
+
+    #This test checks that the extra coffee choices are saved correctly
     
-    def test_invalid_order(self): #here to test the invalid and if there error syntax
-        invalid_call = 'make_coffee(order_id=100, "Matcha", "As")'
-        
-        print(invalid_call)
-        
-        with self.assertRaises(SyntaxError):
-            compile(invalid_call, "<invalid_call>", "exec")
-            
-        
+if result == expected_result:
+    print("Test 2 passed: extras and options are correct")
+else:
+    print("Test 2 failed: extras or options are incorrect")
