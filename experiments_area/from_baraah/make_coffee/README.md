@@ -12,4 +12,8 @@
 
 ## Training References
 
-This task is based on the sample Git files shared during our Python training sessions. These examples helped us understand function arguments, `*args`, `**kwargs`, and how to test Python functions.
+I learned about `*args` and `**kwargs` from this training file:
+
+`experiments_area/from_atyab/func_practice/function_with_flexible_parameters.py`
+
+This file showed me how to use `*args` to accept extra positional arguments and `**kwargs` to accept extra keyword arguments in Python functions.
