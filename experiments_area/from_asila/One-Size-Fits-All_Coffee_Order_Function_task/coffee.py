@@ -1,10 +1,3 @@
-def main():
-    print("Hello from one-size-fits-all-coffee-order-function-task!")
-
-
-if __name__ == "__main__":
-    main()
-
 
 def make_coffee(order_id, coffee_type, customer_name, *extras, **options):
     return {
