@@ -24,7 +24,12 @@ large_orders: list[dict] = list(filter(is_large, orders))
 format_string: list[str] = list(
     map(
         lambda order: (
-            order["name"] + " – " + order["drink"] + str(order["size_oz"]) + "oz)"
+            order["name"]
+            + " – "
+            + order["drink"]
+            + " ("
+            + str(order["size_oz"])
+            + "oz)"
         ),
         large_orders,
     )  # i used str(order["size_oz"]) becuase size_oz is a number, and (+) can only join strings with strings.
@@ -43,4 +48,3 @@ print(format_string)
 print("Total volume: " + str(total_ounces) + " oz")
 
 
-#r
