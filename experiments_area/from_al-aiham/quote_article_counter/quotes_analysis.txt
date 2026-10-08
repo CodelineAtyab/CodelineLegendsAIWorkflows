@@ -1,0 +1,15 @@
+{a:1,an:1,the:0} A small mistake can teach an important lesson.
+{a:1,an:0,the:1} The road to success is a long and difficult journey.
+{a:1,an:1,the:1} The adventure begins with an idea and a plan.
+{a:1,an:1,the:1} An opportunity is a chance to make the world better.
+{a:1,an:0,the:2} The answer to a problem is not always the easiest one.
+{a:1,an:0,the:2} A good programmer understands the problem before writing the code.
+{a:2,an:1,the:0} An engineer can turn a simple idea into a useful tool.
+{a:1,an:0,the:1} The future belongs to those who believe in a dream.
+{a:0,an:1,the:1} An honest person always tells the truth.
+{a:1,an:0,the:1} The Python language is a powerful tool for developers.
+{a:1,an:1,the:1} A developer needs an idea and the courage to build it.
+{a:3,an:0,the:0} A journey of a thousand miles begins with a single step.
+{a:0,an:0,the:2} The theme of the story is another mystery.
+{a:2,an:0,the:1} A book is a window into the world of knowledge.
+{a:1,an:0,the:1} A strong team needs the trust of every member.
