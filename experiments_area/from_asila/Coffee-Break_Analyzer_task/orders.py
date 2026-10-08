@@ -34,7 +34,7 @@ format_string: list[str] = list(
 total_ounces: int = reduce(lambda total, order: total + order["size_oz"], orders, 0)
 
 large_orders_lc: list[str] = [
-    order["name"] + " - " + order["drink"] + " (" + str(order["size_oz"]) + "oz)"
+    order["name"] + " – " + order["drink"] + " (" + str(order["size_oz"]) + "oz)"
     for order in orders
     if order["size_oz"] >= 16
 ]
