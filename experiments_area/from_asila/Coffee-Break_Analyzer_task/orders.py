@@ -1,5 +1,5 @@
+# ruff: noqa: C417
 from functools import reduce
-
 
 # list dictionary
 orders: list[dict] = [
@@ -46,5 +46,3 @@ large_orders_lc: list[str] = [
 
 print(format_string)
 print("Total volume: " + str(total_ounces) + " oz")
-
-
