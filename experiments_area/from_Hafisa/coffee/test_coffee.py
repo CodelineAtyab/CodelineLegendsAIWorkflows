@@ -46,6 +46,10 @@ def test_coffee_with_extras():
 
 
 
+# Test 3 - Negative: keyword argument before positional arguments
+# make_coffee(order_id=101, "latte", "Alice")
+# SyntaxError: positional argument follows keyword argument
+
 
 # Run the tests
 if __name__ == "__main__":
