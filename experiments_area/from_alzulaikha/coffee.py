@@ -6,14 +6,3 @@ def make_coffee(order_id, coffee_type, customer_name, *extras, **options):
         "extras": extras,
         "options": options
     }
-
-
-print(make_coffee(
-    101,
-    "v60",
-    "Alzulaikha",
-    "soy_milk",
-    "extra_shot",
-    size="large",
-    takeaway=True
-))
