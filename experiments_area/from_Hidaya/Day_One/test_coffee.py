@@ -1,4 +1,4 @@
-from coffee import make_coffee
+from experiments_area.from_Hidaya.Day_One.coffee import make_coffee
 
 order = make_coffee(
     101, "latte", "Alice",
