@@ -19,21 +19,19 @@ def is_large(order: dict) -> bool:
 # and keep it inside large_orders
 large_orders: list[dict] = list(filter(is_large, orders))
 
-print(large_orders)
+
 # inline lambda with map() to convert each order in large_orders into the string format
 format_string: list[str] = list(
     map(
         lambda order: (
-            order["name"] + "– " + order["drink"] + str(order["size_oz"]) + "oz)"
+            order["name"] + " – " + order["drink"] + str(order["size_oz"]) + "oz)"
         ),
         large_orders,
     )  # i used str(order["size_oz"]) becuase size_oz is a number, and (+) can only join strings with strings.
 )
-print(format_string)
 
 # calculated total ounces ordered across all drinks and printed
 total_ounces: int = reduce(lambda total, order: total + order["size_oz"], orders, 0)
-print("Total volume: " + str(total_ounces) + " oz")
 
 large_orders_lc: list[str] = [
     order["name"] + " - " + order["drink"] + " (" + str(order["size_oz"]) + "oz)"
@@ -41,4 +39,5 @@ large_orders_lc: list[str] = [
     if order["size_oz"] >= 16
 ]
 
-print(large_orders_lc)
+print(format_string)
+print("Total volume: " + str(total_ounces) + " oz")
