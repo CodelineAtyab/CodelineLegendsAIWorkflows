@@ -34,3 +34,19 @@ def analyze_text(count_words=True, count_spaces=True, count_uppercase_chars=True
             return f"{summary} {text}"
         return wrapper
     return decorator
+
+@analyze_text()
+def get_news1():
+    return "The Codeline Legends team is learning Python decorators in Muscat this week."
+
+@analyze_text(count_spaces=False)
+def get_news2():
+    return "The Codeline Legends team is learning Python decorators in Muscat this week."
+
+@analyze_text(count_words=False, count_spaces=False)
+def get_news3():
+    return "The Codeline Legends team is learning Python decorators in Muscat this week."
+
+print(get_news1())
+print(get_news2())
+print(get_news3())
