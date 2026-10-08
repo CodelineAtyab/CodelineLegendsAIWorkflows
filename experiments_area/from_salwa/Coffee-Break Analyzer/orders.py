@@ -1,4 +1,5 @@
 from functools import reduce
+
 orders: list[dict] = [
     {"name": "salwa", "drink": "Latte", "size_oz": 16},
     {"name": "ali", "drink": "Espresso", "size_oz": 8},
@@ -14,12 +15,10 @@ def is_large(order: dict) -> bool:
 # Filter the large orders
 large_orders = filter(is_large, orders)
 # Format the large orders
-formatted_orders = list(
-    map(
-        lambda order: f"{order['name']} - {order['drink']} ({order['size_oz']}oz)",
-        large_orders,
-    )
-)
+formatted_orders = [
+    f"{order['name']} - {order['drink']} ({order['size_oz']}oz)"
+    for order in large_orders
+]
 print(formatted_orders)
 # Calculate the total volume
 total_volume = reduce(
