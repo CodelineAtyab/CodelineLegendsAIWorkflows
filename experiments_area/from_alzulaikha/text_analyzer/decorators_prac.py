@@ -7,7 +7,11 @@ def get_space_count(text):
 
 
 def get_uppercase_count(text):
-    return sum(1 for char in text if char.isupper())
+    count = 0
+    for char in text:
+        if char.isupper():
+            count += 1
+    return count
 
 
 # Part 1 - add_text_stats decorator
@@ -88,6 +92,13 @@ def get_news_uppercase_only():
     return "The Codeline Legends team is learning Python decorators in Muscat this week."
 
 print(get_news_uppercase_only())
+
+@add_text_stats
+def get_news():
+    return "The Codeline Legends team is learning Python decorators in Muscat this week."
+
+
+print(get_news())
 
 
 # Edge case
