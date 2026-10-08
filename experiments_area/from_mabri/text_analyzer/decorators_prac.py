@@ -7,8 +7,7 @@ def get_space_count(text):
 
 
 def get_uppercase_count(text):
-    return sum(1 for c in text if c.isupper())
-    # return len(list(filter(lambda c: c.isupper(), text)))
+    return len(list(filter(lambda c: c.isupper(), text)))
 
 
 # Part 1: Basic Decorator
