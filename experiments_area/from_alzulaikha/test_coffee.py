@@ -2,8 +2,8 @@ from coffee import make_coffee
 
 result = make_coffee(
     101,
-    "v60",
-    "Alzulaikha",
+    "latte",
+    "Alice",
     "soy_milk",
     "extra_shot",
     size="large",
@@ -12,8 +12,8 @@ result = make_coffee(
 
 expected = {
     "order_id": 101,
-    "coffee_type": "v60",
-    "customer_name": "Alzulaikha",
+    "coffee_type": "latte",
+    "customer_name": "Alice",
     "extras": ("soy_milk", "extra_shot"),
     "options": {
         "size": "large",
@@ -25,3 +25,10 @@ if result == expected:
     print("PASS")
 else:
     print("FAIL")
+
+
+try:
+    exec('make_coffee(order_id=101, "latte", "Alice")')
+    print("NEGATIVE TEST FAIL")
+except SyntaxError:
+    print("NEGATIVE TEST PASS")
