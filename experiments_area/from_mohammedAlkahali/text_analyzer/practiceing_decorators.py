@@ -16,3 +16,21 @@ print(get_news())
 
 
 
+def analyze_text(count_words=True, count_spaces=True, count_uppercase_chars=True):
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            text = func(*args, **kwargs)
+            summary_parts = []
+            if count_words:
+                word_count = len(text.split())
+                summary_parts.append(f"No. of Words: {word_count}")
+            if count_spaces:
+                space_count = text.count(" ")
+                summary_parts.append(f"No. of Spaces: {space_count}")
+            if count_uppercase_chars:
+                uppercase_count = len(list(filter(lambda c: c.isupper(), text)))
+                summary_parts.append(f"No. of Uppercase Chars: {uppercase_count}")
+            summary = f"[{', '.join(summary_parts)}]"
+            return f"{summary} {text}"
+        return wrapper
+    return decorator
