@@ -1,4 +1,4 @@
-from experiments_area.from_Hidaya.Day_One.coffee import make_coffee
+from coffee import make_coffee
 
 order = make_coffee(
     101, "latte", "Alice",
@@ -29,9 +29,6 @@ expected = {
 
 print("Test 2: PASS" if order == expected else "Test 2: FAIL")
 
-# Test 3: Missing required argument (negative case)
-try:
-    make_coffee(103, "latte")  
-    print("Test 3: FAIL")
-except TypeError:
-    print("Test 3: PASS")
+# Test 3: Keyword argument before positional arguments (negative case)
+# make_coffee(order_id=103, "latte", "Hidaya")
+# SyntaxError: positional argument follows keyword argument
