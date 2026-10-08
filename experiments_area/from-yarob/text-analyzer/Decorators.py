@@ -3,7 +3,7 @@ def analyze_text(count_words=True, count_spaces=True, count_uppercase_chars=True
         def wrapper(*args, **kwargs):
             text = func(*args, **kwargs)
             word_count = len(text.split())
-            space_count = text.count("")
+            space_count = text.count(" ")
             uppercase_count = sum(1 for char in text if char.isupper())
 
             if count_words == True and count_spaces ==True and count_uppercase_chars ==True:
@@ -22,6 +22,10 @@ def analyze_text(count_words=True, count_spaces=True, count_uppercase_chars=True
     return add_text_stats
 
 
+
+def get_news_full_stats():
+    return "The Codeline Legends team is learning Python decorators in Muscat this week."
+
 @analyze_text(count_words=True, count_spaces=True, count_uppercase_chars=True)
 def get_news_with_analysis():
     return "The Codeline Legends team is learning Python decorators in Muscat this week."
@@ -38,10 +42,15 @@ def get_news_with_spaces_only():
 def get_news_without_analysis():
     return "The Codeline Legends team is learning Python decorators in Muscat this week."
 
+@analyze_text(count_words=False)
+def get_news_without_word_count():
+    return "The Codeline Legends team is learning Python decorators in Muscat this week."
+
 
 print(get_news_with_analysis())
 print(get_news_with_partial_analysis())
 print(get_news_with_spaces_only())
 print(get_news_without_analysis())
+print(get_news_without_word_count())
 
 
