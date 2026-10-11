@@ -41,11 +41,7 @@ def create_quotes_file(file_path="quotes.txt"):
         print("Finished creating quotes.")
 
 
-def append_result(
-    line,
-    article_counts,
-    output_path="quotes_analysis.txt"
-):
+def append_result(line, article_counts, output_path="quotes_analysis.txt"):
     try:
         with open(output_path, "a") as file:
             file.write(
@@ -59,10 +55,7 @@ def append_result(
         print(f"Something went wrong: {error}")
 
 
-def analyze_quotes(
-    input_path="quotes.txt",
-    output_path="quotes_analysis.txt"
-):
+def analyze_quotes(input_path="quotes.txt", output_path="quotes_analysis.txt"):
     try:
         with open(output_path, "w"):
             pass
@@ -71,11 +64,7 @@ def analyze_quotes(
             for line in file:
                 line = line.strip()
 
-                article_counts = {
-                    "a": 0,
-                    "an": 0,
-                    "the": 0
-                }
+                article_counts = {"a": 0, "an": 0, "the": 0}
 
                 words = line.lower().split()
 
@@ -91,11 +80,7 @@ def analyze_quotes(
                     elif word == "the":
                         article_counts["the"] += 1
 
-                append_result(
-                    line,
-                    article_counts,
-                    output_path
-                )
+                append_result(line, article_counts, output_path)
 
     except FileNotFoundError:
         print("quotes.txt does not exist.")
