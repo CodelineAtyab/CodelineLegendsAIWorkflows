@@ -35,3 +35,10 @@ def create_quotes_file(file_path="quotes.txt"):
             file.write(qoute + "\n")
             
 create_quotes_file()
+
+#open the file to read 
+def analyze_quotes(input_path="quotes.txt", output_path="quotes_analysis.txt"):
+    with open (input_path, "r") as f:
+        for line in f:  #to read each line
+            line = line.strip()
+            
