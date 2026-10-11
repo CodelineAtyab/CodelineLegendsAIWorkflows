@@ -1,4 +1,3 @@
-
 import random
 
 
@@ -40,7 +39,6 @@ def create_quotes_file(file_path="quotes.txt"):
         print("Quotes file created successfully.")
 
 
-
 # Function2 Read quotes and count articles
 def analyze_quotes(input_path="quotes.txt", output_path="quotes_analysis.txt"):
     try:
@@ -76,7 +74,6 @@ def analyze_quotes(input_path="quotes.txt", output_path="quotes_analysis.txt"):
         print("Quotes analyzed successfully.")
 
 
-
 # Function3 Append one result to the output file
 def append_result(line, article_counts, output_path="quotes_analysis.txt"):
     with open(output_path, "a") as file:
@@ -87,4 +84,3 @@ def append_result(line, article_counts, output_path="quotes_analysis.txt"):
         )
 
         file.write(result)
-

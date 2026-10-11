@@ -1,4 +1,3 @@
-
 from quote import create_quotes_file, analyze_quotes
 
 
