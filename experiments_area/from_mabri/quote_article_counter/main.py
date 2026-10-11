@@ -24,10 +24,11 @@ QUOTES = ["We are what we repeatedly do. Excellence, then, is not an act, but a 
             "A leader is best when people barely know he exists.",
             "Alone we can do so little; together we can do so much."]
 
-def create_quotes_file(quotes_list):
-    picked_quotes = random.sample(quotes_list, 15)
+# Function 1
+def create_quotes_file(file_path="quotes.txt"):
+    picked_quotes = random.sample(QUOTES, 15)
     try:
-        with open("quotes.txt", "w") as file:
+        with open(file_path, "w") as file:
             for quote in picked_quotes:
                 file.write(quote + "\n")
     except OSError as error:
@@ -37,4 +38,34 @@ def create_quotes_file(quotes_list):
     finally:
         print("Done trying") 
 
-create_quotes_file(QUOTES)
+create_quotes_file()
+
+# Function 2
+def analyze_quotes(input_path="quotes.txt", output_path="quotes_analysis.txt"):
+    try:
+        with open(input_path, "r") as file:
+            for line in file:
+                a_count = 0
+                an_count = 0
+                the_count = 0
+
+                for word in line.split():
+                    word = word.lower
+                    if word in ['a', 'an', 'the']:
+                        if word == 'a':
+                            a_count += 1
+                        elif word == 'an':
+                            an_count += 1
+                        elif word == 'the':
+                            the_count += 1
+
+                #append_result(line, article_counts, output_path)
+
+    except FileNotFoundError:
+        print("That file does not exist yet.")
+    except OSError as error:
+        print(f"Something else went wrong: {error}")
+    else:
+        print("Read OK")
+    finally:
+        print("Done trying")
