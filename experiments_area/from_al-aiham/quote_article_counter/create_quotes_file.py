@@ -1,5 +1,5 @@
+
 import random
-import re
 
 quotes = [
     "The sun rises over the mountains every morning.",
@@ -30,55 +30,74 @@ quotes = [
 ]
 
 
-
-def create_quotes_file():
+# Function 1: Create quotes file
+def create_quotes_file(file_path="quotes.txt"):
     selected_quotes = random.sample(quotes, 15)
 
     try:
-        with open("quotes.txt", "w") as file:
+        with open(file_path, "w", encoding="utf-8") as file:
             for quote in selected_quotes:
-                file.writelines(quote + "\n")
+                file.write(quote + "\n")
+
+    except OSError as error:
+        print(f"Something went wrong: {error}")
+        return False
+
+    else:
+        print("Quotes file created successfully.")
+        return True
+
+
+# Function 2: Append analysis result
+def append_result(line, article_counts, output_path="quotes_analysis.txt"):
+    try:
+        with open(output_path, "a", encoding="utf-8") as analyzed:
+            analyzed.write(
+                f"{{a: {article_counts['a']}, "
+                f"an: {article_counts['an']}, "
+                f"the: {article_counts['the']}}} "
+                f"{line.strip()}\n"
+            )
+
+    except OSError as error:
+        print(f"Something went wrong: {error}")
+        raise
+
+
+# Function 3: Analyze quotes
+def analyze_quotes(input_path="quotes.txt", output_path="quotes_analysis.txt"):
+    try:
+        with open(input_path, "r", encoding="utf-8") as file:
+            # Clear old analysis results
+            with open(output_path, "w", encoding="utf-8"):
+                pass
+
+            # Read quotes line by line
+            for line in file:
+                article_counts = {"a": 0, "an": 0, "the": 0}
+
+                words = line.lower().split()
+
+                for word in words:
+                    word = word.strip(".,!?;:\"'")
+
+                    if word in article_counts:
+                        article_counts[word] += 1
+
+                append_result(line, article_counts, output_path)
+
+    except FileNotFoundError as error:
+        if error.filename == input_path:
+            print(f"The file '{input_path}' was not found.")
+        else:
+            print(f"File not found: {error}")
 
     except OSError as error:
         print(f"Something went wrong: {error}")
 
-
-
-def append_result(quote, A, AN, THE):
-    try:
-        with open("quotes_analysis.txt","a") as analyzed:
-            analyzed.write(f"{{a:{A},an:{AN},the:{THE}}} {quote}")
-
-    except OSError as error:
-            print(f"Something went wrong: {error}")
-
-
-
-def analyzed_quotes():
-    try:
-        with open("quotes.txt","r") as file:
-            for quote in file:
-                A = len(re.findall(r"\ba\b", quote, re.IGNORECASE))
-                AN = len(re.findall(r"\ban\b", quote, re.IGNORECASE))
-                THE = len(re.findall(r"\bthe\b", quote, re.IGNORECASE))
-
-                append_result(quote, A, AN, THE)
-
-
-    except FileNotFoundError:
-        print("The File You Want is Not Found")
-
-    except OSError as error:
-                print(f"Something went wrong: {error}")
-
     else:
-        print("Quotes analysis completed.")
+        print("Quotes analysis completed successfully.")
 
 
 create_quotes_file()
-
-
-with open("quotes_analysis.txt", "w"):
-    pass
-
-analyzed_quotes()
+analyze_quotes()
