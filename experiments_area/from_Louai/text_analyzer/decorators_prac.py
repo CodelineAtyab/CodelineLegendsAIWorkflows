@@ -1,10 +1,12 @@
-from functools import wraps
 
 # Helper Functions 
-def get_stats(text: str) -> dict[str, int]:
+def get_stats(text):
     words_count = len(text.split())
     spaces_count = text.count(" ")
-    uppercase_count = sum(1 for char in text if char.isupper())
+    uppercase_count = 0
+    for char in text:
+        if char.isupper():
+            uppercase_count = uppercase_count + 1
     return {
         "words": words_count,
         "spaces": spaces_count,
@@ -15,7 +17,6 @@ def get_stats(text: str) -> dict[str, int]:
 # Part 1: add_text_stats Decorator
 # 
 def add_text_stats(func):
-    @wraps(func)
     def wrapper(*args, **kwargs):
         original_text = func(*args, **kwargs)
         stats = get_stats(original_text)
@@ -27,16 +28,15 @@ def add_text_stats(func):
 
 # Part 2: analyze_text Decorator with Parameters
 def analyze_text(
-    count_words: bool = True,
-    count_spaces: bool = True,
-    count_uppercase_chars: bool = True,
+    count_words=True,
+    count_spaces=True,
+    count_uppercase_chars=True,
 ):
     def decorator(func):
-        @wraps(func)
         def wrapper(*args, **kwargs):
             original_text = func(*args, **kwargs)
 
-            if not any([count_words, count_spaces, count_uppercase_chars]):
+            if not count_words and not count_spaces and not count_uppercase_chars:
                 return original_text
 
             stats = get_stats(original_text)
