@@ -1,6 +1,4 @@
-# ruff: noqa
 import random
-
 
 
 def create_quotes_file(file_path="quotes.txt"):
@@ -68,7 +66,7 @@ def analyze_quotes(input_path="quotes.txt", output_path="quotes_analysis.txt"):
                     if word in article_counts:
                         article_counts[word] += 1
 
-                #save the result inside quotes_analysis.txt
+                # save the result inside quotes_analysis.txt
                 append_result(line, article_counts, output_path)
                 print(line, article_counts)
 
@@ -92,5 +90,12 @@ def append_result(line, article_counts, output_path="quotes_analysis.txt"):
     return
 
 
-create_quotes_file()
-analyze_quotes()
+
+def main():
+    create_quotes_file()
+    analyze_quotes()
+    
+    
+if __name__ == "__main__":
+    main()
+
