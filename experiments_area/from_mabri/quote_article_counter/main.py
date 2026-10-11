@@ -40,6 +40,7 @@ def create_quotes_file(file_path="quotes.txt"):
 
 create_quotes_file()
 
+
 # Function 2
 def analyze_quotes(input_path="quotes.txt", output_path="quotes_analysis.txt"):
     try:
@@ -58,8 +59,8 @@ def analyze_quotes(input_path="quotes.txt", output_path="quotes_analysis.txt"):
                             an_count += 1
                         elif word == 'the':
                             the_count += 1
-
-                #append_result(line, article_counts, output_path)
+                article_counts = [an_count, an_count, the_count]
+                append_result(line, article_counts, output_path)
 
     except FileNotFoundError:
         print("That file does not exist yet.")
@@ -69,3 +70,8 @@ def analyze_quotes(input_path="quotes.txt", output_path="quotes_analysis.txt"):
         print("Read OK")
     finally:
         print("Done trying")
+
+
+# Function 3
+def append_result(line, article_counts, output_path="quotes_analysis.txt"):
+    return
