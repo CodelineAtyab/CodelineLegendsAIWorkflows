@@ -1,6 +1,6 @@
 # ruff: noqa
 import random
-import re
+
 
 
 def create_quotes_file(file_path="quotes.txt"):
@@ -57,16 +57,18 @@ def analyze_quotes(input_path="quotes.txt", output_path="quotes_analysis.txt"):
                 # add dictionary to count articles( a, an ,the)
                 article_counts = {"a": 0, "an": 0, "the": 0}
 
+                # Convert the line to lowercase and split it into words
+                words = line.lower().split()
+
                 # to find articles as whole words
-                pattern = re.compile(
-                    r"\b(a|an|the)\b"
-                )  # re.compile Prepares a search pattern.
-                articles = pattern.findall(line.lower())
-
                 # Count each article
-                for article in articles:
-                    article_counts[article] += 1
+                for word in words:
+                    word = word.strip(".,!?;:\"'")
 
+                    if word in article_counts:
+                        article_counts[word] += 1
+
+                #save the result inside quotes_analysis.txt
                 append_result(line, article_counts, output_path)
                 print(line, article_counts)
 
