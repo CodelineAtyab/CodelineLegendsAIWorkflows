@@ -28,8 +28,9 @@ def create_quotes_file(file_path="quotes.txt"):
     selected_quotes = random.sample(quotes, 15)
 
     try:
-       with open(file_path, "w") as file:
-    file.writelines(quote + "\n" for quote in selected_quotes)
+        with open(file_path, "w") as file:
+            file.writelines(quote + "\n" for quote in selected_quotes)
+
     except OSError as error:
         print(f"Something went wrong: {error}")
 
@@ -41,7 +42,6 @@ def create_quotes_file(file_path="quotes.txt"):
 
 
 def append_result(line, article_counts, output_path="quotes_analysis.txt"):
-
     try:
         with open(output_path, "a") as file:
             file.write(
@@ -56,13 +56,16 @@ def append_result(line, article_counts, output_path="quotes_analysis.txt"):
 
 
 def analyze_quotes(input_path="quotes.txt", output_path="quotes_analysis.txt"):
-
     try:
         with open(input_path, "r") as file:
             for line in file:
                 line = line.strip()
 
-                article_counts = {"a": 0, "an": 0, "the": 0}
+                article_counts = {
+                    "a": 0,
+                    "an": 0,
+                    "the": 0,
+                }
 
                 words = line.lower().split()
 
@@ -78,7 +81,11 @@ def analyze_quotes(input_path="quotes.txt", output_path="quotes_analysis.txt"):
                     elif word == "the":
                         article_counts["the"] += 1
 
-                append_result(line, article_counts, output_path)
+                append_result(
+                    line,
+                    article_counts,
+                    output_path,
+                )
 
     except FileNotFoundError:
         print("quotes.txt does not exist.")
