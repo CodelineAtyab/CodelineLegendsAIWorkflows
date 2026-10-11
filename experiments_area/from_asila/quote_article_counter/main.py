@@ -1,6 +1,4 @@
-
-
-
+import random
 
 def create_quotes_file(file_path="quotes.txt"):
 
@@ -26,7 +24,8 @@ def create_quotes_file(file_path="quotes.txt"):
         "An orange is sweet.",
         "The day is sunny.",
         "A friend is kind."
-]
-    
+    ]
 
+#select 15 random qoutes from the list for that i use (import random) to use built-in function sample.random
+    selected_qoutes = random.sample(quotes ,15)
 
