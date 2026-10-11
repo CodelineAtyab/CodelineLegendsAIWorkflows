@@ -31,7 +31,9 @@ def create_quotes_file(file_path="quotes.txt"):
     try:
         with open(file_path, "w") as file:
             file.writelines(quote + "\n" for quote in selected)
-    except Exception as error:
+    except PermissionError:
+        print(f"No permission to write {file_path}.")
+    except OSError as error:
         print(f"Could not write {file_path}: {error}")
     else:
         print(f"Wrote {len(selected)} quotes to {file_path}")
@@ -65,7 +67,11 @@ def analyze_quotes(input_path="quotes.txt", output_path="quotes_analysis.txt"):
                 if not line:
                     continue
                 append_result(line, count_articles(line), output_path)
-    except Exception as error:
+    except FileNotFoundError:
+        print(f"'{input_path}' not found. Run create_quotes_file() first.")
+    except PermissionError:
+        print(f"No permission to read {input_path} or write {output_path}.")
+    except OSError as error:
         print(f"Something went wrong while analyzing quotes: {error}")
     else:
         print(f"Analysis written to {output_path}")
