@@ -1,4 +1,5 @@
 import random
+import re
 
 def create_quotes_file():
     quotes = [ 
@@ -30,4 +31,34 @@ def create_quotes_file():
     with open ("quotes.txt","w") as file:
         for quote in selected_quotes:
             file.write(quote + "\n")
-create_quotes_file()          
+create_quotes_file()     
+
+def analyze_quotes():
+    try:
+        with open("quotes.txt", "r") as file:
+            for line in file:
+                words = re.findall(r"\b[a-z]+\b", line.lower())
+
+                a_count = words.count("a")
+                an_count = words.count("an")
+                the_count = words.count("the")
+
+                append_result(line, a_count, an_count, the_count)
+
+    except FileNotFoundError:
+        print("quotes.txt was not found. Create the quotes file first.")     
+
+def append_result(line, a_count, an_count, the_count):
+    quote = line.rstrip("\r\n")
+
+    with open("quotes_analysis.txt", "a") as file:
+        file.write(
+            f"{{a: {a_count}, an: {an_count}, the: {the_count}}} {quote}\n"
+        )
+        
+append_result(
+    "The best time to plant a tree was 20 years ago. The second best time is now.\n",
+    1,
+    0,
+    2,
+)
