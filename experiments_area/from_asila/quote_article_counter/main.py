@@ -60,11 +60,30 @@ def analyze_quotes(input_path="quotes.txt", output_path="quotes_analysis.txt"):
             for article in articles:
                 article_counts[article] += 1
     
-            print(line, article_counts)
+        append_result(line, article_counts, output_path)
+        print(line, article_counts)
         
 
     except FileNotFoundError:
         print("quotes.txt does not exist!")
+        
+
+def append_result(line, article_counts, output_path="quotes_analysis.txt"):
+        
+    # open the file in append mode
+    with open(output_path, "a") as f: #Appends text without deleting old content.
+        # Format the article counts and original quote
+        result = f"{{a: {article_counts['a']}, an: {article_counts['an']}, the: {article_counts['the']}}} {line}\n"
+
+        f.write(result) # writes exactly one line
+
+    return
+    
+        
+        
+        
+        
+        
             
 create_quotes_file()
 analyze_quotes()
