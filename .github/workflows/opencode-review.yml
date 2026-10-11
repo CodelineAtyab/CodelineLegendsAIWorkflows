@@ -1,0 +1,86 @@
+name: opencode-review
+
+# Automated PR review with the OpenCode GitHub action and a cheap OpenAI model.
+# The action checks out the PR branch, reads the diff/files, and posts a single
+# review comment. Needs the OPENAI_API_KEY secret and a write-capable
+# GITHUB_TOKEN, so it only works for PRs from branches in this repo (not forks).
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  # One review per PR; a newer push cancels an in-flight review to save tokens.
+  group: opencode-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read # read the checked-out PR branch
+  pull-requests: write # post the review comment / react to the PR
+  issues: write # PR comments are created via the issues API
+
+jobs:
+  review:
+    # Skip drafts; they are reviewed when marked "ready for review".
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Review Pull Request with OpenCode
+        uses: anomalyco/opencode/github@latest
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # Cheap mini model. Cheaper still: openai/gpt-4.1-nano or
+          # openai/gpt-5-nano. See https://models.dev for pricing.
+          model: openai/gpt-4.1-mini
+          use_github_token: true
+          prompt: |
+            You are reviewing a practice pull request from a team that is learning
+            Python first, and will progressively move on to FastAPI, then LangGraph,
+            and then Temporal. Match the feedback to their current learning stage:
+            teach good habits early, but do not demand production-grade architecture.
+            The goal is "close to production ready for their stage", not fully
+            production ready.
+
+            Repository conventions: read the root README.md "Contribution Guidelines"
+            and check this pull request against them. These are recommendations only:
+            politely mention any mismatch, but do not treat it as a blocker.
+            - Branch name: ${{ github.event.pull_request.head.ref }}. The README example
+              is "feature/<ticket-id>-<your-id>-ticket-title".
+            - The title of the pull request is: ${{ github.event.pull_request.title }}.
+              It should start with a clickup ticket id (e.g., "86ex6r17g") followed by
+              a ": " and then the clickup ticket title (e.g., "86ex6r17g: Implement user authentication").
+            - The description of the pull request is: ${{ github.event.pull_request.body }}.
+              It should reflect the changes actually made in the pull request.
+
+            Present any branch-naming, title, or description suggestions as
+            recommendations, not requirements.
+
+            Always check, at every stage:
+            - Obvious logical errors, bugs, or edge cases the code does not handle.
+            - Python style: PEP 8, consistent indentation (2 or 4 spaces are both fine), clear naming, and no unnecessary blank lines.
+            - Formatting and type safety are handled by ruff and mypy in CI. Do not nitpick what those tools already enforce; focus on things they cannot catch.
+            - Readability: small focused functions, meaningful names, avoid deep nesting and duplicated code.
+            - Correctness and simplicity: prefer the simplest solution that works, and suggest clear error handling where it helps the team learn.
+            - Type hints are optional but recommended; suggest them when they add clarity.
+            - Unit tests are optional; mention when a small test would catch a likely bug or edge case.
+            - Obvious security or resource footguns (e.g., unclosed files, hardcoded secrets).
+
+            Stage-aware guidance: only mention a framework or tool if it actually
+            appears in this pull request.
+            - Python foundations: idiomatic Python, comprehensions, f-strings, context managers, virtual environments, and clear module layout.
+            - FastAPI: clear route signatures, Pydantic models for input/output, correct status codes, dependency injection, and async vs sync (do not block the event loop).
+            - LangGraph: explicit graph state, small node functions, clear edges and conditions, and no hidden global state.
+            - Temporal: deterministic workflow code, side effects only in activities, idempotency, and explicit timeouts and retries.
+
+            How to respond:
+            - Be encouraging and specific, and briefly explain the "why" so the team learns.
+            - Reference the relevant line numbers from the code changed in this pull request.
+            - Put everything under one heading "Code Review Comments". No sub headings.
+            - Keep it highly summarized. If the PR looks good for its stage, say so briefly.
