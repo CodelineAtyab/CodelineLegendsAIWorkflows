@@ -27,12 +27,18 @@ def create_quotes_file():
         "The theme of the day is friendship.",
         ]
     selected_quotes = random.sample(quotes, 15)
+    try:
+        with open("quotes.txt", "w") as file:
+            for quote in selected_quotes:
+                file.write(quote + "\n")
 
-    with open ("quotes.txt","w") as file:
-        for quote in selected_quotes:
-            file.write(quote + "\n")
-create_quotes_file()     
+    except OSError as error:
+        print(f"Could not create quotes.txt: {error}")
+        return False
 
+    else:
+        print("quotes.txt created successfully.")
+        return True    
 def analyze_quotes():
     try:
         with open("quotes.txt", "r") as file:
@@ -43,26 +49,39 @@ def analyze_quotes():
                 an_count = words.count("an")
                 the_count = words.count("the")
 
-                append_result(line, a_count, an_count, the_count)
+                saved = append_result(
+                    line, a_count, an_count, the_count
+                )
+
+                if not saved:
+                    return
 
     except FileNotFoundError:
-        print("quotes.txt was not found. Create the quotes file first.")     
+        print("quotes.txt was not found. Create the quotes file first.")
+
+    except OSError as error:
+        print(f"Could not analyze the files: {error}")
+
+    else:
+        print("Analysis completed successfully.")  
 
 def append_result(line, a_count, an_count, the_count):
     quote = line.rstrip("\r\n")
+    try:
 
-    with open("quotes_analysis.txt", "a") as file:
-        file.write(
-            f"{{a: {a_count}, an: {an_count}, the: {the_count}}} {quote}\n"
-        )
+        with open("quotes_analysis.txt", "a") as file:
+            file.write(
+                f"{{a: {a_count}, an: {an_count}, the: {the_count}}} {quote}\n"
+            )
+    except OSError as error:
+        print(f"Could not save the result: {error}")
+        return False
+    return True
         
 
 if __name__ == "__main__":
-    append_result(
-    "The best time .\n",
-    1,
-    0,
-    2,
-)
+    if create_quotes_file():
+        analyze_quotes()
+  
 
     
