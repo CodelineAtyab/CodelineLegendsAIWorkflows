@@ -56,9 +56,13 @@ def append_result(line, a_count, an_count, the_count):
             f"{{a: {a_count}, an: {an_count}, the: {the_count}}} {quote}\n"
         )
         
-append_result(
-    "The best time to plant a tree was 20 years ago. The second best time is now.\n",
+
+if __name__ == "__main__":
+    append_result(
+    "The best time .\n",
     1,
     0,
     2,
 )
+
+    
