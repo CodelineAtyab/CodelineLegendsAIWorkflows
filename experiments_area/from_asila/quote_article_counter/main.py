@@ -29,11 +29,18 @@ def create_quotes_file(file_path="quotes.txt"):
 
 #select 15 random qoutes from the list for that i use (import random) to use built-in function sample.random
     selected_qoutes = random.sample(quotes ,15)
-
+    try:
+        
 #here to write the 15 random qoutes in the file
-    with open(file_path ,"w") as file: #because i used "w" everytime will write it and replace it with the old one
-        for qoute in selected_qoutes : # loops through the 15 selected quotes.
-            file.write(qoute + "\n")
+        with open(file_path ,"w") as file: #because i used "w" everytime will write it and replace it with the old one
+            for qoute in selected_qoutes : # loops through the 15 selected quotes.
+                file.write(qoute + "\n")
+            
+    except OSError as error:
+        print("Error writing quotes:", error)
+
+    else:
+        print("Quotes file created successfully.")
             
 
 
