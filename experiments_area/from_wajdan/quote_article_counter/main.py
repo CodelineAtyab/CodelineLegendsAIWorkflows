@@ -86,6 +86,9 @@ def analyze_quotes(input_path="quotes.txt", output_path="quotes_analysis.txt"):
 
     else:
         print("Analysis completed.")
+    
+    finally:
+        print("Finished trying.")
 
 
 if __name__ == "__main__":
