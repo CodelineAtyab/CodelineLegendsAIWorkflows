@@ -1,0 +1,18 @@
+{a: 1, an: 0, the: 0} A new day brings new hope.
+{a: 0, an: 1, the: 0} An empty mind cannot learn much.
+{a: 0, an: 1, the: 0} An amazing story begins with an idea.
+{a: 0, an: 2, the: 0} An amazing story begins with an idea.
+{a: 0, an: 1, the: 0} An active mind loves to learn.
+{a: 1, an: 0, the: 0} A good habit improves your life.
+{a: 1, an: 0, the: 0} A brave person never gives up.
+{a: 0, an: 0, the: 1} The morning breeze feels refreshing.
+{a: 0, an: 1, the: 0} An interesting book opens new doors.
+{a: 0, an: 0, the: 1} The right choice can change everything.
+{a: 0, an: 0, the: 1} The rain makes the flowers grow.
+{a: 0, an: 0, the: 2} The rain makes the flowers grow.
+{a: 1, an: 0, the: 0} A clear goal helps you succeed.
+{a: 1, an: 0, the: 0} A little kindness goes a long way.
+{a: 2, an: 0, the: 0} A little kindness goes a long way.
+{a: 0, an: 1, the: 0} An unexpected moment can bring joy.
+{a: 0, an: 0, the: 1} The moon looks beautiful tonight.
+{a: 1, an: 0, the: 0} A strong team works together.
