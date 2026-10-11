@@ -42,19 +42,20 @@ def create_quotes_file(file_path="quotes.txt"):
         print("Done trying")
 
 
-create_quotes_file()
-
-
 # Function 2
 def analyze_quotes(input_path="quotes.txt", output_path="quotes_analysis.txt"):
     try:
+        # Each run reports only the current quotes.txt, so drop any older analysis.
+        with open(output_path, "w") as file:
+            file.write("")
+
         with open(input_path, "r") as file:
             for line in file:
                 article_counts = {"a": 0, "an": 0, "the": 0}
 
                 for word in line.split():
-                    word = word.lower()
-                    if word in ["a", "an", "the"]:
+                    word = word.lower().strip(".,!?;:\"'")
+                    if word in article_counts:
                         article_counts[word] += 1
 
                 append_result(line.strip(), article_counts, output_path)
@@ -84,4 +85,10 @@ def append_result(line, article_counts, output_path="quotes_analysis.txt"):
         print("Done trying")
 
 
-analyze_quotes()
+def main():
+    create_quotes_file()
+    analyze_quotes()
+
+
+if __name__ == "__main__":
+    main()
