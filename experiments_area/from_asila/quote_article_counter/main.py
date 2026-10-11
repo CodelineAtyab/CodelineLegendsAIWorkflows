@@ -49,6 +49,11 @@ def analyze_quotes(input_path="quotes.txt", output_path="quotes_analysis.txt"):
 
     try:
         with open(input_path, "r") as f:
+            
+            # Clear previous analysis results
+            with open(output_path, "w") as output_file:
+                pass
+            
             for line in f:  # to read each line
                 line = line.strip()
 
