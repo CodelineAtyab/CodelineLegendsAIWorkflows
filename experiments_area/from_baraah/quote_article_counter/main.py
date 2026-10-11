@@ -1,5 +1,10 @@
+
+from quote import create_quotes_file, analyze_quotes
+
+
 def main():
-    print("Hello from quote-article-counter!")
+    create_quotes_file()
+    analyze_quotes()
 
 
 if __name__ == "__main__":
