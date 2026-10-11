@@ -1,5 +1,6 @@
 import random
 
+# Function1 create_quotes_file with 15 random quotes
 def create_quotes_file(file_path="quotes.txt"):
     quotes = [
     "A brave person never gives up.",
@@ -34,3 +35,30 @@ def create_quotes_file(file_path="quotes.txt"):
         print(f"Error creating quotes file: {error}")
      else:
         print("Quotes file created successfully.")
+
+#Function 2 reads the quotes and counts articles per line
+def analyze_quotes(input_path="quotes.txt", output_path="quotes_analysis.txt"):
+     try:
+         with open(input_path, "r") as file:
+            for line in file:
+                line = line.strip()
+                article_counts = {"a": 0, "an": 0, "the": 0}
+
+                words = line.lower().split()
+
+                for word in words:
+                    word = word.strip(".,!?;:\"'()[]")
+
+                    if word in article_counts:
+                        article_counts[word] += 1
+
+                        append_result(line, article_counts, output_path)
+
+    except FileNotFoundError:
+        print(f"Input file not found: {input_path}")
+    except OSError as error:
+        print(f"Error reading quotes file: {error}")
+    else:
+        print("Quotes analyzed successfully.")
+        
+
