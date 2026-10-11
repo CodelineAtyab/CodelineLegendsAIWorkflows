@@ -1,4 +1,4 @@
-from quote import create_quotes_file, analyze_quotes
+from quote import analyze_quotes, create_quotes_file
 
 
 def main():
