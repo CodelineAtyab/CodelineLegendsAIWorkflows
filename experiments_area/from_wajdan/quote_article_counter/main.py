@@ -40,6 +40,7 @@ def create_quotes_file(file_path="quotes.txt"):
 def append_result(line, article_counts, output_path="quotes_analysis.txt"):
     try:
         with open(output_path, "a") as file:
+            # Format the counts and the original quote.
             result = (
                 f"{{a: {article_counts['a']}, "
                 f"an: {article_counts['an']}, "
