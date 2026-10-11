@@ -67,8 +67,8 @@ def analyze_quotes(input_path="quotes.txt", output_path="quotes_analysis.txt"):
             for article in articles:
                 article_counts[article] += 1
 
-        append_result(line, article_counts, output_path)
-        print(line, article_counts)
+            append_result(line, article_counts, output_path)
+            print(line, article_counts)
 
     except FileNotFoundError:
         print("quotes.txt does not exist!")
