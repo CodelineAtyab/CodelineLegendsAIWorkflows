@@ -13,12 +13,21 @@ orders: list[dict] = [
  
 def is_large(order: dict) -> bool:
     return order["size_oz"] >= 16
+
+
+
 large_orders = list(filter(is_large, orders))
-#print(large_orders)
 
-result = [f"{order['name']} - {order['drink']} ({order['size_oz']}oz)" for order in large_orders]
-for i in result:
-    print(i)
 
-total_size = reduce(lambda x, y: x + y, (order["size_oz"] for order in orders))
-print(f"Total size of all orders: {total_size} oz")
+result = list(
+    map(lambda order: f"{order['name']} - {order['drink']} ({order['size_oz']}oz)", large_orders)
+)
+
+
+
+for line in result:
+    print(line)
+
+
+total_size = reduce(lambda total, order: total + order["size_oz"], orders, 0)
+print(f"Total volume: {total_size} oz")
