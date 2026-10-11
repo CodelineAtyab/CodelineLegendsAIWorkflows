@@ -24,5 +24,17 @@ def create_quotes_file(file_path="quotes.txt"):
         "An effort brings a result.",
         "A mistake is a lesson.",
     ]
+    try:
+        selected_quotes = random.sample(quotes, 15)
 
-   
+        with open(file_path, "w") as file:
+            for quote in selected_quotes:
+                file.write(quote + "\n")
+
+    except OSError:
+        print("Could not create the quotes file.")
+        return False
+
+    return True
+
+
