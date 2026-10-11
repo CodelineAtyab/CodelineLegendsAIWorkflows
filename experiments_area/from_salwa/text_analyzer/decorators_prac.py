@@ -1,22 +1,15 @@
 # Part 1: add_text_stats decorator
 
-
 def get_word_count(text):
     return len(text.split())
-
-
 def get_space_count(text):
     return text.count(" ")
-
-
 def get_uppercase_count(text):
     count = 0
     for char in text:
         if char.isupper():
             count = count + 1
     return count
-
-
 # function receives the original function
 def add_text_stats(func):
 
@@ -39,16 +32,13 @@ def add_text_stats(func):
 
     return wrapper
 
-
 @add_text_stats
 def get_news():
     return (
         "The Codeline Legends team is learning Python decorators in Muscat this week."
     )
 
-
 print(get_news())
-
 
 # Part 2: analyze_text decorator with paramet
 def analyze_text(count_words=True, count_spaces=True, count_uppercase_chars=True):
@@ -116,7 +106,6 @@ def get_news_4():
     return (
         "The Codeline Legends team is learning Python decorators in Muscat this week."
     )
-
 
 print(get_news_1())
 print(get_news_2())
