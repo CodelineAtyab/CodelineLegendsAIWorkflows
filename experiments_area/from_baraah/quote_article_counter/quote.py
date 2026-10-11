@@ -1,3 +1,4 @@
+
 import random
 
 
@@ -30,8 +31,7 @@ def create_quotes_file(file_path="quotes.txt"):
 
     try:
         with open(file_path, "w") as file:
-            for quote in selected_quotes:
-                file.write(quote + "\n")
+            file.writelines(quote + "\n" for quote in selected_quotes)
 
     except OSError as error:
         print(f"Error creating quotes file: {error}")
