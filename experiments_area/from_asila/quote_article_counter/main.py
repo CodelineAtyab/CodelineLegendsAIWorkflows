@@ -35,29 +35,36 @@ def create_quotes_file(file_path="quotes.txt"):
         for qoute in selected_qoutes : # loops through the 15 selected quotes.
             file.write(qoute + "\n")
             
-create_quotes_file()
+
 
 #open the file to read 
 def analyze_quotes(input_path="quotes.txt", output_path="quotes_analysis.txt"):
-    with open (input_path, "r") as f:
-        for line in f:  #to read each line
-            line = line.strip()
+    
+    try:
+        with open (input_path, "r") as f:
+            for line in f:  #to read each line
+                line = line.strip()
             
             #add dictionary to count articles( a, an ,the)
-            article_counts = {
+                article_counts = {
                 "a": 0,
                 "an": 0,
                 "the": 0
             }
             
             # to find articles as whole words
-            pattern = re.compile(r"\b(a|an|the)\b") #re.compile Prepares a search pattern.
-            articles = pattern.findall(line.lower())
+                pattern = re.compile(r"\b(a|an|the)\b") #re.compile Prepares a search pattern.
+                articles = pattern.findall(line.lower())
             
             # Count each article
             for article in articles:
                 article_counts[article] += 1
     
             print(line, article_counts)
+        
+
+    except FileNotFoundError:
+        print("quotes.txt does not exist!")
             
+create_quotes_file()
 analyze_quotes()
