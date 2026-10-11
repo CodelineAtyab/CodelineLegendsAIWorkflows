@@ -82,7 +82,7 @@ def get_news_uppercase_only():
     return "The Codeline Legends team is learning Python decorators in Muscat this week."
 print(get_news_uppercase_only())
     
-@analyze_text(count_words=False, count_spaces=False, count_uppercase=False)
+@analyze_text(count_words=False, count_spaces=False, count_uppercase_chars=False)
 def get_news_without_stats():
     return "The Codeline Legends team is learning Python decorators in Muscat this week."
 print(get_news_without_stats())
