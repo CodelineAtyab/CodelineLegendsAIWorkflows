@@ -1,0 +1,15 @@
+{a: 0, an: 0, the: 1} The sky is full of beautiful stars.
+{a: 0, an: 1, the: 1} An honest person earns the trust of others.
+{a: 0, an: 0, the: 1} The future depends on what you do today.
+{a: 1, an: 1, the: 0} An early start makes a productive day.
+{a: 0, an: 0, the: 1} The best time to start is now.
+{a: 0, an: 1, the: 0} An opportunity can change your future.
+{a: 1, an: 0, the: 1} The smallest actions can make a big difference.
+{a: 1, an: 0, the: 0} A simple idea can lead to success.
+{a: 1, an: 0, the: 0} A strong mind can overcome challenges.
+{a: 0, an: 0, the: 2} The journey is more important than the destination.
+{a: 2, an: 0, the: 0} A happy heart makes a happy life.
+{a: 1, an: 0, the: 0} A little progress every day matters.
+{a: 1, an: 1, the: 0} A new challenge is an opportunity to grow.
+{a: 0, an: 0, the: 1} The best lessons come from experience.
+{a: 1, an: 1, the: 0} An exciting adventure begins with a plan.
