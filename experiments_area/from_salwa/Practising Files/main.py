@@ -26,13 +26,15 @@ quotes = [
 ]
 
 # Function : Create quotes.txt
+
+
+# Function: Create quotes.txt
 def create_quotes_file(file_path="quotes.txt"):
     selected_quotes = random.sample(quotes, 15)
 
     try:
         with open(file_path, "w") as file:
-            for quote in selected_quotes:
-                file.write(quote + "\n")
+            file.writelines(quote + "\n" for quote in selected_quotes)
 
     except OSError as error:
         print(f"Could not create the file: {error}")
@@ -43,8 +45,13 @@ def create_quotes_file(file_path="quotes.txt"):
     finally:
         print("Create quotes operation finished.")
 
+
 # Function : Append one result
-def append_result( line, article_counts, output_path="quotes_analysis.txt",):
+def append_result(
+    line,
+    article_counts,
+    output_path="quotes_analysis.txt",
+):
     result = (
         f"{{a: {article_counts['a']}, "
         f"an: {article_counts['an']}, "
@@ -59,8 +66,12 @@ def append_result( line, article_counts, output_path="quotes_analysis.txt",):
     except OSError as error:
         print(f"Could not append the result: {error}")
 
+
 # Function : Analyze quotes
-def analyze_quotes(input_path="quotes.txt", output_path="quotes_analysis.txt",):
+def analyze_quotes(
+    input_path="quotes.txt",
+    output_path="quotes_analysis.txt",
+):
     try:
         # Clear old analysis results
         with open(output_path, "w") as file:
@@ -86,7 +97,11 @@ def analyze_quotes(input_path="quotes.txt", output_path="quotes_analysis.txt",):
                     elif word == "the":
                         article_counts["the"] += 1
 
-                append_result( line, article_counts, output_path,)
+                append_result(
+                    line,
+                    article_counts,
+                    output_path,
+                )
 
     except FileNotFoundError:
         print(f"Sorry, {input_path} does not exist.")
