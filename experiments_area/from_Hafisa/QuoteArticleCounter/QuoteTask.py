@@ -1,4 +1,6 @@
 import random
+
+
 def create_quotes_file(file_path="quotes.txt"):
     quotes = [
         "A walk in Muttrah can make the day better.",
@@ -55,22 +57,15 @@ def append_result(line, article_counts, output_path="quotes_analysis.txt"):
     except OSError as error:
         print(f"Something went wrong: {error}")
 
-def analyze_quotes(
-    input_path="quotes.txt",
-    output_path="quotes_analysis.txt"
-):
+
+def analyze_quotes(input_path="quotes.txt", output_path="quotes_analysis.txt"):
 
     try:
         with open(input_path, "r") as file:
-
             for line in file:
                 line = line.strip()
 
-                article_counts = {
-                    "a": 0,
-                    "an": 0,
-                    "the": 0
-                }
+                article_counts = {"a": 0, "an": 0, "the": 0}
 
                 words = line.lower().split()
 
@@ -86,11 +81,7 @@ def analyze_quotes(
                     elif word == "the":
                         article_counts["the"] += 1
 
-                append_result(
-                    line,
-                    article_counts,
-                    output_path
-                )
+                append_result(line, article_counts, output_path)
 
     except FileNotFoundError:
         print("quotes.txt does not exist.")
