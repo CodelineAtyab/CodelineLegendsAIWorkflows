@@ -30,8 +30,7 @@ def create_quotes_file(file_path="quotes.txt"):
     selected = random.sample(QUOTES, 15)
     try:
         with open(file_path, "w") as file:
-            for quote in selected:
-                file.write(quote + "\n")
+            file.writelines(quote + "\n" for quote in selected)
     except Exception as error:
         print(f"Could not write {file_path}: {error}")
     else:
