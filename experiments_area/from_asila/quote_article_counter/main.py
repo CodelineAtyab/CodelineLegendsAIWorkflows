@@ -76,21 +76,20 @@ def analyze_quotes(input_path="quotes.txt", output_path="quotes_analysis.txt"):
         
 
 def append_result(line, article_counts, output_path="quotes_analysis.txt"):
-        
+    
+    try:    
     # open the file in append mode
-    with open(output_path, "a") as f: #Appends text without deleting old content.
+        with open(output_path, "a") as f: #Appends text without deleting old content.
         # Format the article counts and original quote
-        result = f"{{a: {article_counts['a']}, an: {article_counts['an']}, the: {article_counts['the']}}} {line}\n"
+            result = f"{{a: {article_counts['a']}, an: {article_counts['an']}, the: {article_counts['the']}}} {line}\n"
 
-        f.write(result) # writes exactly one line
+            f.write(result) # writes exactly one line
 
+    except OSError as error:
+        print("Error writing analysis:", error)
+        
     return
     
-        
-        
-        
-        
-        
-            
+
 create_quotes_file()
 analyze_quotes()

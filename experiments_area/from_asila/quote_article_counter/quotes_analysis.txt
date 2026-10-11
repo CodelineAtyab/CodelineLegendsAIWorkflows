@@ -1,2 +1,3 @@
 {a: 0, an: 0, the: 1} the water is cold.
 {a: 1, an: 0, the: 0} a student is learning.
+{a: 1, an: 0, the: 0} a book is useful.
