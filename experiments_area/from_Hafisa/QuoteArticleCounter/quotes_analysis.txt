@@ -1,0 +1,15 @@
+{a: 1, an: 0, the: 0} A weekend in Muscat can be full of activities.
+{a: 0, an: 0, the: 1} The sea in Oman is calm and beautiful.
+{a: 1, an: 1, the: 0} A visit to Wadi Shab can be an amazing experience.
+{a: 0, an: 0, the: 1} The mountains of Oman are full of beautiful views.
+{a: 0, an: 1, the: 1} An old fort can tell the story of Oman.
+{a: 0, an: 1, the: 0} An evening in Muscat can feel peaceful.
+{a: 1, an: 0, the: 1} A walk in Muttrah can make the day better.
+{a: 1, an: 1, the: 0} A visit to Sur can be an exciting adventure.
+{a: 1, an: 0, the: 0} A cup of Omani coffee can bring people together.
+{a: 0, an: 1, the: 0} An evening at Qurum beach can be very relaxing.
+{a: 1, an: 1, the: 0} An open road in Oman can lead to a beautiful place.
+{a: 0, an: 0, the: 1} The beaches of Oman are perfect for relaxing.
+{a: 0, an: 1, the: 0} An early morning in Salalah can feel refreshing.
+{a: 0, an: 0, the: 1} The markets in Oman are full of local products.
+{a: 2, an: 0, the: 0} A trip to Nizwa can teach you a lot about history.
