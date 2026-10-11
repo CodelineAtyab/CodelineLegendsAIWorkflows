@@ -68,6 +68,8 @@ def analyze_quotes(input_path="quotes.txt", output_path="quotes_analysis.txt"):
                 article_counts = {"a": 0, "an": 0, "the": 0}
 
                 for word in line.lower().split():
+                    
+                    # Remove punctuation from the ends of the word.
                     word = word.strip(".,!?;:\"'()")
 
                     if word in article_counts:
@@ -75,7 +77,7 @@ def analyze_quotes(input_path="quotes.txt", output_path="quotes_analysis.txt"):
 
                 if append_result(line, article_counts, output_path) == False:
                     return
-
+# Handle a missing file or folder.
     except FileNotFoundError:
         print("File or folder not found. Check your paths.")
 
