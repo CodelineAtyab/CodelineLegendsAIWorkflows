@@ -46,21 +46,14 @@ def analyze_quotes(input_path="quotes.txt", output_path="quotes_analysis.txt"):
     try:
         with open(input_path, "r") as file:
             for line in file:
-                a_count = 0
-                an_count = 0
-                the_count = 0
+                article_counts = {'a': 0, 'an': 0, 'the': 0}
 
                 for word in line.split():
                     word = word.lower()
                     if word in ['a', 'an', 'the']:
-                        if word == 'a':
-                            a_count += 1
-                        elif word == 'an':
-                            an_count += 1
-                        elif word == 'the':
-                            the_count += 1
+                        article_counts[word] += 1
 
-                append_result(line.strip(), [a_count, an_count, the_count], output_path)
+                append_result(line.strip(), article_counts, output_path)
 
     except FileNotFoundError:
         print("That file does not exist yet.")
@@ -76,7 +69,7 @@ def analyze_quotes(input_path="quotes.txt", output_path="quotes_analysis.txt"):
 def append_result(line, article_counts, output_path="quotes_analysis.txt"):
     try:
         with open(output_path, "a") as file:
-            file.write(f"{{a: {article_counts[0]}, an: {article_counts[1]}, the: {article_counts[2]}}} {line}\n")
+            file.write(f"{{a: {article_counts['a']}, an: {article_counts['an']}, the: {article_counts['the']}}} {line}\n")
     except OSError as error:
         print(f"Something else went wrong: {error}")
     else:
