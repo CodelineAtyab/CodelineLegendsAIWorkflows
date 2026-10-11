@@ -37,4 +37,56 @@ def create_quotes_file(file_path="quotes.txt"):
 
     return True
 
+def append_result(line, article_counts, output_path="quotes_analysis.txt"):
+    try:
+        with open(output_path, "a") as file:
+            result = (
+                f"{{a: {article_counts['a']}, "
+                f"an: {article_counts['an']}, "
+                f"the: {article_counts['the']}}} {line}"
+            )
+
+            file.write(result + "\n")
+
+    except OSError:
+        print("Could not write the result.")
+        return False
+
+    return True
+
+
+def analyze_quotes(input_path="quotes.txt", output_path="quotes_analysis.txt"):
+    try:
+        with open(input_path, "r") as file:
+            # Clear the old analysis results.
+            with open(output_path, "w") as output:
+                output.write("")
+
+            for line in file:
+                line = line.strip()
+                article_counts = {"a": 0, "an": 0, "the": 0}
+
+                for word in line.lower().split():
+                    word = word.strip(".,!?;:\"'()")
+
+                    if word in article_counts:
+                        article_counts[word] += 1
+
+                if append_result(line, article_counts, output_path) == False:
+                    return
+
+    except FileNotFoundError:
+        print("File or folder not found. Check your paths.")
+
+    except OSError:
+        print("Could not analyze the file.")
+
+    else:
+        print("Analysis completed.")
+
+
+if __name__ == "__main__":
+    if create_quotes_file():
+        analyze_quotes()
+   
 
