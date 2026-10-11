@@ -1,15 +1,15 @@
-{a: 0, an: 0, the: 1} The best time is now.
-{a: 1, an: 0, the: 1} A teacher helps the students.
-{a: 2, an: 0, the: 0} A book is a good friend.
-{a: 1, an: 1, the: 1} An apple a day keeps the doctor away.
-{a: 1, an: 0, the: 0} A smile brings happiness.
-{a: 2, an: 0, the: 0} A mistake is a lesson.
-{a: 0, an: 1, the: 0} An honest person earns respect.
-{a: 1, an: 1, the: 0} An effort brings a result.
-{a: 1, an: 0, the: 1} The sun is a source of energy.
-{a: 0, an: 0, the: 1} The sky is blue.
-{a: 0, an: 1, the: 1} An idea can change the world.
 {a: 0, an: 0, the: 1} The world needs kindness.
-{a: 0, an: 0, the: 1} The future starts today.
 {a: 0, an: 1, the: 1} An artist sees the beauty.
+{a: 1, an: 0, the: 1} The journey starts with a step.
+{a: 1, an: 0, the: 1} A teacher helps the students.
+{a: 2, an: 0, the: 0} A mistake is a lesson.
+{a: 1, an: 1, the: 1} An apple a day keeps the doctor away.
+{a: 1, an: 0, the: 1} A friend makes the day better.
+{a: 0, an: 0, the: 1} The answer is simple.
 {a: 1, an: 1, the: 0} An opportunity is a chance to grow.
+{a: 0, an: 1, the: 0} An honest person earns respect.
+{a: 2, an: 0, the: 0} A book is a good friend.
+{a: 1, an: 0, the: 0} A smile brings happiness.
+{a: 0, an: 0, the: 1} The sky is blue.
+{a: 1, an: 1, the: 0} An effort brings a result.
+{a: 1, an: 1, the: 0} A dream needs an action plan.
