@@ -33,8 +33,7 @@ def create_quotes_file(file_path="quotes.txt"):
     picked_quotes = random.sample(QUOTES, 15)
     try:
         with open(file_path, "w") as file:
-            for quote in picked_quotes:
-                file.write(quote + "\n")
+            file.writelines(quote + "\n" for quote in picked_quotes)
     except OSError as error:
         print(f"Something else went wrong: {error}")
     else:
