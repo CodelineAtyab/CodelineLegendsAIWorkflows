@@ -37,7 +37,7 @@ def create_quotes_file(file_path="quotes.txt"):
     try:
         with open(file_path, "w", encoding="utf-8") as file:
             for quote in selected_quotes:
-                file.write(quote + "\n")
+                file.writelines(quote + "\n")
 
     except OSError as error:
         print(f"Something went wrong: {error}")
