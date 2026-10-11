@@ -1,16 +1,4 @@
 def word_count(text: str) -> int:
-    return len(text.split())
-
-
-def space_count(text: str) -> int:
-    return text.count(" ")
-
-
-def uppercase_count(text: str) -> int:
-    return len(list(filter(lambda c: c.isupper(), text)))
-
-
-def word_count(text: str) -> int:
     """Number of words, split on whitespace."""
     return len(text.split())
 
