@@ -1,4 +1,4 @@
-list_name = [num*num for num in range(10)]
+list_name = [num * num for num in range(10)]
 print(list_name)
 
 dict_name = [("Ali", 85), ("Ahmed", 90), ("Sara", 95)]

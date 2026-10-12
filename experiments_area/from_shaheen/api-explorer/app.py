@@ -1,7 +1,6 @@
 import requests
 
 
-
 def main():
     currancy = input("Enter currancy here: ").upper()
 
@@ -9,13 +8,13 @@ def main():
         respone = requests.get("https://open.er-api.com/v6/latest/" + currancy)
         result_dict = respone.json()
 
+        data = [(currancy, result_dict["rates"][currancy])]
 
+        converted_currancy = input(
+            "Enter the currancy you want to convert too: "
+        ).upper()
 
-        data = [(currancy,result_dict["rates"][currancy])]
-
-        converted_currancy = input("Enter the currancy you want to convert too: ").upper()
-
-        data.append((converted_currancy,result_dict["rates"][converted_currancy]))
+        data.append((converted_currancy, result_dict["rates"][converted_currancy]))
 
         final_output = f"The converted currancy: {data[0]}. converted to {data[1]}"
 
@@ -26,4 +25,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
