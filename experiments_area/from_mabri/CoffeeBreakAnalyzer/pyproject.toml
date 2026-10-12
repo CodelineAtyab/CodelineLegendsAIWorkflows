@@ -1,0 +1,12 @@
+[project]
+name = "coffeebreakanalyzer"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = []
+
+[tool.ruff.lint]
+# Issue #31 requires map() with an inline lambda; C417 would prefer a
+# comprehension (already here as large_orders_lc).
+ignore = ["C417"]
