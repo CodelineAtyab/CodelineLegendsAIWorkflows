@@ -1,15 +1,14 @@
 import utils
+from uuid import uuid4
 # from utils import multiply as mul
 
 def main():
-    list_of_even_numbers = tuple([num for num in range(1000 + 1)])
-    list_of_even_numbers = []
-
-    # Initialize the list with ODD numbers upto 1000
-    for num in range(1000 + 1):
-        list_of_even_numbers.append(None)
-
-    print(list_of_even_numbers)
+    a, b = (1, 2)
+    
+    # dummy_student = {"name": "Anoymous", "id": -1, "email": "unknown"}
+    dummy_data = [("name", "Anoymous"), ("id", -1), ("email", "unknown")]
+    dummy_data = {k: v for k, v in dummy_data}
+    print(dummy_data)
 
 if __name__ == "__main__":
     main()
