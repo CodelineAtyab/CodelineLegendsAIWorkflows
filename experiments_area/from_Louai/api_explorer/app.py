@@ -22,3 +22,16 @@ def print_results(name, data):
         name = input("Enter a name: ")
         data = fetch_nationality(name)
         print_results(name, data)
+
+
+import requests
+
+name = input("Enter a name to guess age: ")
+response = requests.get(f"https://api.agify.io/?name={name}")
+data = response.json()
+
+age = data.get("age")
+count = data.get("count")
+print(f"Name: {name}, Estimated Age: {age}, Based on {count} samples.")
+
+ 
