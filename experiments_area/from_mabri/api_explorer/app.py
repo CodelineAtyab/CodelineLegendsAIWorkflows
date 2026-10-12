@@ -22,7 +22,14 @@ def display_data(data):
 
 def main():
     ip_address = input("Enter a public IP address: ")
-    data = get_ip_info(ip_address)
+    try:
+        data = get_ip_info(ip_address)
+    except requests.exceptions.HTTPError:
+        print(f"Could not find info for '{ip_address}'. Please enter a valid public IP address.")
+        return
+    except requests.exceptions.RequestException:
+        print("Network problem: could not reach the API. Check your connection and try again.")
+        return
     display_data(data)
 
 if __name__ == "__main__":
