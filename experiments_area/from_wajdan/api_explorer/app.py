@@ -6,7 +6,7 @@ def main():
     try:
         response = requests.get(
             f"https://open.er-api.com/v6/latest/{currency}",
-            timeout=10
+           
         )
         response.raise_for_status()
         result_dict = response.json()
