@@ -75,7 +75,7 @@ def analyze_quotes(input_path="quotes.txt", output_path="quotes_analysis.txt"):
                     if word in article_counts:
                         article_counts[word] += 1
 
-                if append_result(line, article_counts, output_path):
+                if not append_result(line, article_counts, output_path):
                     return
 # Handle a missing file or folder.
     except FileNotFoundError:
