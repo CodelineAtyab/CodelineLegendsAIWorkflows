@@ -10,6 +10,8 @@ print(double_numbers)
 # Dictionary comprehension
 countries = [("Oman", "Muscat"), ("UAE", "Abu Dhabi"), ("France", "Paris")] #store countries and their capitals
 
-capitals = {country: capital for country, capital in countries}
+capitals = {country: capital for country, capital in countries} #Dictionary comprehension it is a short way to create a dictionary using a loop in one line.
 
 print(capitals)
+
+
