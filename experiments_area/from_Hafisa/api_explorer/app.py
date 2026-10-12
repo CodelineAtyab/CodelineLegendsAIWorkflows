@@ -7,9 +7,12 @@ def get_city(city):
     response = requests.get(url)
     data = response.json()
 
-    location = data.get("results")[0]
+    results = data.get("results")
 
-    return location
+    if not results:
+        return None
+
+    return results[0]
 
 
 def get_weather(latitude, longitude):
@@ -29,6 +32,10 @@ def get_weather(latitude, longitude):
 
 def show_weather(data, city):
     hourly = data.get("hourly")
+
+    if hourly is None:
+        print("No weather data found.")
+        return
 
     times = hourly.get("time")
     temperatures = hourly.get("temperature_2m")
@@ -51,6 +58,10 @@ def main():
     city = input("Enter an Oman city: ")
 
     location = get_city(city)
+
+    if location is None:
+        print("City not found.")
+        return
 
     latitude = location.get("latitude")
     longitude = location.get("longitude")
