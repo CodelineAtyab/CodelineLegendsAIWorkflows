@@ -1,14 +1,14 @@
-import utils
-from uuid import uuid4
-# from utils import multiply as mul
+import requests
 
 def main():
-    a, b = (1, 2)
-    
-    # dummy_student = {"name": "Anoymous", "id": -1, "email": "unknown"}
-    dummy_data = [("name", "Anoymous"), ("id", -1), ("email", "unknown")]
-    dummy_data = {k: v for k, v in dummy_data}
-    print(dummy_data)
+    user_name = input("Enter your name: ")
+    response = requests.get("https://api.nationalize.io/?name=" + user_name)
+    result_dict = response.json()
+
+    list_of_countries = result_dict.get("country")
+
+    for curr_country in list_of_countries:
+        print(curr_country.get("country_id"))
 
 if __name__ == "__main__":
     main()
