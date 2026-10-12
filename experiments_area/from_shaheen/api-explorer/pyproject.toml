@@ -6,4 +6,10 @@ readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
     "requests>=2.34.2",
+    "types-requests>=2.33.0.20261006",
+]
+
+[dependency-groups]
+dev = [
+    "types-requests>=2.33.0.20261006",
 ]
