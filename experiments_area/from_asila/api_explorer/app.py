@@ -23,3 +23,7 @@ def main(): #to start the program and run all the functions in order.
 
 if __name__ == "__main__":
     main()
+    
+    
+#I choose the Official Joke API to get random jokes.
+# I choose it because it is simple to use and lets the program display a joke from an API.
