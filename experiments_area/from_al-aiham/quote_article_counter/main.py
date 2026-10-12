@@ -99,5 +99,10 @@ def analyze_quotes(input_path="quotes.txt", output_path="quotes_analysis.txt"):
         print("Quotes analysis completed successfully.")
 
 
-create_quotes_file()
-analyze_quotes()
+def main():
+    if create_quotes_file():
+        analyze_quotes()
+
+
+if __name__ == "__main__":
+    main()
