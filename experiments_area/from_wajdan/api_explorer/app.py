@@ -9,7 +9,8 @@ def main():
     
     print ("Exchange rates for 1 " + currency + ":")
     
-
+    for country_currency, rate in rates.items():
+        print(f"{country_currency}: {rate}")
 
 if __name__ == "__main__":
     main()
