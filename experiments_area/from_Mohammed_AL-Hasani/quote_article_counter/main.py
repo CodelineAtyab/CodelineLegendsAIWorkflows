@@ -1,7 +1,9 @@
 import random
 import re
+
+
 def create_quotes_file(file_path="quotes.txt"):
-    quotes =[
+    quotes = [
         "Small steps still move you forward.",
         "Curiosity turns ordinary days into discoveries.",
         "Every sunrise is a fresh page.",
@@ -28,8 +30,7 @@ def create_quotes_file(file_path="quotes.txt"):
     
     try:
          with open(file_path, "w") as file:
-            for quote in selected_quotes:
-             file.write(quote + "\n")
+            file.writelines(quote + "\n" for quote in selected_quotes)
     except OSError as error:
         print(f"Error creating quotes file: {error}")
 
@@ -66,7 +67,7 @@ def analyze_quotes(input_path="quotes.txt", output_path="quotes_analysis.txt"):
                 append_result(quote, article_count, output_path)
 
     except FileNotFoundError:
-     print(f"{input_path} was not found")
+        print(f"{input_path} was not found")
 
     except OSError as error:
         print(f"An error occurred: {error}")
@@ -78,8 +79,7 @@ def main():
     create_quotes_file()
 
     try:
-        with open("quotes_analysis.txt", "w") as file:
-            pass
+        open("quotes_analysis.txt", "w").close()
     except OSError as error:
         print(f"Error clearing analysis file: {error}")
         return
