@@ -66,19 +66,26 @@ def analyze_quotes(input_path="quotes.txt", output_path="quotes_analysis.txt"):
                 append_result(quote, article_count, output_path)
 
     except FileNotFoundError:
-        print("quotes.txt was not found")
+     print(f"{input_path} was not found")
 
     except OSError as error:
-        print(f"{input_path}An error occurred: {error}")
+        print(f"An error occurred: {error}")
 
     else:
         print("Quote analysis completed successfully.")
 
-create_quotes_file()
+def main():
+    create_quotes_file()
 
-with open("quotes_analysis.txt", "w") as file:
-    pass
+    try:
+        with open("quotes_analysis.txt", "w") as file:
+            pass
+    except OSError as error:
+        print(f"Error clearing analysis file: {error}")
+        return
 
-analyze_quotes()
+    analyze_quotes()
 
 
+if __name__ == "__main__":
+    main()
