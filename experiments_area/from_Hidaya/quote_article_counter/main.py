@@ -1,7 +1,7 @@
 import random
 import re
 
-def create_quotes_file():
+def create_quotes_file(file_path="quotes.txt"):
     quotes = [ 
         "A fresh start brings hope.",
         "The stars shine at night.",
@@ -28,36 +28,38 @@ def create_quotes_file():
         ]
     selected_quotes = random.sample(quotes, 15)
     try:
-        with open("quotes.txt", "w") as file:
+        with open(file_path, "w") as file:
             for quote in selected_quotes:
                 file.write(quote + "\n")
 
     except OSError as error:
-        print(f"Could not create quotes.txt: {error}")
+        print(f"Could not create {file_path}: {error}")
         return False
 
     else:
-        print("quotes.txt created successfully.")
+        print(f"{file_path} created successfully.")
         return True    
-def analyze_quotes():
+def analyze_quotes(input_path="quotes.txt", output_path="quotes_analysis.txt"):
     try:
-        with open("quotes.txt", "r") as file:
+        with open(input_path, "r") as file:
+            with open(output_path, "w") as output:
+                output.write("")
             for line in file:
                 words = re.findall(r"\b[a-z]+\b", line.lower())
 
-                a_count = words.count("a")
-                an_count = words.count("an")
-                the_count = words.count("the")
+                article_counts = {
+                    "a": words.count("a"),
+                    "an": words.count("an"),
+                    "the": words.count("the"),
+                }
 
-                saved = append_result(
-                    line, a_count, an_count, the_count
-                )
+                saved = append_result(line, article_counts, output_path)
 
                 if not saved:
                     return
 
     except FileNotFoundError:
-        print("quotes.txt was not found. Create the quotes file first.")
+        print(f"{input_path} was not found. Create the quotes file first.")
 
     except OSError as error:
         print(f"Could not analyze the files: {error}")
@@ -65,17 +67,19 @@ def analyze_quotes():
     else:
         print("Analysis completed successfully.")  
 
-def append_result(line, a_count, an_count, the_count):
+def append_result(line, article_counts, output_path="quotes_analysis.txt"):
     quote = line.rstrip("\r\n")
     try:
-
-        with open("quotes_analysis.txt", "a") as file:
+        with open(output_path, "a") as file:
             file.write(
-                f"{{a: {a_count}, an: {an_count}, the: {the_count}}} {quote}\n"
+                f"{{a: {article_counts['a']}, "
+                f"an: {article_counts['an']}, "
+                f"the: {article_counts['the']}}} {quote}\n"
             )
     except OSError as error:
         print(f"Could not save the result: {error}")
         return False
+
     return True
         
 
