@@ -20,7 +20,10 @@ def display_data(data):
     print("==============================================")
 
 
-if __name__ == "__main__":
+def main():
     ip_address = input("Enter a public IP address: ")
     data = get_ip_info(ip_address)
     display_data(data)
+
+if __name__ == "__main__":
+    main()
