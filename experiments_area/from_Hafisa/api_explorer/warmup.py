@@ -2,11 +2,7 @@ numbers = [1, 2, 3, 4, 5]
 
 squares = [number * number for number in numbers]
 
-pairs = [
-    ("name", "Hafisa"),
-    ("city", "Muscat"),
-    ("country", "Oman")
-]
+pairs = [("name", "Hafisa"), ("city", "Muscat"), ("country", "Oman")]
 
 person = {key: value for key, value in pairs}
 
