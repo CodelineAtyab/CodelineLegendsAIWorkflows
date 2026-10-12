@@ -1,19 +1,31 @@
 import requests
 
 def main():
-    
-    currency = input("Enter currency code (e.g. OMR): ").upper()         
-    response = requests.get(f"https://open.er-api.com/v6/latest/{currency}")
+    currency = input("Enter currency code (e.g. OMR): ").upper()
 
-    result_dict = response.json()
-    rates = result_dict.get("rates") 
-    
-    print ("Exchange rates for 1 " + currency + ":")
-    
+    try:
+        response = requests.get(
+            f"https://open.er-api.com/v6/latest/{currency}",
+            timeout=10
+        )
+        response.raise_for_status()
+        result_dict = response.json()
+
+    except requests.exceptions.RequestException:
+        print("Could not get valid data from the API.")
+        return
+
+    rates = result_dict.get("rates")
+
+    if rates is None:
+        print("Invalid currency code. Enter OMR or USD.")
+        return
+
+    print("Exchange rates for 1 " + currency + ":")
+
     for country_currency, rate in rates.items():
         print(f"{country_currency}: {rate}")
-        
-    
+
     # #-----name API
     # name = input("Enter your name: ")
     # response = requests.get(f"https://api.nationalize.io/?name={name}")
