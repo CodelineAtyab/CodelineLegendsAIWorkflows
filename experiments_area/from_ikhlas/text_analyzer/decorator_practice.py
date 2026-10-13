@@ -92,26 +92,26 @@ print(analyze_all())
 
 # Spaces false case
 @analyze_text_fun(count_spaces=False)
-def analyze_all():
+def analyze_without_spaces():
     return "The Codeline Legends team is learning python decorators this week."
 
 
-print(analyze_all())
+print(analyze_without_spaces())
 
 
 # Spaces and word are false case
 @analyze_text_fun(count_word=False, count_spaces=False)
-def analyze_all():
+def analyze_without_word_and_spaces():
     return "The Codeline Legends team is learning python decorators this week."
 
 
-print(analyze_all())
+print(analyze_without_word_and_spaces())
 
 
 # all are false
 @analyze_text_fun(count_word=False, count_spaces=False, count_uppercase=False)
-def analyze_all():
+def analyze_without_all_counts():
     return "The Codeline Legends team is learning python decorators this week."
 
 
-print(analyze_all())
+print(analyze_without_all_counts())

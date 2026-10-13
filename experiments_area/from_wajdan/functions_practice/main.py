@@ -10,10 +10,6 @@ if is_active:
     print("Hello")
 elif len(name) < 5:
     print("less than 5")
-elif len(name) < 5:
-    print("less than 5")
-elif len(name) < 5:
-    print("less than 5")
 else:
     print("World")
     print("World")

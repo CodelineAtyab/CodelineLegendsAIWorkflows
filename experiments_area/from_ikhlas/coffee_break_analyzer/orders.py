@@ -8,10 +8,7 @@ orders: list[dict] = [
 
 
 def is_large(order: dict) -> bool:
-    if order["size_oz"] >= 16:
-        return True
-    else:
-        return False
+    return order["size_oz"] >= 16
 
 
 print(is_large(orders[1]))
@@ -22,13 +19,11 @@ large_orders = list(filter(is_large, orders))
 print(large_orders)
 
 
-# using map() with lambda
-order_format = list(
-    map(
-        lambda orders: f"{orders['name']} - {orders['drink']} ({orders['size_oz']}oz)",
-        large_orders,
-    )
-)
+# using list comprehension
+order_format = [
+    f"{order['name']} - {order['drink']} ({order['size_oz']}oz)"
+    for order in large_orders
+]
 print(order_format)
 
 

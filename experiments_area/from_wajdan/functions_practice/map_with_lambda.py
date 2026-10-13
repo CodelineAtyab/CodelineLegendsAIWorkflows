@@ -4,7 +4,7 @@ result = []
 # for num in data:
 #      result.append(num*num)
 # print(result)
-result = list(map(lambda num: num * num, data))
+result = [num * num for num in data]
 print(result)
 
 # data = [onum * onum for onum in [num * num for num in range(1, 11)]]

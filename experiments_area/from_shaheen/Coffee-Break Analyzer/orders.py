@@ -17,9 +17,9 @@ large_orders = list[dict](filter(is_large, orders))
 
 print(large_orders)
 
-result = map(
-    lambda test: f"{test['name']} - {test['drink']} ({test['size_oz']} oz)",
-    large_orders,
+result = (
+    f"{order['name']} - {order['drink']} ({order['size_oz']} oz)"
+    for order in large_orders
 )
 
 print(list(result))
