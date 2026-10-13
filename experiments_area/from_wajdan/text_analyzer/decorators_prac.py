@@ -40,13 +40,13 @@ def analyze_text(
             words, spaces, uppercase = get_text_stats(text)
 
             stats = []
-            
+
             if count_words:
                 stats.append(f"No. of Words: {words}")
 
             if count_spaces:
                 stats.append(f"No. of Spaces: {spaces}")
-                
+
             if count_uppercase_chars:
                 stats.append(f"No. of Uppercase Chars: {uppercase}")
 
@@ -96,10 +96,7 @@ def get_original_message(message):
     return message
 
 
-message = (
-    "The Codeline Legends team is learning Python decorators "
-    "in Muscat this week."
-)
+message = "The Codeline Legends team is learning Python decorators in Muscat this week."
 
 print(get_message(message))
 print(get_all_stats(message=message))

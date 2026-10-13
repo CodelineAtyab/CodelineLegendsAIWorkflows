@@ -6,4 +6,3 @@ print(squares)
 pairs = [("name", "Hidaya"), ("course", "Python")]
 student = {key: value for key, value in pairs}
 print(student)
-

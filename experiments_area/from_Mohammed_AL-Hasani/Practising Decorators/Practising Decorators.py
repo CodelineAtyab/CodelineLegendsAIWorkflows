@@ -1,5 +1,5 @@
-
 # Helper functions
+
 
 def get_word_count(text):
     return len(text.split())
@@ -15,6 +15,7 @@ def get_uppercase_count(text):
 
 # Part 1
 
+
 def add_text_stats(func):
     def wrapper(*args, **kwargs):
         text = func(*args, **kwargs)
@@ -28,6 +29,7 @@ def add_text_stats(func):
 
 
 # Part 2
+
 
 def analyze_text(count_words=True, count_spaces=True, count_uppercase_chars=True):
     def decorator(func):

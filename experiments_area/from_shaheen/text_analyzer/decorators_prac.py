@@ -1,9 +1,11 @@
-#Helper Functions
+# Helper Functions
 def words_num(text):
     return len(text.split())
 
+
 def space_count(text):
     return text.count(" ")
+
 
 def uppercase_char(text):
     counter = 0
@@ -13,31 +15,32 @@ def uppercase_char(text):
     return counter
 
 
-#Part 1:
+# Part 1:
 def add_text_stats(given_fun):
     def text_stats_func_call(*args, **kwargs):
         func = given_fun(*args, **kwargs)
         result = f"[No. of Words: {words_num(func)}, No. of Spaces: {space_count(func)}, No. of Uppercase Chars: {uppercase_char(func)}] {func}"
         return result
+
     return text_stats_func_call
-
-
 
 
 @add_text_stats
 def get_news(msg):
-    return msg 
-
-print(get_news("The Codeline Legends team is learning Python decorators in Muscat this week."))
+    return msg
 
 
+print(
+    get_news(
+        "The Codeline Legends team is learning Python decorators in Muscat this week."
+    )
+)
 
 
-
-#Part 2:
+# Part 2:
 def analyze_text(count_words=True, count_spaces=True, count_uppercase_chars=True):
     def add_text_stats(given_fun):
-        def text_stats_func_call(*args, **kwargs):          
+        def text_stats_func_call(*args, **kwargs):
             func = given_fun(*args, **kwargs)
             result = f"{func}"
             text = []
@@ -89,6 +92,7 @@ def get_news5(msg):
 @analyze_text(count_words=False, count_spaces=False)
 def get_news6(msg):
     return msg
+
 
 message = "The Codeline Legends team is learning Python decorators in Muscat this week."
 

@@ -10,7 +10,7 @@ def test_default_coffee():
         "coffee_type": "V60",
         "customer_name": "Alice",
         "extras": (),
-        "options": {}
+        "options": {},
     }
 
     assert result == expected
@@ -20,13 +20,7 @@ def test_default_coffee():
 # Test 2 - Coffee with extras and options
 def test_coffee_with_extras():
     result = make_coffee(
-        101,
-        "latte",
-        "Alice",
-        "soy_milk",
-        "extra_shot",
-        size="large",
-        takeaway=True
+        101, "latte", "Alice", "soy_milk", "extra_shot", size="large", takeaway=True
     )
 
     expected = {
@@ -34,16 +28,11 @@ def test_coffee_with_extras():
         "coffee_type": "latte",
         "customer_name": "Alice",
         "extras": ("soy_milk", "extra_shot"),
-        "options": {
-            "size": "large",
-            "takeaway": True
-        }
+        "options": {"size": "large", "takeaway": True},
     }
 
     assert result == expected
     print("Test 2 passed")
-
-
 
 
 # Test 3 - Negative: keyword argument before positional arguments

@@ -1,4 +1,3 @@
-
 def get_word_count(text):
     return len(text.split())
 
@@ -33,8 +32,9 @@ def add_text_stats(func):
 
 @add_text_stats
 def get_news_part1():
-    return "The Codeline Legends team is learning Python decorators in Muscat this week."
-
+    return (
+        "The Codeline Legends team is learning Python decorators in Muscat this week."
+    )
 
 
 def analyze_text(count_words=True, count_spaces=True, count_uppercase_chars=True):
@@ -52,7 +52,9 @@ def analyze_text(count_words=True, count_spaces=True, count_uppercase_chars=True
                 summary_parts.append(f"No. of Spaces: {get_space_count(text)}")
 
             if count_uppercase_chars:
-                summary_parts.append(f"No. of Uppercase Chars: {get_uppercase_count(text)}")
+                summary_parts.append(
+                    f"No. of Uppercase Chars: {get_uppercase_count(text)}"
+                )
 
             if not summary_parts:
                 return text
@@ -66,25 +68,32 @@ def analyze_text(count_words=True, count_spaces=True, count_uppercase_chars=True
     return decorator
 
 
-
 @analyze_text()
 def get_news():
-    return "The Codeline Legends team is learning Python decorators in Muscat this week."
+    return (
+        "The Codeline Legends team is learning Python decorators in Muscat this week."
+    )
 
 
 @analyze_text(count_spaces=False)
 def get_news_no_spaces():
-    return "The Codeline Legends team is learning Python decorators in Muscat this week."
+    return (
+        "The Codeline Legends team is learning Python decorators in Muscat this week."
+    )
 
 
 @analyze_text(count_words=False, count_spaces=False)
 def get_news_uppercase():
-    return "The Codeline Legends team is learning Python decorators in Muscat this week."
+    return (
+        "The Codeline Legends team is learning Python decorators in Muscat this week."
+    )
 
 
 @analyze_text(count_words=False, count_spaces=False, count_uppercase_chars=False)
 def get_news_without_stats():
-    return "The Codeline Legends team is learning Python decorators in Muscat this week."
+    return (
+        "The Codeline Legends team is learning Python decorators in Muscat this week."
+    )
 
 
 # Print results
