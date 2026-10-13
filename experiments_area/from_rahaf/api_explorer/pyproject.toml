@@ -1,8 +1,16 @@
+# Start the project's metadata and configuration section.
 [project]
+# Set the package/project name used by Python packaging tools.
 name = "api-explorer"
+# Set the current project version.
 version = "0.1.0"
+# Provide a short human-readable description of the project.
 description = "A simple Python app that gets cat facts using the Cat Facts API"
+# Require Python 3.14 or newer to run this project.
 requires-python = ">=3.14"
+# List the third-party packages that the project needs.
 dependencies = [
+    # Require requests version 2.34.2 or newer for making HTTP calls.
     "requests>=2.34.2",
+# End the list of project dependencies.
 ]
