@@ -2,12 +2,12 @@
 import requests
 
 
-# Read API key from file
+# read API key from file
 def read_key():
     with open("api_key.txt", "r") as file:
         return file.read().strip()
 
-# Convert city name into coordinates
+# convert city name into coordinates
 def get_location(city, key):
     url = f"https://api.tomtom.com/search/2/geocode/{city}.json"
     data = requests.get(url, params={"key": key}).json()
@@ -15,7 +15,7 @@ def get_location(city, key):
 
     return f"{position['lat']},{position['lon']}"
 
-# Get driving time with current traffic
+# get time with current traffic
 def get_travel_time(source, destination, key):
     start = get_location(source, key)
     end = get_location(destination, key)
@@ -26,7 +26,7 @@ def get_travel_time(source, destination, key):
 
     return requests.get(url, params=params).json()
 
-# Convert seconds to hours and minutes
+# convert seconds to hours and minutes
 def format_time(seconds):
     total = (seconds + 30) // 60
     hours = total // 60
@@ -40,7 +40,7 @@ def format_time(seconds):
     return f"{hours} hours {minutes} minutes"
 
 
-# Run the program
+# run 
 def main():
     source = input("Enter source: ")
     destination = input("Enter destination: ")
