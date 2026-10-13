@@ -34,19 +34,6 @@ def extract_duration_in_traffic(data):
     return element.get("duration_in_traffic").get("text")
 
 
-def format_duration(total_seconds):
-    total_minutes = round(total_seconds / 60)
-    hours = total_minutes // 60
-    minutes = total_minutes % 60
-
-    parts = []
-    if hours > 0:
-        parts.append(f"{hours} hour" if hours == 1 else f"{hours} hours")
-    if minutes > 0 or hours == 0:
-        parts.append(f"{minutes} minute" if minutes == 1 else f"{minutes} minutes")
-    return " ".join(parts)
-
-
 # ---------------------------------------------------------------------------
 # Alternative: Google Routes API (the newer API Google recommends).
 # Kept commented out because the issue requires requests.get(...) with params=,
