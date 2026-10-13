@@ -11,4 +11,5 @@ dependencies = [
 [tool.uv.workspace]
 members = [
     "api_explorer",
+    "travel_time",
 ]
