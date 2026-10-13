@@ -37,20 +37,13 @@ example. It has the same shape as mine: fixed parameters first, then `*args` and
 ```python
 from coffee import make_coffee
 
-order = make_coffee(
-    101, "latte", "Alice", "soy_milk", "extra_shot", size="large", takeaway=True
-)
+order = make_coffee(101, "latte", "Alice", "soy_milk", "extra_shot", size="large", takeaway=True)
 print(order)
 ```
 
 Output:
 
 ```python
-{
-    "order_id": 101,
-    "coffee_type": "latte",
-    "customer_name": "Alice",
-    "extras": ("soy_milk", "extra_shot"),
-    "options": {"size": "large", "takeaway": True},
-}
+{'order_id': 101, 'coffee_type': 'latte', 'customer_name': 'Alice',
+ 'extras': ('soy_milk', 'extra_shot'), 'options': {'size': 'large', 'takeaway': True}}
 ```

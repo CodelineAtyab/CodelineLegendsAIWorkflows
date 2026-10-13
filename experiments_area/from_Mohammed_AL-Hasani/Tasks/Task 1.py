@@ -16,8 +16,8 @@
 #     print("num1 is greater than num2.")
 # else:
 #     print("num2 is greater than num1.")
-
-CodeLine: list = ["Atyab", "Fatma", "Ikhlas", "Kareem", "Ishaq"]
+    
+CodeLine: list = ["Atyab", "Fatma", "Ikhlas", "Kareem" , "Ishaq"]
 
 startLetter = input("Enter startLetter to filter the list: ")
 endLetter = input("Enter endLetter to filter the list: ")

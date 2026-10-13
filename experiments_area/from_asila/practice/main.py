@@ -5,27 +5,28 @@ def main():
 if __name__ == "__main__":
     main()
 
-num_one = 45
+num_one =45
 blood_result = 10.4
-is_active: bool = True
+is_active :bool =True
 name = "asila"
-a_char = "a"
+a_char = 'a'
 
 
 if is_active:
-    print(f"Your boold mesure is {blood_result}")  # f means formatted string.
+  print(f"Your boold mesure is {blood_result}") # f means formatted string.
 else:
-    print("not finished yet")
-
+  print("not finished yet")
+  
 
 family_member: list = ["Asila", "Suad", "Hilal", "Mohammed"]
 personal_info: dict = {"name": "asila", "ID_Card": "14236221", "active": True}
 print(family_member)
 family_member.append("Hammad")
 
-# display all family member
+#display all family member
 for member in family_member:
     print(member)
+
 
 
 sentence = "Never share your IDcard with anyone"
@@ -41,13 +42,14 @@ while counter < len(family_member):
     counter += 1
 
 print("-------------------")
-
+    
 # to do it reverse
 counter = len(family_member) - 1
 
 while counter >= 0:
     print(family_member[counter])
     counter -= 1
+    
 
 
 def get_branch_info(commit_id, name, owner_name, **kwargs):
@@ -62,5 +64,5 @@ get_branch_info(
     name="feature/something",
     commit_id=123,
     show_history=True,
-    duplicate_branch_name="bugfix/anotherthing",
+    duplicate_branch_name="bugfix/anotherthing"
 )

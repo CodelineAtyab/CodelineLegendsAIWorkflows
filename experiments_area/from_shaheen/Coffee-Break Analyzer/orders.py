@@ -10,16 +10,16 @@ orders: list[dict] = [
 
 
 def is_large(order: dict):
-    return order["size_oz"] >= 16
+        return order["size_oz"] >= 16
 
 
 large_orders = list[dict](filter(is_large, orders))
 
 print(large_orders)
 
-result = (
-    f"{order['name']} - {order['drink']} ({order['size_oz']} oz)"
-    for order in large_orders
+result = map(
+    lambda test: f"{test['name']} - {test['drink']} ({test['size_oz']} oz)",
+    large_orders
 )
 
 print(list(result))

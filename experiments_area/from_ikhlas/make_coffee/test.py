@@ -1,14 +1,11 @@
 from coffee import make_coffee
-
-
 def test_make_coffee():
     result = make_coffee(11, "latte", "Ikhlas")
-    expected = {
-        "order_id": 11,
-        "coffee_type": "latte",
-        "customer_name": "Ikhlas",
-        "extras": (),
-        "options": {},
+    expected = {"order_id": 11,
+                "coffee_type": "latte",
+                "customer_name": "Ikhlas",
+                "extras": (),
+                "options": {}
     }
     if result == expected:
         print("first test passed")
@@ -18,18 +15,24 @@ def test_make_coffee():
         print("Got:", result)
     return result
 
-
 def test_make_coffee_with_extras():
-    result = make_coffee(
-        11, "latte", "Ikhlas", "low_fat_milk", "iced", size="large", takeaway=True
-    )
+    result = make_coffee(11,
+                        "latte",
+                        "Ikhlas",
+                        "low_fat_milk",
+                        "iced",
+                        size="large",
+                        takeaway=True)
 
     expected = {
         "order_id": 11,
         "coffee_type": "latte",
         "customer_name": "Ikhlas",
         "extras": ("low_fat_milk", "iced"),
-        "options": {"size": "large", "takeaway": True},
+        "options": {
+            "size": "large",
+            "takeaway": True
+        }
     }
 
     if result == expected:
@@ -40,7 +43,6 @@ def test_make_coffee_with_extras():
         print("Expected:", expected)
         print("Got:", result)
 
-
-# to run the tests
+#to run the tests
 test_make_coffee()
 test_make_coffee_with_extras()

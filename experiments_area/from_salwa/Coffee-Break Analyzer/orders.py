@@ -8,11 +8,9 @@ orders: list[dict] = [
     {"name": "fatam", "drink": "Mocha", "size_oz": 16},
 ]
 
-
 # funcation is large
 def is_large(order: dict) -> bool:
     return order["size_oz"] >= 16
-
 
 # Filter the large orders
 large_orders = filter(is_large, orders)

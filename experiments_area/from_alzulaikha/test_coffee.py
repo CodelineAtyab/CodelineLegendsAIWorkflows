@@ -1,7 +1,13 @@
 from coffee import make_coffee
 
 result = make_coffee(
-    101, "latte", "Alice", "soy_milk", "extra_shot", size="large", takeaway=True
+    101,
+    "latte",
+    "Alice",
+    "soy_milk",
+    "extra_shot",
+    size="large",
+    takeaway=True
 )
 
 expected = {
@@ -9,7 +15,10 @@ expected = {
     "coffee_type": "latte",
     "customer_name": "Alice",
     "extras": ("soy_milk", "extra_shot"),
-    "options": {"size": "large", "takeaway": True},
+    "options": {
+        "size": "large",
+        "takeaway": True
+    }
 }
 
 if result == expected:

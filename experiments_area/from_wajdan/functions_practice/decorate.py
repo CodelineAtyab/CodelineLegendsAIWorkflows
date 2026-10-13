@@ -1,18 +1,16 @@
 def decorate_with_stars(given_fun):
     def decorated_func(*args, **kwargs):
-        final_msg = ""
-        final_msg = final_msg + "**********************"
-        final_msg = final_msg + given_fun(*args, **kwargs)
-        final_msg = final_msg + "**********************"
-        return final_msg
+      final_msg = ""
+      final_msg = final_msg + "**********************"
+      final_msg = final_msg + given_fun(*args, **kwargs)
+      final_msg = final_msg + "**********************"
+      return final_msg
 
     return decorated_func
-
 
 @decorate_with_stars
 def greet_opal_2(pre_message, message, post_message):
     return pre_message + message + post_message
-
 
 print(greet_opal_2("START! ", "OPAL-2 Is doing great!!!", " DONE!!!"))
 
@@ -23,6 +21,7 @@ print(greet_opal_2("START! ", "OPAL-2 Is doing great!!!", " DONE!!!"))
 # @decorate_with_stars
 # def get_team_feedback_of_python():
 #     return "Python seems funny!"
+
 
 
 # new_func = decorate_with_stars(greet_opal_2)

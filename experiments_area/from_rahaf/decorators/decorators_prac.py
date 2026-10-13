@@ -1,6 +1,4 @@
-news_text = (
-    "The Codeline Legends team is learning Python decorators in Muscat this week."
-)
+news_text = "The Codeline Legends team is learning Python decorators in Muscat this week."
 
 
 def get_word_count(text):
@@ -22,7 +20,7 @@ def get_uppercase_count(text):
 
 
 # Part 1
-def add_text_stats(func):  # func will contain another function.
+def add_text_stats(func): # func will contain another function.
     # wrapper is the new function that will run instead of directly running the original function.
     def wrapper(*args, **kwargs):
         text = func(*args, **kwargs)
@@ -67,13 +65,19 @@ def analyze_text(
             summary = []
 
             if count_words:
-                summary.append(f"No. of Words: {get_word_count(text)}")
+                summary.append(
+                    f"No. of Words: {get_word_count(text)}"
+                )
 
             if count_spaces:
-                summary.append(f"No. of Spaces: {get_space_count(text)}")
+                summary.append(
+                    f"No. of Spaces: {get_space_count(text)}"
+                )
 
             if count_uppercase_chars:
-                summary.append(f"No. of Uppercase Chars: {get_uppercase_count(text)}")
+                summary.append(
+                    f"No. of Uppercase Chars: {get_uppercase_count(text)}"
+                )
 
             if len(summary) == 0:
                 return text

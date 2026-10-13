@@ -52,7 +52,9 @@ def analyze_text(
                 summary.append(f"No. of Spaces: {get_space_count(text)}")
 
             if count_uppercase_chars:
-                summary.append(f"No. of Uppercase Chars: {get_uppercase_count(text)}")
+                summary.append(
+                    f"No. of Uppercase Chars: {get_uppercase_count(text)}"
+                )
 
             if not summary:
                 return text
@@ -65,9 +67,7 @@ def analyze_text(
 
 
 # Text used in all examples
-sentence = (
-    "The Codeline Legends team is learning Python decorators in Muscat this week."
-)
+sentence = "The Codeline Legends team is learning Python decorators in Muscat this week."
 
 
 # Part 1 example
@@ -102,7 +102,7 @@ def get_sentence_no_stats():
     return sentence
 
 
-# Print
+# Print 
 print(get_sentence())
 print(get_sentence_all())
 print(get_sentence_without_spaces())

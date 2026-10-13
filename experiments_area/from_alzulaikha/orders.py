@@ -12,7 +12,6 @@ orders: list[dict] = [
 def is_large(order: dict) -> bool:
     return order["size_oz"] >= 16
 
-
 # Filter large coffee orders
 filtered_list = list(filter(is_large, orders))
 
@@ -27,7 +26,7 @@ result = list(
 )
 # Format large orders using list comprehension
 large_orders_lc = [
-    f"{order['name']} - {order['drink']} ({order['size_oz']}oz)"
+    f'{order["name"]} - {order["drink"]} ({order["size_oz"]}oz)'
     for order in orders
     if is_large(order)
 ]

@@ -8,12 +8,21 @@ def get_word_count(text):
 def get_space_count(text):
     return text.count(" ")
 
+  
+def  get_uppercase_count(text):
+     return sum(1 for char in text if char.isupper())
 
-def get_uppercase_count(text):
-    return sum(1 for char in text if char.isupper())
 
 
-def analyze_text(count_words=True, count_spaces=True, count_uppercase_chars=True):
+
+
+def analyze_text(
+    count_words=True,
+    count_spaces=True,
+    count_uppercase_chars=True
+):
+
+
 
     def decorator(func):
 
@@ -33,7 +42,9 @@ def analyze_text(count_words=True, count_spaces=True, count_uppercase_chars=True
 
             if count_uppercase_chars:
                 uppercase = get_uppercase_count(text)
-                summary_parts.append(f"No. of Uppercase Chars: {uppercase}")
+                summary_parts.append(
+                    f"No. of Uppercase Chars: {uppercase}"
+                )
 
             # If all three are False
             if not summary_parts:
@@ -67,7 +78,11 @@ def get_news_3():
 
 
 # Example 4
-@analyze_text(count_words=False, count_spaces=False, count_uppercase_chars=False)
+@analyze_text(
+    count_words=False,
+    count_spaces=False,
+    count_uppercase_chars=False
+)
 def get_news_4():
     return "The Codeline Legends team is learning Python"
 

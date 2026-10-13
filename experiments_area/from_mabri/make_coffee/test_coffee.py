@@ -10,7 +10,9 @@ expected = {
 }
 
 result = make_coffee(
-    101, "latte", "Alice", "soy_milk", "extra_shot", size="large", takeaway=True
+    101, "latte", "Alice",
+    "soy_milk", "extra_shot",
+    size="large", takeaway=True
 )
 
 if result == expected:
@@ -21,4 +23,4 @@ else:
     print("got:", result)
 
 # Negative test case raises a SyntaxError
-# print(make_coffee(order_id=101, "latte", "Alice"))
+#print(make_coffee(order_id=101, "latte", "Alice"))
