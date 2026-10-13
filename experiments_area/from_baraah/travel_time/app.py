@@ -1,4 +1,3 @@
-
 import requests
 
 
@@ -7,6 +6,7 @@ def read_key():
     with open("api_key.txt", "r") as file:
         return file.read().strip()
 
+
 # convert city name into coordinates
 def get_location(city, key):
     url = f"https://api.tomtom.com/search/2/geocode/{city}.json"
@@ -14,6 +14,7 @@ def get_location(city, key):
     position = data["results"][0]["position"]
 
     return f"{position['lat']},{position['lon']}"
+
 
 # get time with current traffic
 def get_travel_time(source, destination, key):
@@ -25,6 +26,7 @@ def get_travel_time(source, destination, key):
     params = {"key": key, "travelMode": "car", "traffic": "true", "departAt": "now"}
 
     return requests.get(url, params=params).json()
+
 
 # convert seconds to hours and minutes
 def format_time(seconds):
@@ -40,7 +42,7 @@ def format_time(seconds):
     return f"{hours} hours {minutes} minutes"
 
 
-# run 
+# run
 def main():
     source = input("Enter source: ")
     destination = input("Enter destination: ")
@@ -50,7 +52,9 @@ def main():
         data = get_travel_time(source, destination, key)
         seconds = data["routes"][0]["summary"]["travelTimeInSeconds"]
 
-        print(f"Driving from {source} to {destination} takes about {format_time(seconds)} with current traffic.")
+        print(
+            f"Driving from {source} to {destination} takes about {format_time(seconds)} with current traffic."
+        )
 
     except Exception as e:
         print("Could not get the travel time:", e)
@@ -58,5 +62,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
