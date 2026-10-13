@@ -4,9 +4,9 @@ import requests
 # get prayer times
 def get_prayers(city):
     response = requests.get(
-        f"https://api.aladhan.com/v1/timingsByCity?city={city}&country=Oman"
+        "https://api.aladhan.com/v1/timingsByCity",
+        params={"city": city, "country": "Oman"},
     )
-
     return response.json()
 
 
