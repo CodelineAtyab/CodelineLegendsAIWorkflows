@@ -1,0 +1,15 @@
+{a: 1, an: 0, the: 0} A smile can make someone's day better.
+{a: 0, an: 0, the: 2} The journey is more important than the destination.
+{a: 1, an: 1, the: 0} A new challenge is an opportunity to grow.
+{a: 0, an: 0, the: 1} The best lessons come from experience.
+{a: 1, an: 0, the: 1} The smallest actions can make a big difference.
+{a: 0, an: 1, the: 0} An opportunity can change your future.
+{a: 1, an: 0, the: 0} A little progress every day matters.
+{a: 0, an: 1, the: 0} An important decision can change everything.
+{a: 1, an: 1, the: 0} An exciting adventure begins with a plan.
+{a: 0, an: 1, the: 1} An honest person earns the trust of others.
+{a: 1, an: 0, the: 0} A strong mind can overcome challenges.
+{a: 0, an: 0, the: 1} The sky is full of beautiful stars.
+{a: 2, an: 0, the: 0} A journey begins with a single step.
+{a: 0, an: 0, the: 2} The beauty of life is in the little things.
+{a: 0, an: 0, the: 1} The best time to start is now.
