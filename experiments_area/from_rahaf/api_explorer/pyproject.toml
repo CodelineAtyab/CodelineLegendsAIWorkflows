@@ -1,0 +1,8 @@
+[project]
+name = "api-explorer"
+version = "0.1.0"
+description = "A simple Python app that gets cat facts using the Cat Facts API"
+requires-python = ">=3.14"
+dependencies = [
+    "requests>=2.34.2",
+]
