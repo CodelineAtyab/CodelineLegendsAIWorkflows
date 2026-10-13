@@ -2,6 +2,7 @@ from urllib.parse import quote
 
 import requests
 
+
 def read_api_key():
     with open("api_key.txt", "r", encoding="utf-8") as file:
         api_key = file.read().strip()
