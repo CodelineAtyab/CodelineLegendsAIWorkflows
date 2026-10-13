@@ -1,6 +1,7 @@
 def add_msg_to_chat_history(msg, chat_history):
-  chat_history.append(msg) 
-  return None
+    chat_history.append(msg)
+    return None
+
 
 # x = 10
 
@@ -14,4 +15,3 @@ def add_msg_to_chat_history(msg, chat_history):
 #   print(sum(1,2))
 #   print(sum(-1,-2))
 #   print(sum("Abc", "Def"))
-
