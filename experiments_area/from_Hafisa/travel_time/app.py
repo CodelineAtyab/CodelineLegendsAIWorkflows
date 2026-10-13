@@ -97,7 +97,7 @@ def main():
             f"{travel_time} with current traffic."
         )
 
-    except Exception as error:
+    except (OSError, ValueError, KeyError, IndexError, requests.RequestException) as error:
         print(f"Could not get the travel time: {error}")
 
 
