@@ -1,8 +1,11 @@
 import requests
 
+
 # get prayer times
 def get_prayers(city):
-    response = requests.get(f"https://api.aladhan.com/v1/timingsByCity?city={city}&country=Oman" )
+    response = requests.get(
+        f"https://api.aladhan.com/v1/timingsByCity?city={city}&country=Oman"
+    )
 
     return response.json()
 
@@ -18,7 +21,7 @@ def show_prayers(data):
     print("Isha:", times.get("Isha"))
 
 
-# Run 
+# Run
 def main():
     city = input("Enter city in Oman: ")
     show_prayers(get_prayers(city))
