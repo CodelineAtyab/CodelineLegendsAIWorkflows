@@ -2,28 +2,37 @@ import requests # to use requests library to can communicate with Apis
 
 
 # send a GET request to the API
-def get_joke():
+def get_books(book_title):
     response = requests.get(
-        "https://official-joke-api.appspot.com/random_joke"
+        "https://openlibrary.org/search.json",
+        params={
+            "q": book_title,
+            "fields": "title,author_name",
+            "limit": 5 #return up five matching books.
+        }
     )
-
+    
     data = response.json()  # to convert JSON response into a Python dictionary
     return data
 
 #to display the result
-def display_result(data): 
-    print(data.get("setup"))
-    print(data.get("punchline"))
+def display_result(data):
+    for book in data.get("docs", []):
+        print("Title:", book.get("title"))
+        print("Author:", book.get("author_name"))
+        print()
 
 
 def main(): #to start the program and run all the functions in order.
-    joke = get_joke()
-    display_result(joke)
+    book_title = input("Enter a book title: ")
+
+    books = get_books(book_title)
+    display_result(books)
 
 
 if __name__ == "__main__":
     main()
     
     
-#I choose the Official Joke API to get random jokes.
-# I choose it because it is simple to use and lets the program display a joke from an API.
+# I chose the Open Library API to search for books.
+# I chose it because the user can enter a title and get matching books.
