@@ -7,7 +7,8 @@ def main():
 
     for university in data:
         print(f"Name: {university['name']}")
-        
+
+
 
 
 if __name__ == "__main__":
