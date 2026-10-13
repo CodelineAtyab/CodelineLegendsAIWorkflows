@@ -1,5 +1,5 @@
-
 from urllib.parse import quote
+
 import requests
 
 def read_api_key():
