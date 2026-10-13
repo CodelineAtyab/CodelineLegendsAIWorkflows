@@ -1,5 +1,6 @@
 import requests
 
+
 def read_api_key():
     with open('api_key.txt', 'r') as file:
         return file.read().strip()
@@ -56,7 +57,7 @@ def main():
             
         )
         
-    except Exception as e:
+    except requests.RequestException as e:
         print("could not get travel time:", str(e))
         
 if __name__ == "__main__":
