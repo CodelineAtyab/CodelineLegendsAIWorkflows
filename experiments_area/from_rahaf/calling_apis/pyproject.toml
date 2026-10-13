@@ -1,0 +1,9 @@
+[project]
+name = "calling-apis"
+version = "0.1.0"
+description = "Simple API client for nationality lookup"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "requests>=2.32.3",
+]
