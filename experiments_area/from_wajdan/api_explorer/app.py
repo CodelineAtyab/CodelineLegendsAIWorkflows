@@ -8,20 +8,19 @@ def get_rates(currency):
     return response.json()
 
 
-def print_rates(data):
-    currency = data.get("base_code")
-    rates = data.get("rates")
+def show_rates(currency, rates):
+    print(f"Exchange rates for 1 {currency}:")
 
-    print("Exchange rates for 1 " + currency + ":")
-
-    for country_currency, rate in rates.items():
-        print(f"{country_currency}: {rate}")
+    for code in ["OMR", "USD", "EUR"]:
+        rate = rates.get(code)
+        print(f"{code:<5} {rate:>10.4f}")
 
 
 def main():
     currency = input("Enter currency code (e.g. OMR): ").strip().upper()
     data = get_rates(currency)
-    print_rates(data)
+    rates = data.get("rates")
+    show_rates(currency, rates)
 
 
 if __name__ == "__main__":
