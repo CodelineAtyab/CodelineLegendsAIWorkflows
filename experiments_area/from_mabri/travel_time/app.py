@@ -15,7 +15,7 @@ def get_travel_data(source, destination, api_key):
         "origins": source,
         "destinations": destination,
         "mode": "driving",
-        # departure_time=now makes Google return duration_in_traffic (live traffic)
+        # departure_time=now makes Google return live traffic
         "departure_time": "now",
         "key": api_key,
     }
@@ -23,7 +23,7 @@ def get_travel_data(source, destination, api_key):
     return response.json()
 
 
-def extract_traffic_seconds(data):
+def extract_duration_in_traffic(data):
     if data.get("status") != "OK":
         raise ValueError(data.get("error_message", data.get("status")))
 
@@ -31,7 +31,7 @@ def extract_traffic_seconds(data):
     if element.get("status") != "OK":
         raise ValueError(f"no route found ({element.get('status')})")
 
-    return element.get("duration_in_traffic").get("value")
+    return element.get("duration_in_traffic").get("text")
 
 
 def format_duration(total_seconds):
@@ -96,8 +96,8 @@ def main():
     try:
         api_key = read_api_key()
         data = get_travel_data(source, destination, api_key)
-        travel_seconds = extract_traffic_seconds(data)
-        print(f"Driving from {source} to {destination} takes about {format_duration(travel_seconds)} with current traffic.")
+        duration_text = extract_duration_in_traffic(data)
+        print(f"Driving from {source} to {destination} takes about {duration_text} with current traffic.")
     except Exception as ex:
         print(f"Could not get the travel time: {str(ex)}")
 
