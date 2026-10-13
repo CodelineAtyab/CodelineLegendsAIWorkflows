@@ -56,8 +56,8 @@ def main():
             f"Driving from {source} to {destination} takes about {format_time(seconds)} with current traffic."
         )
 
-    except Exception as e:
-        print("Could not get the travel time:", e)
+    except (requests.RequestException, KeyError, IndexError, TypeError, ValueError, OSError) as e:
+     print("Could not get the travel time:", e)
 
 
 if __name__ == "__main__":
