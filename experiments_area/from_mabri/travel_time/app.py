@@ -97,7 +97,9 @@ def main():
         api_key = read_api_key()
         data = get_travel_data(source, destination, api_key)
         duration_text = extract_duration_in_traffic(data)
-        print(f"Driving from {source} to {destination} takes about {duration_text} with current traffic.")
+        print(
+            f"Driving from {source} to {destination} takes about {duration_text} with current traffic."
+        )
     except Exception as ex:
         print(f"Could not get the travel time: {str(ex)}")
 
