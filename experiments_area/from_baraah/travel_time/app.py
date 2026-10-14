@@ -1,4 +1,3 @@
-
 import requests
 
 
@@ -54,7 +53,7 @@ def get_travel_time(data):
     return f"{hours} {h} {minutes} {m}"
 
 
-# Run 
+# Run
 def main():
     source = input("Enter the source: ").strip()
     destination = input("Enter the destination: ").strip()
@@ -68,7 +67,14 @@ def main():
             f"takes about {travel_time} with current traffic."
         )
 
-    except (requests.RequestException, OSError, KeyError, IndexError, TypeError, ValueError) as e:
+    except (
+        requests.RequestException,
+        OSError,
+        KeyError,
+        IndexError,
+        TypeError,
+        ValueError,
+    ) as e:
         print(f"Could not get the travel time: {e}")
 
 
