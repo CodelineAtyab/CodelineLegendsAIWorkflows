@@ -1,0 +1,5 @@
+# Generated conversation history (one JSON file per session)
+sessions/
+
+# Python bytecode
+__pycache__/

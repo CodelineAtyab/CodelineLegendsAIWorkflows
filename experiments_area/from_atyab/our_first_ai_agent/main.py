@@ -1,34 +1,38 @@
-import os
-from dotenv import load_dotenv
-from openai import OpenAI
+# Entry point: runs the interactive chat loop and wires the utils together.
 
-load_dotenv()
-
-MODEL = "gpt-4.1-mini"
-EXIT_WORDS = {"exit", "quit"}
+from utils.client import create_client, send_message
+from utils.config import EXIT_WORDS, MODEL, require_api_key
+from utils.session import load_session, resolve_session_id, save_session
 
 
 def main():
-    if not os.getenv("OPENAI_API_KEY"):
-        raise SystemExit("Error: OPENAI_API_KEY is not set in your environment.")
+    # 1. Make sure the API key is available before doing anything else.
+    require_api_key()
 
-    client = OpenAI()
-    messages = [{"role": "system", "content": "You are a helpful assistant."}]
+    # 2. Prepare the client and decide which conversation to continue.
+    client = create_client()
+    session_id = resolve_session_id()
+
+    # 3. Load any previously saved messages for this session (empty on first run).
+    messages = load_session(session_id)
     user_input = ""
 
-    print("Chat with gpt-4.1-mini (type 'exit' or 'quit' to stop).\n")
+    print(f"Chat with {MODEL} — session {session_id}")
+    print("(type 'exit' or 'quit' to stop)\n")
+
+    # 4. Loop until the user types an exit word (checked in the condition).
     while user_input.lower() not in EXIT_WORDS:
         user_input = input("You: ").strip()
 
+        # Skip blank input; exit words are handled by the loop condition above.
         if user_input and user_input.lower() not in EXIT_WORDS:
+            # Record the user's message, ask the model, then record its reply.
             messages.append({"role": "user", "content": user_input})
-
-            response = client.chat.completions.create(
-                model=MODEL,
-                messages=messages,
-            )
-            reply = response.choices[0].message.content
+            reply = send_message(client, messages)
             messages.append({"role": "assistant", "content": reply})
+
+            # Persist the updated history so it survives the next run.
+            save_session(session_id, messages)
             print(f"Assistant: {reply}\n")
 
 
