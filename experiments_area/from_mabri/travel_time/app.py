@@ -1,6 +1,5 @@
 import requests
 
-
 DISTANCE_MATRIX_URL = "https://maps.googleapis.com/maps/api/distancematrix/json"
 KEY_FILE = "config.txt"
 
@@ -23,7 +22,7 @@ def get_travel_data(source, destination, api_key):
     return response.json()
 
 
-def extract_duration_in_traffic(data):
+def extract_traffic_seconds(data):
     if data.get("status") != "OK":
         raise ValueError(data.get("error_message", data.get("status")))
 
@@ -31,7 +30,20 @@ def extract_duration_in_traffic(data):
     if element.get("status") != "OK":
         raise ValueError(f"no route found ({element.get('status')})")
 
-    return element.get("duration_in_traffic").get("text")
+    return element.get("duration_in_traffic").get("value")
+
+
+def format_duration(total_seconds):
+    total_minutes = round(total_seconds / 60)
+    hours = total_minutes // 60
+    minutes = total_minutes % 60
+
+    parts = []
+    if hours > 0:
+        parts.append(f"{hours} hour" if hours == 1 else f"{hours} hours")
+    if minutes > 0 or hours == 0:
+        parts.append(f"{minutes} minute" if minutes == 1 else f"{minutes} minutes")
+    return " ".join(parts)
 
 
 # ---------------------------------------------------------------------------
@@ -83,12 +95,23 @@ def main():
     try:
         api_key = read_api_key()
         data = get_travel_data(source, destination, api_key)
-        duration_text = extract_duration_in_traffic(data)
+        duration_text = format_duration(extract_traffic_seconds(data))
         print(
             f"Driving from {source} to {destination} takes about {duration_text} with current traffic."
         )
-    except Exception as ex:
-        print(f"Could not get the travel time: {str(ex)}")
+    # OSError: config.txt missing/unreadable
+    # RequestException: no internet, timeout, bad response (incl. invalid JSON)
+    # ValueError: API returned an error status or no route
+    # LookupError/AttributeError/TypeError: unexpected JSON shape
+    except (
+        OSError,
+        requests.RequestException,
+        ValueError,
+        LookupError,
+        AttributeError,
+        TypeError,
+    ) as ex:
+        print(f"Could not get the travel time: {ex}")
 
 
 if __name__ == "__main__":
