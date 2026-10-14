@@ -1,11 +1,9 @@
 import requests
+
+
 def read_api_key():
-    try:
-        with open("google_api_key.txt") as key_file:
-            return key_file.read().strip()
-    except OSError:
-        print("Could not read the API key file.")
-        return None
+    with open("google_api_key.txt") as file:
+        return file.read().strip()
 
 
 def get_travel_time_seconds(source, destination, api_key):
@@ -17,56 +15,62 @@ def get_travel_time_seconds(source, destination, api_key):
         "key": api_key,
     }
 
-    try:
-        response = requests.get(
-            "https://maps.googleapis.com/maps/api/directions/json",
-            params=params,
-        )
-        data = response.json()
+    response = requests.get(
+        "https://maps.googleapis.com/maps/api/directions/json",
+        params=params,
+        timeout=10,
+    )
+    response.raise_for_status()
+    data = response.json()
 
-        if data.get("status") != "OK":
-            print(f"Could not get the travel time: {data.get('status', 'bad response')}")
-            return None
+    if data.get("status") != "OK":
+        raise ValueError(data.get("status", "bad response"))
 
-        seconds = data["routes"][0]["legs"][0]["duration_in_traffic"]["value"]
-        return int(seconds)
-    except Exception:
-        print("Could not get the travel time: request or response failed")
-        return None
+    return data["routes"][0]["legs"][0]["duration_in_traffic"]["value"]
 
 
-def format_duration(total_minutes):
-    hours, minutes = divmod(total_minutes, 60)
-    parts = []
+def format_duration(seconds):
+    total_minutes = round(seconds / 60)
+    hours = total_minutes // 60
+    minutes = total_minutes % 60
 
-    if hours:
-        parts.append(f"{hours} hour" + ("s" if hours != 1 else ""))
-    if minutes:
-        parts.append(f"{minutes} minute" + ("s" if minutes != 1 else ""))
+    if hours == 1:
+        hour_text = "1 hour"
+    else:
+        hour_text = f"{hours} hours"
 
-    if not parts:
-        parts.append("0 minutes")
+    if minutes == 1:
+        minute_text = "1 minute"
+    else:
+        minute_text = f"{minutes} minutes"
 
-    return " ".join(parts)
+    if hours == 0:
+        return minute_text
+    if minutes == 0:
+        return hour_text
+
+    return f"{hour_text} {minute_text}"
 
 
 def main():
     source = input("Enter source: ").strip()
     destination = input("Enter destination: ").strip()
 
-    api_key = read_api_key()
-    if api_key is None:
-        return
+    try:
+        api_key = read_api_key()
+        seconds = get_travel_time_seconds(source, destination, api_key)
+        duration = format_duration(seconds)
 
-    seconds = get_travel_time_seconds(source, destination, api_key)
-    if seconds is None:
-        return
-
-    minutes = round(seconds / 60)
-    print(
-        f"Driving from {source} to {destination} takes about "
-        f"{format_duration(minutes)} with current traffic."
-    )
+        print(
+            f"Driving from {source} to {destination} "
+            f"takes about {duration} with current traffic."
+        )
+    except OSError:
+        print("Could not get the travel time: file or network problem")
+    except ValueError:
+        print("Could not get the travel time: invalid API response")
+    except (KeyError, IndexError, TypeError):
+        print("Could not get the travel time: traffic time unavailable")
 
 
 if __name__ == "__main__":
