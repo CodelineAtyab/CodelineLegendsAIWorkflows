@@ -49,10 +49,16 @@ def main():
             raise ValueError(data.get("error_message", data.get("status")))
 
         route = data.get("rows")[0].get("elements")[0]
+
         if route.get("status") != "OK":
             raise ValueError(route.get("status"))
 
-        seconds = route.get("duration_in_traffic").get("value")
+        duration = route.get("duration_in_traffic")
+
+        if not duration or "value" not in duration:
+            raise ValueError("Traffic duration is unavailable")
+
+        seconds = duration["value"]
         travel_time = format_time(seconds)
 
         print(
