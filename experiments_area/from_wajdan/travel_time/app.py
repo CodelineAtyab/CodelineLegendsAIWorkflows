@@ -43,14 +43,14 @@ def format_duration(seconds):
         unit = "minute" if minutes == 1 else "minutes"
         parts.append(f"{minutes} {unit}")
 
-    return " and ".join(parts) if parts else "0 minutes"
+    return " ".join(parts) if parts else "0 minutes"
 
 
 def main():
     try:
         api_key = read_api_key()
-        source = input()
-        destination = input()
+        source = input("Enter the source: ")
+        destination = input("Enter the destination: ")
         seconds = get_travel_seconds(api_key, source, destination)
         travel_time = format_duration(seconds)
         print(
