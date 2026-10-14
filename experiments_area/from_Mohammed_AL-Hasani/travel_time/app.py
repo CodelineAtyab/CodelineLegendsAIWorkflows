@@ -48,14 +48,13 @@ def main():
         if route.get("status") != "OK":
             raise ValueError(route.get("status"))
 
-        seconds = route.get("duration").get("value")
+        seconds = route.get("duration_in_traffic").get("value")
         travel_time = format_time(seconds)
         
         print(
-            f"driving time from {source} to {destination}"
-            f"takes about {travel_time} with current traffic"
-            
-        )
+    f"Driving from {source} to {destination} "
+    f"takes about {travel_time} with current traffic."
+    )
         
     except requests.RequestException as e:
         print("could not get travel time:", str(e))
