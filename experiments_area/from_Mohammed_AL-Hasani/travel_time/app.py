@@ -28,10 +28,13 @@ def format_time(seconds):
 
     if hours == 0:
         return f"{minutes} minutes"
-    if minutes == 0:
-        return f"{hours} {'hour' if hours == 1 else 'hours'}"
 
-    return f"{hours} hours and {minutes} minutes" if hours else f"{minutes} minutes"
+    hour_text = "hour" if hours == 1 else "hours"
+
+    if minutes == 0:
+        return f"{hours} {hour_text}"
+
+    return f"{hours} {hour_text} {minutes} minutes"
 
 
 def main():
@@ -57,8 +60,15 @@ def main():
             f"takes about {travel_time} with current traffic."
         )
 
-    except requests.RequestException as e:
-        print("could not get travel time:", str(e))
+    except (
+        OSError,
+        requests.RequestException,
+        ValueError,
+        TypeError,
+        KeyError,
+        IndexError,
+    ) as e:
+        print(f"Could not get the travel time: {e}")
 
 
 if __name__ == "__main__":
