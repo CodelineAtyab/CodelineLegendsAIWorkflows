@@ -18,7 +18,7 @@ def get_api_key_respon(source, destination):
             "mode": "driving",
             "departure_time": "now",
             "traffic_model": "best_guess",
-            "key": api_key
+            "key": api_key,
         }
 
         response = requests.get(url, params=params, timeout=30)
@@ -40,7 +40,7 @@ def get_travel_time(data):
         if data.get("status") != "OK":
             print(
                 "Could not get the travel time:",
-                data.get("error_message", data.get("status", "API error"))
+                data.get("error_message", data.get("status", "API error")),
             )
             return None
 
