@@ -58,6 +58,7 @@ def analyze_text(
             return final_msg
 
         return decorated_func
+
     return decorator
 
 
