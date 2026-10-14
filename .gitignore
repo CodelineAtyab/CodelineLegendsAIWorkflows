@@ -189,3 +189,6 @@ desktop.ini
 #   If you scaffold a new project, its own .gitignore is respected on top of
 #   this root file.
 # =============================================================================
+
+# Travel time local API key
+experiments_area/from_Hidaya/travel_time/google_api_key.txt
