@@ -48,20 +48,13 @@ def save_session(session_id: str, messages: list) -> None:
 
 
 def resolve_session_id() -> str:
-    """Pick which session to use: explicit CLI arg, else most recent, else new."""
-    # 1. An explicit id passed on the command line always takes priority.
+    """Use the given session id if it exists, otherwise start a brand new session."""
+    # 1. An explicit id from the command line must point to an existing session.
     if len(sys.argv) > 1:
-        return sys.argv[1]
+        session_id = sys.argv[1]
+        if not os.path.exists(session_file(session_id)):
+            raise SystemExit(f"Error: no session found with id '{session_id}'.")
+        return session_id
 
-    # 2. Otherwise resume the most recently modified session file, if any.
-    if SESSIONS_DIR.exists():
-        sessions = sorted(
-            SESSIONS_DIR.glob("*.json"),
-            key=lambda path: path.stat().st_mtime,
-            reverse=True,
-        )
-        if sessions:
-            return sessions[0].stem
-
-    # 3. No saved sessions -> generate a new unique id.
+    # 2. No id provided -> always start a new session.
     return str(uuid4())
