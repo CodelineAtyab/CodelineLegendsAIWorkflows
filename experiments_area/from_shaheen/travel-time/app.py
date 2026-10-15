@@ -2,7 +2,6 @@ from pathlib import Path
 
 import requests
 
-
 API_KEY_FILE = Path(__file__).with_name("api_key_file.txt")
 ROUTES_URL = "https://routes.googleapis.com/directions/v2:computeRoutes"
 
@@ -64,20 +63,22 @@ def get_travel_time(data):
         duration = routes[0]["duration"]
         if not duration.endswith("s"):
             raise ValueError("invalid route duration")
+
         seconds = float(duration[:-1])
         total_minutes = round(seconds / 60)
         hours, minutes = divmod(total_minutes, 60)
 
+        minute_text = "minute" if minutes == 1 else "minutes"
+
         if hours == 0:
-            return f"{minutes} {'minute' if minutes == 1 else 'minutes'}"
+            return f"{minutes} {minute_text}"
 
         hour_text = "hour" if hours == 1 else "hours"
+
         if minutes == 0:
             return f"{hours} {hour_text}"
 
-        return (
-            f"{hours} {hour_text} {minutes} {'minute' if minutes == 1 else 'minutes'}"
-        )
+        return f"{hours} {hour_text} {minutes} {minute_text}"
 
     except (KeyError, IndexError, TypeError, ValueError) as error:
         print(f"Could not get the travel time: {error}")
