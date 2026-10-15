@@ -7,22 +7,26 @@ def get_api_key():
         return file.read().strip()
 
 
-# Fetch travel data from Google
+# Fetch travel data from Google Routes API
 def fetch_travel_data(source, destination):
     api_key = get_api_key()
 
-    url = "https://maps.googleapis.com/maps/api/distancematrix/json"
+    url = "https://routes.googleapis.com/directions/v2:computeRoutes"
 
-    params = {
-        "origins": source,
-        "destinations": destination,
-        "mode": "driving",
-        "departure_time": "now",
-        "traffic_model": "best_guess",
-        "key": api_key,
+    headers = {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": api_key,
+        "X-Goog-FieldMask": "routes.duration",
     }
 
-    response = requests.get(url, params=params, timeout=30)
+    body = {
+        "origin": {"address": source},
+        "destination": {"address": destination},
+        "travelMode": "DRIVE",
+        "routingPreference": "TRAFFIC_AWARE",
+    }
+
+    response = requests.post(url, headers=headers, json=body, timeout=30)
     response.raise_for_status()
 
     return response.json()
@@ -30,16 +34,12 @@ def fetch_travel_data(source, destination):
 
 # Convert travel time into hours and minutes
 def get_travel_time(data):
-    if data.get("status") != "OK":
-        raise ValueError(data.get("error_message", "API error"))
+    if not data.get("routes"):
+        raise ValueError("No route found")
 
-    route = data["rows"][0]["elements"][0]
+    seconds = float(data["routes"][0]["duration"].rstrip("s"))
+    total = int((seconds + 30) // 60)
 
-    if route.get("status") != "OK":
-        raise ValueError(route["status"])
-
-    seconds = route["duration_in_traffic"]["value"]
-    total = (seconds + 30) // 60
     hours, minutes = divmod(total, 60)
 
     h = "hour" if hours == 1 else "hours"
