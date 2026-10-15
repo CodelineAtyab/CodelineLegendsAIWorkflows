@@ -108,3 +108,81 @@ def load_history(name):
     except (OSError, json.JSONDecodeError):
         print("Could not load session history.")
         return None
+#Create the chat loop 
+def chat(client, name, history, index, new_session):
+    while True:
+        question = input("You: ").strip()
+
+        if question.lower() == "exit":
+            print("Goodbye!")
+            break
+
+        if not question:
+            continue
+
+        if new_session:
+            name = generate_name(client, question)
+
+            # Keep session names unique and two words.
+            base_name = name
+            number = 2
+
+            while name in index:
+                name = f"{base_name.split('_')[0]}_{number}"
+                number += 1
+
+            session_id = f"session-{len(index) + 1}"
+
+            index[name] = session_id
+
+            if not save_json(INDEX_FILE, index):
+                return
+
+            print(f"Session created: {name}")
+            new_session = False
+
+        pending_messages = history + [
+            {"role": "user", "content": question}
+        ]
+
+        answer = get_answer(client, pending_messages)
+
+        if answer is None:
+            continue
+
+        print(f"AI: {answer}")
+
+        history = pending_messages + [
+            {"role": "assistant", "content": answer}
+        ]
+
+        if not save_json(SESSIONS_DIR / f"{name}.json", history):
+            return
+
+#Create main()
+def main():
+    if not API_KEY:
+        print("API key not found. Check your .env file.")
+        return
+    client = OpenAI(api_key=API_KEY)
+    try:
+        SESSIONS_DIR.mkdir(exist_ok=True)
+    except OSError:
+        print("Could not create sessions folder.")
+        return
+    index = load_index()
+    if index is None:
+        return
+    name = input("Enter session name (Enter for new): ").strip()
+    if not name:
+        chat(client, "", [], index, True)
+    elif name in index:
+        history = load_history(name)
+        if history is not None:
+            print(f"Session loaded: {name}")
+            chat(client, name, history, index, False)
+    else:
+        print("Session not found.")
+
+if __name__ == "__main__":
+    main()
