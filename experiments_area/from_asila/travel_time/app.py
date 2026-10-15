@@ -1,99 +1,90 @@
-import requests 
-from urllib.parse import quote
+import requests
+from requests.exceptions import RequestException
 
 
-
+# read the Google API key from a local file.
 def read_api_key():
-    with open("api_key.txt", "r") as file:  #read the key from the file.
-        key = file.read().strip()
+    with open("api_key.txt", "r", encoding="utf-8") as file:
+        return file.read().strip()
 
-    return key
 
-# Convert a place name into coordinates for TomTom.
-def get_coordinates(place, key):
-    response = requests.get(
-        f"https://api.tomtom.com/search/2/geocode/{quote(place, safe='')}.json",
-        params={"key": key,"limit": 1}
+# request driving time with current traffic.
+#This function asks Google for the driving time between two places, including traffic.
+def get_travel_time(source, destination, api_key):
+    url = "https://routes.googleapis.com/directions/v2:computeRoutes"
+
+    headers = { # here header includes your API key and the fields you want back.
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": api_key,
+        "X-Goog-FieldMask": "routes.duration",
+    }
+
+    data_to_send = {
+        "origin": {"address": source},
+        "destination": {"address": destination},
+        "travelMode": "DRIVE",
+        "routingPreference": "TRAFFIC_AWARE",
+    }
+
+    response = requests.post(
+        url,
+        headers=headers,
+        json=data_to_send,  #sends data as JSON.
+        timeout=30, #limits how long it waits for a connection or data.
     )
-    
-    
-    if not response.ok:
-        raise ValueError(f"Location request failed: HTTP {response.status_code}")
+    response.raise_for_status()
 
     data = response.json()
-    position = data.get("results")[0].get("position")
-    return f"{position['lat']},{position['lon']}"
+    routes = data.get("routes", [])
+
+    if not routes:
+        raise ValueError("No driving route was found")
+
+    return routes[0]["duration"]
 
 
 
-# Request a driving route with current traffic.
-def get_travel_data(source, destination, key):
-    start = get_coordinates(source, key)
-    end = get_coordinates(destination, key)
+# Convert seconds into hours and minutes.
+def format_duration(duration):
+    total_seconds = float(duration.removesuffix("s"))
+    total_minutes = int(total_seconds / 60 + 0.5)
 
-    response = requests.get(
-        f"https://api.tomtom.com/routing/1/calculateRoute/{start}:{end}/json",
-        params={
-            "key": key,
-            "travelMode": "car",
-            "traffic": "true",
-            "departAt": "now",
-            "computeTravelTimeFor": "all"
-        }
-    )
-
-    if not response.ok:
-        raise ValueError("Driving route request failed")
-
-    return response.json()
-
-
-# convert the traffic time into hours and minutes.
-def format_time(data):
-    summary = data.get("routes")[0].get("summary")
-    seconds = summary.get("liveTrafficIncidentsTravelTimeInSeconds")
-
-    if seconds is None:
-        raise ValueError("Current traffic time is unavailable")
-
-    total_minutes = int(seconds / 60 + 0.5)
     hours = total_minutes // 60
     minutes = total_minutes % 60
 
     parts = []
 
-    if hours > 0:
-        hour_word = "hour" if hours == 1 else "hours"
-        parts.append(f"{hours} {hour_word}")
+    if hours:
+        unit = "hour" if hours == 1 else "hours"
+        parts.append(f"{hours} {unit}")
 
-    if minutes > 0 or hours == 0:
-        minute_word = "minute" if minutes == 1 else "minutes"
-        parts.append(f"{minutes} {minute_word}")
+    if minutes:
+        unit = "minute" if minutes == 1 else "minutes"
+        parts.append(f"{minutes} {unit}")
 
-    return " ".join(parts)
+    return " ".join(parts) if parts else "0 minutes"
 
 
 def main():
-    #Ask for the source and destination.
-    source = input("Enter the source: ")
-    destination = input("Enter the destination: ")
+    source = input("Enter starting place: ")
+    destination = input("Enter destination: ")
 
-    #Handle request and parsing failures.
     try:
-        key = read_api_key()
-        data = get_travel_data(source, destination, key)
-        travel_time = format_time(data)
+        api_key = read_api_key()
+        duration = get_travel_time(source, destination, api_key)
+        travel_time = format_duration(duration)
 
-        #Print the required result.
         print(
             f"Driving from {source} to {destination} takes about "
             f"{travel_time} with current traffic."
         )
 
-    except requests.exceptions.RequestException:
-        print("Could not get the travel time: Network request failed")
-    except Exception as error:
+    except RequestException:
+        print("Could not get the travel time: Google API or network request failed")
+
+    except (OSError, KeyError, IndexError, ValueError, TypeError) as error:
         print(f"Could not get the travel time: {error}")
+
 
 
 if __name__ == "__main__":
