@@ -13,10 +13,9 @@ def is_large(order: Dict[str, Any]) -> bool:
     return bool(order["size_oz"] >= 16)
 
 
-# 1. Keep only the large orders
 large_orders: List[Dict[str, Any]] = list(filter(is_large, orders))
 
-# 2. Convert each large order into a formatted string
+#  Convert each large order into a formatted string
 formatted_orders: List[str] = list(
     map(
         lambda order: f"{order['name']} – {order['drink']} ({order['size_oz']}oz)",
