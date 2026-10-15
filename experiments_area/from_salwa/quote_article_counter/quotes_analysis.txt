@@ -1,0 +1,15 @@
+{a: 0, an: 1, the: 0} An open mind learns new things.
+{a: 0, an: 0, the: 1} The road to success needs patience.
+{a: 2, an: 0, the: 0} A little practice improves a skill.
+{a: 1, an: 1, the: 0} An old friend is a treasure.
+{a: 2, an: 0, the: 0} A journey begins with a single step.
+{a: 0, an: 1, the: 0} An opportunity may come at any time.
+{a: 0, an: 0, the: 1} The best time to start is now.
+{a: 0, an: 1, the: 0} An early start can save time.
+{a: 0, an: 1, the: 1} An idea can change the world.
+{a: 0, an: 0, the: 1} The sky is full of stars.
+{a: 0, an: 0, the: 1} The secret of success is hard work.
+{a: 2, an: 0, the: 0} A small change makes a big difference.
+{a: 0, an: 0, the: 1} The best lessons come from experience.
+{a: 1, an: 0, the: 0} A new day brings new hope.
+{a: 0, an: 0, the: 2} The sun shines after the rain.
