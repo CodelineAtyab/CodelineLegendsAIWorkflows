@@ -1,0 +1,15 @@
+{a: 0, an: 0, the: 0} Actions speak louder than words.
+{a: 2, an: 0, the: 0} A picture is worth a thousand words.
+{a: 1, an: 0, the: 2} A bird in the hand is worth two in the bush.
+{a: 0, an: 0, the: 0} Knowledge is power.
+{a: 0, an: 0, the: 1} The only way to do great work is to love what you do.
+{a: 1, an: 1, the: 0} An ounce of prevention is worth a pound of cure.
+{a: 0, an: 0, the: 2} The apple does not fall far from the tree.
+{a: 3, an: 0, the: 0} A journey of a thousand miles begins with a single step.
+{a: 0, an: 0, the: 2} The early bird catches the worm.
+{a: 0, an: 0, the: 1} Fortune favors the bold.
+{a: 1, an: 0, the: 0} A chain is only as strong as its weakest link.
+{a: 0, an: 0, the: 2} The squeaky wheel gets the grease.
+{a: 0, an: 1, the: 1} An empty vessel makes the most noise.
+{a: 2, an: 0, the: 0} A friend in need is a friend indeed.
+{a: 0, an: 0, the: 2} The pen is mightier than the sword.
