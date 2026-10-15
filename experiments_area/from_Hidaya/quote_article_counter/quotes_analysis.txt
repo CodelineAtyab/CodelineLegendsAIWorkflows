@@ -1,0 +1,15 @@
+{a: 1, an: 0, the: 0} A quiet moment brings peace.
+{a: 1, an: 0, the: 0} A fresh start brings hope.
+{a: 0, an: 0, the: 2} The flowers grow in the garden.
+{a: 0, an: 0, the: 1} The path becomes clear as you walk.
+{a: 0, an: 0, the: 2} The theme of the day is friendship.
+{a: 0, an: 0, the: 2} The rain helps the trees grow.
+{a: 0, an: 0, the: 2} The moon lights the sky.
+{a: 0, an: 0, the: 1} The stars shine at night.
+{a: 1, an: 0, the: 0} A warm welcome makes people smile.
+{a: 0, an: 0, the: 0} Another try may bring success.
+{a: 2, an: 0, the: 0} A helping hand means a lot.
+{a: 1, an: 0, the: 0} A little practice helps you improve.
+{a: 0, an: 1, the: 0} An animal needs love and care.
+{a: 1, an: 0, the: 0} A happy heart spreads joy.
+{a: 0, an: 0, the: 1} The morning brings new chances.
