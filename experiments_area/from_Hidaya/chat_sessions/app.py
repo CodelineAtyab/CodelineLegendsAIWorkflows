@@ -157,7 +157,8 @@ def main():
             print(f"Session loaded: {name}")
             chat(client, name, history, index, False)
     else:
-        print("Session not found.")
+        print("Session not found. Starting a new session.")
+        chat(client, "", [], index, True)
 
 
 if __name__ == "__main__":
