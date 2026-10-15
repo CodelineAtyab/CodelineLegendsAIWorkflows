@@ -1,0 +1,9 @@
+[project]
+name = "api-explorer"
+version = "0.1.0"
+description = "Fetch jokes from the Official Joke API by type"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "requests>=2.34.2",
+]
