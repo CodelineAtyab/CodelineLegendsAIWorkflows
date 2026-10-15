@@ -1,20 +1,23 @@
 import requests
 
 
-def read_api_key(path="api_key.txt"):
+def read_api_key(path="API.txt"):
     with open(path) as f:
         return f.read().strip()
 
 
 def get_route(source, destination, key):
-    response = requests.get(
-        "https://maps.googleapis.com/maps/api/directions/json",
-        params={
-            "origin": source,
-            "destination": destination,
-            "mode": "driving",
-            "departure_time": "now",  
-            "key": key,
+    response = requests.post(
+        "https://routes.googleapis.com/directions/v2:computeRoutes",
+        headers={
+            "X-Goog-Api-Key": key,
+            "X-Goog-FieldMask": "routes.duration",  
+        },
+        json={
+            "origin": {"address": source},
+            "destination": {"address": destination},
+            "travelMode": "DRIVE",
+            "routingPreference": "TRAFFIC_AWARE",  
         },
         timeout=10,
     )
@@ -22,11 +25,14 @@ def get_route(source, destination, key):
 
 
 def get_traffic_seconds(data):
-    if data.get("status") != "OK":
-        raise ValueError(data.get("error_message") or data.get("status"))
-    leg = data.get("routes")[0].get("legs")[0]
-   
-    return leg.get("duration_in_traffic").get("value")
+    if data.get("error"):
+        raise ValueError(data.get("error").get("message"))
+    routes = data.get("routes")
+    if not routes:
+        raise ValueError("No route found")
+    
+    duration = routes[0].get("duration")
+    return int(duration.rstrip("s"))
 
 
 def format_time(seconds):
@@ -56,9 +62,6 @@ def main():
         )
     except Exception as e:
         print("Could not get the travel time:", str(e))
-
-
-        
 
 
 if __name__ == "__main__":
