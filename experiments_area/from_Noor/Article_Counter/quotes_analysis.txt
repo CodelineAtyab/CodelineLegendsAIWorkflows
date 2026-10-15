@@ -1,0 +1,15 @@
+[a: 0, an: 0, the: 1] Action is the foundational key to success.
+[a: 1, an: 0, the: 0] Every moment is a fresh beginning.
+[a: 0, an: 0, the: 0] Believe you can and you are halfway there.
+[a: 0, an: 0, the: 0] Hard work beats talent when talent does not work hard.
+[a: 0, an: 0, the: 1] Learning never exhausts the mind.
+[a: 0, an: 0, the: 1] The only way to do great work is to love what you do.
+[a: 0, an: 0, the: 0] Do what you can with what you have.
+[a: 3, an: 0, the: 0] A journey of a thousand miles begins with a single step.
+[a: 1, an: 0, the: 1] The best time to plant a tree is now.
+[a: 0, an: 0, the: 0] Practice makes progress.
+[a: 0, an: 0, the: 1] Success is the sum of small efforts repeated daily.
+[a: 1, an: 0, the: 0] A little progress each day adds up to big results.
+[a: 0, an: 0, the: 1] The secret of getting ahead is getting started.
+[a: 0, an: 0, the: 0] Knowledge is power.
+[a: 1, an: 0, the: 0] Great things are done by a series of small things.
