@@ -27,6 +27,22 @@ def fetch_travel_data(source, destination):
     }
 
     response = requests.post(url, headers=headers, json=body, timeout=30)
+# Fetch travel data from Google
+def fetch_travel_data(source, destination):
+    api_key = get_api_key()
+
+    url = "https://maps.googleapis.com/maps/api/distancematrix/json"
+
+    params = {
+        "origins": source,
+        "destinations": destination,
+        "mode": "driving",
+        "departure_time": "now",
+        "traffic_model": "best_guess",
+        "key": api_key,
+    }
+
+    response = requests.get(url, params=params, timeout=30)
     response.raise_for_status()
 
     return response.json()
@@ -39,6 +55,16 @@ def get_travel_time(data):
 
     seconds = float(data["routes"][0]["duration"].rstrip("s"))
     total = int((seconds + 30) // 60)
+    if data.get("status") != "OK":
+        raise ValueError(data.get("error_message", "API error"))
+
+    route = data["rows"][0]["elements"][0]
+
+    if route.get("status") != "OK":
+        raise ValueError(route["status"])
+
+    seconds = route["duration_in_traffic"]["value"]
+    total = (seconds + 30) // 60
     hours, minutes = divmod(total, 60)
 
     h = "hour" if hours == 1 else "hours"
