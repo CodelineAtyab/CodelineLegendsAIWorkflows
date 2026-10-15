@@ -148,7 +148,10 @@ def ask_openai(client, messages, purpose):
     """Send messages and return the model's text response."""
     try:
         response = client.chat.completions.create(model=MODEL, messages=messages)
-    except OpenAIError:
+    except OpenAIError as error:
+        if type(error).__name__ == "RateLimitError":
+            error_code = getattr(error, "code", None) or "unknown"
+            raise RuntimeError(f"RateLimitError code: {error_code}. Check your usage limits.")
         raise RuntimeError(f"The OpenAI {purpose} request failed. Check your key, billing, or connection.")
 
     try:
