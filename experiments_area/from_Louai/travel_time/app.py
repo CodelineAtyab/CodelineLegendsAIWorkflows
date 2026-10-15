@@ -1,11 +1,14 @@
 import os
+
 import requests
 
 
 def get_api_key(file_path="key.txt"):
+
     api_key = os.getenv("MAPS_API_KEY")
     if api_key:
         return api_key.strip()
+
 
     try:
         with open(file_path, "r") as file:
@@ -37,7 +40,7 @@ def fetch_travel_time(source, destination, api_key):
         response = requests.post(url, json=payload, headers=headers)
         response.raise_for_status()
         return response.json()
-    except requests.exceptions.RequestException as e:
+    except requests.exceptions.RequestException:
 
         print("Could not get the travel time due to a network or API error.")
         return None
@@ -80,7 +83,7 @@ def format_and_print_time(source, destination, data):
             f"Driving from {source} to {destination} takes about {time_str} with current traffic."
         )
 
-    except (ValueError, KeyError, TypeError) as e:
+    except (ValueError, KeyError, TypeError):
         print("Could not get the travel time: Malformed response received from API.")
 
 
@@ -97,8 +100,8 @@ def main():
         api_data = fetch_travel_time(source_place, dest_place, api_key)
         format_and_print_time(source_place, dest_place, api_data)
 
-    except Exception as e:
-        print("An unexpected error occurred.")
+    except (EOFError, KeyboardInterrupt):
+        print("\nOperation cancelled.")
 
 
 if __name__ == "__main__":
