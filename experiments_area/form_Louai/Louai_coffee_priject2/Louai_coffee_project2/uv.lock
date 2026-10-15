@@ -1,0 +1,8 @@
+version = 1
+revision = 5
+requires-python = ">=3.14"
+
+[[package]]
+name = "louai-coffee-project2"
+version = "0.1.0"
+source = { virtual = "." }
