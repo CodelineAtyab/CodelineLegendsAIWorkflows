@@ -160,7 +160,11 @@ def main():
     session_name, history, stopped = get_session(index)
     if stopped:
         return
-    client = OpenAI(api_key=api_key)
+    try:
+        client = OpenAI(api_key=api_key)
+    except Exception as error:
+        print(f"Could not start the OpenAI client: {error}")
+        return
     is_new = session_name is None
 
     while True:
