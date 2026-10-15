@@ -16,7 +16,7 @@ def load_json(path, default):
             return json.load(file)
     except FileNotFoundError:
         return default
-    except OSError, json.JSONDecodeError:
+    except (OSError, json.JSONDecodeError):
         print(f"Could not read {path.name}. Starting with empty data.")
         return default
 
@@ -87,9 +87,20 @@ def clean_session_name(model_name):
     return "_".join(clean_words[:2])
 
 
+def unique_session_name(session_name, index):
+    if session_name not in index:
+        return session_name
+
+    suffix = 2
+    while f"{session_name}_{suffix}" in index:
+        suffix += 1
+
+    return f"{session_name}_{suffix}"
+
+
 def call_model(client, messages):
-    response = client.responses.create(model=MODEL, input=messages)
-    return response.output_text.strip()
+    response = client.chat.completions.create(model=MODEL, messages=messages)
+    return response.choices[0].message.content.strip()
 
 
 def generate_session_name(client, first_question):
@@ -98,7 +109,8 @@ def generate_session_name(client, first_question):
         "Reply with only two words and nothing else.\n\n"
         f"Question: {first_question}"
     )
-    return clean_session_name(call_model(client, naming_prompt))
+    naming_messages = [{"role": "user", "content": naming_prompt}]
+    return clean_session_name(call_model(client, naming_messages))
 
 
 def chat_loop(client, index, session_name, history, is_new_session):
@@ -118,6 +130,7 @@ def chat_loop(client, index, session_name, history, is_new_session):
             except OpenAIError:
                 print("Could not generate a session name. Using new_session.")
                 session_name = "new_session"
+            session_name = unique_session_name(session_name, index)
 
         history.append({"role": "user", "content": question})
 
