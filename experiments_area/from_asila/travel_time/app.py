@@ -9,11 +9,11 @@ def read_api_key():
 
 
 # request driving time with current traffic.
-#This function asks Google for the driving time between two places, including traffic.
+# This function asks Google for the driving time between two places, including traffic.
 def get_travel_time(source, destination, api_key):
     url = "https://routes.googleapis.com/directions/v2:computeRoutes"
 
-    headers = { # here header includes your API key and the fields you want back.
+    headers = {  # here header includes your API key and the fields you want back.
         "Content-Type": "application/json",
         "X-Goog-Api-Key": api_key,
         "X-Goog-FieldMask": "routes.duration",
@@ -29,10 +29,14 @@ def get_travel_time(source, destination, api_key):
     response = requests.post(
         url,
         headers=headers,
-        json=data_to_send,  #sends data as JSON.
-        timeout=30, #limits how long it waits for a connection or data.
+        json=data_to_send,  # sends data as JSON.
+        timeout=30,  # limits how long it waits for a connection or data.
     )
-    response.raise_for_status()
+
+    if not response.ok:
+        error = response.json().get("error", {})
+        message = error.get("message", f"HTTP {response.status_code}")
+        raise ValueError(message)
 
     data = response.json()
     routes = data.get("routes", [])
@@ -43,10 +47,9 @@ def get_travel_time(source, destination, api_key):
     return routes[0]["duration"]
 
 
-
 # Convert seconds into hours and minutes.
 def format_duration(duration):
-    total_seconds = float(duration.removesuffix("s"))
+    total_seconds = float(duration[:-1])
     total_minutes = int(total_seconds / 60 + 0.5)
 
     hours = total_minutes // 60
@@ -84,7 +87,6 @@ def main():
 
     except (OSError, KeyError, IndexError, ValueError, TypeError) as error:
         print(f"Could not get the travel time: {error}")
-
 
 
 if __name__ == "__main__":
