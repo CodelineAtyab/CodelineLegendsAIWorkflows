@@ -69,7 +69,7 @@ def main():
         print("Could not get the travel time: file or network problem")
     except ValueError:
         print("Could not get the travel time: invalid API response")
-    except (KeyError, IndexError, TypeError):
+    except KeyError, IndexError, TypeError:
         print("Could not get the travel time: traffic time unavailable")
 
 
