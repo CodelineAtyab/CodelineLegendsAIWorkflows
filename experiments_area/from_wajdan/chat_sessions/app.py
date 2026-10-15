@@ -4,12 +4,13 @@ import re
 from pathlib import Path
 
 from dotenv import load_dotenv
-from openai import OpenAI
+from openai import APIConnectionError, APIError, AuthenticationError, OpenAI, RateLimitError
 
 
 INDEX_PATH = Path("session_index.json")
 SESSIONS_DIR = Path("sessions")
 MODEL = "gpt-4.1-mini"
+PLACEHOLDER_KEYS = {"your-key", "your_api_key_here", "your-api-key", "replace-me", "changeme"}
 
 
 def validate_index(data):
@@ -91,18 +92,44 @@ def clean_generated_name(text):
     return "new_session"
 
 
-def name_session(client, first_question, index):
+def request_model(client, messages, purpose):
+    """Make one model request and keep API errors separate from bad responses."""
     try:
-        response = client.chat.completions.create(
-            model=MODEL,
-            messages=[
-                {"role": "system", "content": "Return only two words that describe the user's question."},
-                {"role": "user", "content": first_question},
-            ],
-        )
-        raw_name = response.choices[0].message.content or ""
-    except Exception as error:
-        raise RuntimeError(f"Could not generate a session name: {error}")
+        return client.chat.completions.create(model=MODEL, messages=messages)
+    except AuthenticationError:
+        raise RuntimeError("OpenAI authentication failed. Check OPENAI_API_KEY in .env.")
+    except RateLimitError:
+        raise RuntimeError("OpenAI rate limit or billing limit reached. Check your account.")
+    except APIConnectionError:
+        raise RuntimeError("Could not connect to OpenAI. Check your internet connection.")
+    except APIError:
+        raise RuntimeError(f"The OpenAI {purpose} request failed. Please try again.")
+    except Exception:
+        raise RuntimeError(f"The OpenAI {purpose} request could not be completed.")
+
+
+def response_text(response, purpose):
+    try:
+        content = response.choices[0].message.content
+    except (AttributeError, IndexError, TypeError):
+        raise RuntimeError(f"The OpenAI {purpose} response was malformed.")
+    if not isinstance(content, str):
+        raise RuntimeError(f"The OpenAI {purpose} response was malformed.")
+    if not content.strip():
+        raise RuntimeError(f"The OpenAI {purpose} response was empty.")
+    return content.strip()
+
+
+def name_session(client, first_question, index):
+    response = request_model(
+        client,
+        [
+            {"role": "system", "content": "Return only two words that describe the user's question."},
+            {"role": "user", "content": first_question},
+        ],
+        "naming",
+    )
+    raw_name = response_text(response, "naming")
 
     base_name = clean_generated_name(raw_name)
     candidate = base_name
@@ -134,21 +161,18 @@ def get_session(index):
 
 
 def request_reply(client, history):
-    try:
-        response = client.chat.completions.create(model=MODEL, messages=history)
-        reply = response.choices[0].message.content
-        if not reply:
-            raise ValueError("The model returned an empty response.")
-        return reply
-    except Exception as error:
-        raise RuntimeError(f"The request failed: {error}")
+    response = request_model(client, history, "chat")
+    return response_text(response, "chat")
 
 
 def main():
-    load_dotenv()
-    api_key = os.getenv("OPENAI_API_KEY")
+    load_dotenv(dotenv_path=Path(__file__).with_name(".env"))
+    api_key = os.getenv("OPENAI_API_KEY", "").strip()
     if not api_key:
-        print("OPENAI_API_KEY is missing. Create a local .env with OPENAI_API_KEY=your-key.")
+        print("OPENAI_API_KEY is missing. Create a local .env with your real API key.")
+        return
+    if api_key.lower() in PLACEHOLDER_KEYS:
+        print("OPENAI_API_KEY is still a placeholder. Put your real API key in .env.")
         return
 
     try:
@@ -162,8 +186,8 @@ def main():
         return
     try:
         client = OpenAI(api_key=api_key)
-    except Exception as error:
-        print(f"Could not start the OpenAI client: {error}")
+    except Exception:
+        print("Could not start the OpenAI client. Please check your local configuration.")
         return
     is_new = session_name is None
 
