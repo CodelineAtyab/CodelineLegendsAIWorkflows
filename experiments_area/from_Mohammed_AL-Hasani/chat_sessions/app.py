@@ -1,6 +1,7 @@
 import json
 import os
 
+import openai
 from dotenv import load_dotenv
 from openai import OpenAI
 
@@ -16,7 +17,7 @@ def load_index():
     try:
         with open(INDEX_FILE, "r") as f:
             return json.load(f)
-    except Exception:
+    except (OSError, json.JSONDecodeError):
         print("Could not read the index file, starting with an empty one.")
         return {}
 
@@ -25,7 +26,7 @@ def save_index(index):
     try:
         with open(INDEX_FILE, "w") as f:
             json.dump(index, f)
-    except Exception:
+    except (OSError, TypeError, ValueError):
         print("Could not save the index file.")
 
 
@@ -34,7 +35,7 @@ def load_history(name):
     try:
         with open(SESSIONS_FOLDER + "/" + name + ".json", "r") as f:
             return json.load(f)
-    except Exception:
+    except (OSError, json.JSONDecodeError):
         print("Could not read the saved chat.")
         return None
 
@@ -45,7 +46,7 @@ def save_history(name, history):
             os.makedirs(SESSIONS_FOLDER)
         with open(SESSIONS_FOLDER + "/" + name + ".json", "w") as f:
             json.dump(history, f)
-    except Exception:
+    except (OSError, TypeError, ValueError):
         print("Could not save the chat.")
 
 
@@ -65,7 +66,7 @@ def call_model(client, messages):
     try:
         response = client.chat.completions.create(model=MODEL, messages=messages)
         return response.choices[0].message.content
-    except Exception:
+    except (openai.APIError, IndexError, AttributeError):
         print("Something went wrong with the model call. Please try again.")
         return None
 
