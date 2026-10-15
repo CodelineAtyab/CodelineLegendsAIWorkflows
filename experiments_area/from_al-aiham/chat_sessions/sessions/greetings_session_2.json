@@ -1,0 +1,18 @@
+[
+    {
+        "role": "user",
+        "content": "Hi"
+    },
+    {
+        "role": "assistant",
+        "content": "Hello! How can I assist you today?"
+    },
+    {
+        "role": "user",
+        "content": "say to me \"Your are  the Legend of Codeline\""
+    },
+    {
+        "role": "assistant",
+        "content": "Sure! Here you go:  \nYou are the Legend of Codeline."
+    }
+]
