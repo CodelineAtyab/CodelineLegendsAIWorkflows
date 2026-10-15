@@ -20,6 +20,7 @@ NAMING_INSTRUCTION = (
 
 # ---------- File helpers ----------
 
+
 def load_json(path, default):
     """Return the JSON stored at path, or default if the file is missing or unreadable."""
     if not os.path.exists(path):
@@ -27,7 +28,7 @@ def load_json(path, default):
     try:
         with open(path, "r", encoding="utf-8") as file:
             return json.load(file)
-    except (OSError, json.JSONDecodeError):
+    except OSError, json.JSONDecodeError:
         print(f"Sorry, could not read {os.path.basename(path)}.")
         return default
 
@@ -67,6 +68,7 @@ def save_history(session_name, history):
 
 # ---------- Session naming ----------
 
+
 def ask_session_name(index):
     """Return an existing session name to resume, or None to start a new session."""
     name = input("Session name to resume (press Enter for a new session): ").strip()
@@ -82,7 +84,8 @@ def clean_session_name(raw_name):
     """Turn the model's reply into exactly two lower-case words joined by '_'."""
     without_apostrophes = raw_name.lower().replace("'", "").replace("’", "")
     letters_only = "".join(
-        char if char.isascii() and char.isalnum() else " " for char in without_apostrophes
+        char if char.isascii() and char.isalnum() else " "
+        for char in without_apostrophes
     )
     words = letters_only.split()[:2]
     if not words:
@@ -116,13 +119,16 @@ def next_session_id(index):
 
 # ---------- Chat ----------
 
+
 def ask_model(client, messages):
     """Send the messages to the model and return the reply text, or None on failure."""
     try:
         response = client.responses.create(model=MODEL, input=messages)
         return response.output_text.strip()
     except OpenAIError as error:
-        print(f"Sorry, the model could not be reached ({type(error).__name__}). Please try again.")
+        print(
+            f"Sorry, the model could not be reached ({type(error).__name__}). Please try again."
+        )
         return None
 
 
@@ -145,7 +151,9 @@ def chat_loop(client, session_name, history, index):
         if answer is None:
             history.pop()  # keep the saved history consistent: no question without an answer
             if session_name not in index:
-                session_name = None  # nothing saved yet, so the next question names the session
+                session_name = (
+                    None  # nothing saved yet, so the next question names the session
+                )
             continue
 
         print(f"\nAssistant: {answer}")
@@ -185,7 +193,7 @@ def main():
 
     try:
         start_session(client)
-    except (KeyboardInterrupt, EOFError):
+    except KeyboardInterrupt, EOFError:
         print("\nGoodbye!")
 
 
