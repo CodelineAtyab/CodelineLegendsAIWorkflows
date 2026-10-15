@@ -39,7 +39,7 @@ def get_route_response(source, destination):
         if error.response is not None:
             try:
                 message = error.response.json()["error"]["message"]
-            except (KeyError, TypeError, ValueError):
+            except KeyError, TypeError, ValueError:
                 pass
         print(f"Could not get the travel time: {message}")
     except (requests.RequestException, OSError, ValueError) as error:
@@ -50,7 +50,10 @@ def get_route_response(source, destination):
 def get_travel_time(data):
     try:
         if "error" in data:
-            print("Could not get the travel time:", data["error"].get("message", "API error"))
+            print(
+                "Could not get the travel time:",
+                data["error"].get("message", "API error"),
+            )
             return None
 
         routes = data.get("routes", [])
@@ -72,7 +75,9 @@ def get_travel_time(data):
         if minutes == 0:
             return f"{hours} {hour_text}"
 
-        return f"{hours} {hour_text} {minutes} {'minute' if minutes == 1 else 'minutes'}"
+        return (
+            f"{hours} {hour_text} {minutes} {'minute' if minutes == 1 else 'minutes'}"
+        )
 
     except (KeyError, IndexError, TypeError, ValueError) as error:
         print(f"Could not get the travel time: {error}")
