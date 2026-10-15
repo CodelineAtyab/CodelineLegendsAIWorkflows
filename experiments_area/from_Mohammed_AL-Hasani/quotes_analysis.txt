@@ -1,0 +1,15 @@
+{a: 0, an: 0, the: 0} Gratitude turns what we have into enough.
+{a: 0, an: 0, the: 0} Listen closely; insight often arrives quietly.
+{a: 0, an: 0, the: 1} The best path is often made by walking it.
+{a: 0, an: 0, the: 1} Courage is found in the moments we choose to act.
+{a: 0, an: 0, the: 2} The quiet moments often hold the loudest truths.
+{a: 0, an: 0, the: 0} Make space for wonder, even in routine.
+{a: 0, an: 0, the: 0} Choose progress over perfection.
+{a: 1, an: 0, the: 0} Hope is a small flame worth tending.
+{a: 1, an: 0, the: 0} Build a life that leaves room for laughter.
+{a: 1, an: 0, the: 1} The world is wide, and your curiosity is a compass.
+{a: 0, an: 0, the: 0} Bravery can begin with one honest question.
+{a: 1, an: 0, the: 1} Rest is part of the journey, not a delay.
+{a: 0, an: 0, the: 0} Share what you know, and your light multiplies.
+{a: 0, an: 0, the: 0} Mistakes are maps to what you can learn next.
+{a: 1, an: 0, the: 0} Every ending is a chance to start anew.
