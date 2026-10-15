@@ -16,7 +16,7 @@ def load_json(path, default):
             return json.load(file)
     except FileNotFoundError:
         return default
-    except (OSError, json.JSONDecodeError):
+    except OSError, json.JSONDecodeError:
         print(f"Could not read {path.name}. Starting with empty data.")
         return default
 
@@ -75,7 +75,9 @@ def clean_session_name(model_name):
     clean_words = []
 
     for word in words:
-        clean_word = "".join(character for character in word.lower() if character.isalnum())
+        clean_word = "".join(
+            character for character in word.lower() if character.isalnum()
+        )
         if clean_word:
             clean_words.append(clean_word)
 
