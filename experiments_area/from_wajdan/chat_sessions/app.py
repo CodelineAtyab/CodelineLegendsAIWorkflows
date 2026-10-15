@@ -14,17 +14,19 @@ PLACEHOLDER_KEYS = {"your-key", "your_api_key_here", "your-api-key", "replace-me
 
 
 def validate_index(data):
-    """Return whether the session index has the expected shape and unique IDs."""
     if not isinstance(data, dict):
         return False
-    values = []
+
+    session_ids = []
     for name, session_id in data.items():
         if not isinstance(name, str) or not name:
             return False
         if not isinstance(session_id, str) or not session_id:
             return False
-        values.append(session_id)
-    return len(values) == len(set(values))
+        if session_id in session_ids:
+            return False
+        session_ids.append(session_id)
+    return True
 
 
 def load_index():
@@ -45,13 +47,19 @@ def load_index():
 def validate_history(history):
     if not isinstance(history, list):
         return False
-    return all(
-        isinstance(message, dict)
-        and set(message) == {"role", "content"}
-        and isinstance(message["role"], str)
-        and isinstance(message["content"], str)
-        for message in history
-    )
+
+    for message in history:
+        if not isinstance(message, dict):
+            return False
+        if "role" not in message or "content" not in message:
+            return False
+        if len(message) != 2:
+            return False
+        if not isinstance(message["role"], str):
+            return False
+        if not isinstance(message["content"], str):
+            return False
+    return True
 
 
 def load_history(session_name):
@@ -69,7 +77,6 @@ def load_history(session_name):
 
 
 def save_session(index, session_name, history):
-    """Save readable UTF-8 JSON after a successful assistant response."""
     try:
         SESSIONS_DIR.mkdir(parents=True, exist_ok=True)
         with (SESSIONS_DIR / f"{session_name}.json").open("w", encoding="utf-8") as history_file:
@@ -93,7 +100,6 @@ def clean_generated_name(text):
 
 
 def request_model(client, messages, purpose):
-    """Make one model request and keep API errors separate from bad responses."""
     try:
         return client.chat.completions.create(model=MODEL, messages=messages)
     except AuthenticationError:
@@ -175,6 +181,7 @@ def main():
         print("OPENAI_API_KEY is still a placeholder. Put your real API key in .env.")
         return
 
+    # Load the saved index before asking for a session.
     try:
         index = load_index()
     except (OSError, ValueError) as error:
@@ -184,6 +191,7 @@ def main():
     session_name, history, stopped = get_session(index)
     if stopped:
         return
+    # Create the client only after the local key has been checked.
     try:
         client = OpenAI(api_key=api_key)
     except Exception:
@@ -191,6 +199,7 @@ def main():
         return
     is_new = session_name is None
 
+    # Continue asking questions until the user exits.
     while True:
         prompt = "First question: " if is_new else "You: "
         try:
@@ -209,9 +218,11 @@ def main():
             except RuntimeError as error:
                 print(error)
                 return
-            session_id = f"session-{len(index) + 1}"
+            session_number = len(index) + 1
+            session_id = f"session-{session_number}"
             while session_id in index.values():
-                session_id = f"session-{int(session_id.split('-')[1]) + 1}"
+                session_number += 1
+                session_id = f"session-{session_number}"
             index[session_name] = session_id
             is_new = False
 
