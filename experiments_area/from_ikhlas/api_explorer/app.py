@@ -1,8 +1,8 @@
 import requests
 
+
 def fetch_api(name):
-    response_result = requests.get(
-        "https://api.agify.io",params={"name": name})
+    response_result = requests.get("https://api.agify.io", params={"name": name})
 
     print("Status code:", response_result.status_code)
     data = response_result.json()
