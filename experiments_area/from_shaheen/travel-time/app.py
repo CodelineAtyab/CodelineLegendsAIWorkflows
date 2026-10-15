@@ -1,4 +1,3 @@
-from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from pathlib import Path
 
 import requests
@@ -62,8 +61,8 @@ def get_travel_time(data):
         duration = routes[0]["duration"]
         if not duration.endswith("s"):
             raise ValueError("invalid route duration")
-        seconds = Decimal(duration[:-1])
-        total_minutes = int((seconds / 60).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
+        seconds = float(duration[:-1])
+        total_minutes = round(seconds / 60)
         hours, minutes = divmod(total_minutes, 60)
 
         if hours == 0:
@@ -75,7 +74,7 @@ def get_travel_time(data):
 
         return f"{hours} {hour_text} {minutes} {'minute' if minutes == 1 else 'minutes'}"
 
-    except (KeyError, IndexError, TypeError, ValueError, InvalidOperation) as error:
+    except (KeyError, IndexError, TypeError, ValueError) as error:
         print(f"Could not get the travel time: {error}")
         return None
 
