@@ -1,26 +1,47 @@
+
 import requests
 
 
+# Reads API key from a text file.
 def read_api_key():
     with open("api_key.txt", "r") as file:
         return file.read().strip()
 
 
+# Sends the request to Google Routes API.
 def get_travel_data(source, destination, api_key):
-    url = "https://maps.googleapis.com/maps/api/distancematrix/json"
-
-    params = {
-        "origins": source,
-        "destinations": destination,
-        "departure_time": "now",
-        "key": api_key,
+    url = "https://routes.googleapis.com/directions/v2:computeRoutes"
+    
+    
+    #tell the server like how the data is formatted and which API key to use.
+    headers = {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": api_key,
+        "X-Goog-FieldMask": "routes.duration",
     }
 
-    response = requests.get(url, params=params, timeout=10)
-    response.raise_for_status()
+    params = {
+        "origin": {
+            "address": source,
+        },
+        "destination": {
+            "address": destination,
+        },
+        "travelMode": "DRIVE",
+        "routingPreference": "TRAFFIC_AWARE",
+    }
+
+    response = requests.post(
+        url,
+        headers=headers,
+        json=params,
+        timeout=10,
+    )
+    response.raise_for_status() #checks whether the HTTP request was successful or returned an HTTP error.
     return response.json()
 
 
+# Converts seconds into hours and minutes.
 def format_time(seconds):
     minutes = round(seconds / 60)
     hours = minutes // 60
@@ -37,6 +58,7 @@ def format_time(seconds):
     return f"{hours} {hour_text} {minutes} minutes"
 
 
+# Controls the main program.
 def main():
     try:
         key = read_api_key()
@@ -45,20 +67,17 @@ def main():
 
         data = get_travel_data(source, destination, key)
 
-        if data.get("status") != "OK":
-            raise ValueError(data.get("error_message", data.get("status")))
+        routes = data.get("routes", [])
 
-        route = data.get("rows")[0].get("elements")[0]
+        if not routes:
+            raise ValueError("No route found.")
 
-        if route.get("status") != "OK":
-            raise ValueError(route.get("status"))
+        duration = routes[0].get("duration")
 
-        duration = route.get("duration_in_traffic")
+        if not duration:
+            raise ValueError("Travel duration is unavailable.")
 
-        if not duration or "value" not in duration:
-            raise ValueError("Traffic duration is unavailable")
-
-        seconds = duration["value"]
+        seconds = float(duration.removesuffix("s"))
         travel_time = format_time(seconds)
 
         print(
