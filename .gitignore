@@ -43,6 +43,7 @@ uv-cache/
 .env.*
 !.env.example
 !.env.sample
+api_key.txt
 *.pem
 *.key
 secrets/
