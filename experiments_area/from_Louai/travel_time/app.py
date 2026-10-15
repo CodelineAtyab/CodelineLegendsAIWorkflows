@@ -1,17 +1,19 @@
 import requests
 
+
 def read_api_key(file_path="key.txt"):
     # Read the API key from a file
-    with open(file_path,"r") as file:
+    with open(file_path, "r") as file:
         return file.read().strip()
 
+
 def fetch_travel_time(source, destination, api_key):
-    
+
     url = "https://maps.googleapis.com/maps/api/directions/json"
     params = {
         "origin": source,
         "destination": destination,
-        "departure_time": "now",  
+        "departure_time": "now",
         "key": api_key,
     }
 
@@ -21,7 +23,7 @@ def fetch_travel_time(source, destination, api_key):
 
 def format_and_print_time(source, destination, data):
 
-  try:
+    try:
         routes = data.get("routes")
         if not routes:
             print("Could not get the travel time: No route found")
@@ -47,8 +49,9 @@ def format_and_print_time(source, destination, data):
             f"Driving from {source} to {destination} takes about {time_str} with current traffic."
         )
 
-  except Exception as e:
-    print(f"Could not get the travel time: {str(e)}")
+    except Exception as e:
+        print(f"Could not get the travel time: {e!s}")
+
 
 if __name__ == "__main__":
     try:
@@ -60,4 +63,4 @@ if __name__ == "__main__":
         format_and_print_time(source_place, dest_place, api_data)
 
     except Exception as e:
-        print(f"Could not get the travel time: {str(e)}")
+        print(f"Could not get the travel time: {e!s}")

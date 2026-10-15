@@ -26,8 +26,7 @@ def create_quotes_file(file_path="quotes.txt"):
     selected_quotes = random.sample(quotes, 15)
 
     with open(file_path, "w", encoding="utf-8") as file:
-        for quote in selected_quotes:
-            file.write(f"{quote}\n")
+        file.writelines(f"{quote}\n" for quote in selected_quotes)
 
 
 def append_result(line, article_counts, output_path="quotes_analysis.txt"):

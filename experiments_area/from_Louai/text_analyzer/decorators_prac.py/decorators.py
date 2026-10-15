@@ -1,6 +1,7 @@
 from functools import wraps
 
-# Helper Functions 
+
+# Helper Functions
 def get_stats(text: str) -> dict[str, int]:
     words_count = len(text.split())
     spaces_count = text.count(" ")
@@ -13,7 +14,7 @@ def get_stats(text: str) -> dict[str, int]:
 
 
 # Part 1: add_text_stats Decorator
-# 
+#
 def add_text_stats(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
@@ -57,9 +58,11 @@ def analyze_text(
     return decorator
 
 
-# Examples Demonstration 
+# Examples Demonstration
 if __name__ == "__main__":
-    text_data = "The Codeline Legends team is learning Python decorators in Muscat this week."
+    text_data = (
+        "The Codeline Legends team is learning Python decorators in Muscat this week."
+    )
 
     print("--- Part 1 Example ---")
 
@@ -92,9 +95,7 @@ if __name__ == "__main__":
     print(get_news_ex3())
 
     # Example 4: All options False (Edge case)
-    @analyze_text(
-        count_words=False, count_spaces=False, count_uppercase_chars=False
-    )
+    @analyze_text(count_words=False, count_spaces=False, count_uppercase_chars=False)
     def get_news_ex4():
         return text_data
 
