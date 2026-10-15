@@ -5,6 +5,7 @@ import requests
 
 def get_api_key(file_path="key.txt"):
 
+
     api_key = os.getenv("MAPS_API_KEY")
     if api_key:
         return api_key.strip()
