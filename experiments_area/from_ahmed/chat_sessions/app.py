@@ -1,6 +1,7 @@
 import json
 import os
 import re
+
 from dotenv import load_dotenv
 from openai import OpenAI, OpenAIError
 
@@ -15,7 +16,7 @@ def load_session_index():
     try:
         with open(INDEX_FILE, "r", encoding="utf-8") as f:
             return json.load(f)
-    except Exception:
+    except (OSError, json.JSONDecodeError):
         print("Warning: Could not read index file, starting with empty session list.")
         return {}
 
@@ -25,7 +26,7 @@ def load_history(session_name):
     try:
         with open(file_path, "r", encoding="utf-8") as f:
             return json.load(f)
-    except Exception as e:
+    except (OSError, json.JSONDecodeError) as e:
         print(f"Could not load session '{session_name}': {e}")
         return None
 
@@ -39,7 +40,7 @@ def save_session(index, session_name, history):
 
         with open(INDEX_FILE, "w", encoding="utf-8") as f:
             json.dump(index, f, indent=2, ensure_ascii=False)
-    except Exception as e:
+    except OSError as e:
         print(f"Could not save session data: {e}")
 
 
@@ -51,7 +52,7 @@ def ask_model(client, messages):
         )
         return response.choices[0].message.content.strip()
     except OpenAIError as e:
-        raise RuntimeError(f"OpenAI API call failed: {e}")
+        raise RuntimeError(f"OpenAI API call failed: {e}") from e
 
 
 def generate_two_word_name(client, first_question, existing_index):
@@ -71,7 +72,7 @@ def generate_two_word_name(client, first_question, existing_index):
             base_name = f"{words[0]}_chat"
         else:
             base_name = "new_session"
-    except Exception:
+    except (OpenAIError, RuntimeError):
         base_name = "new_session"
 
     name = base_name
@@ -113,7 +114,7 @@ def main():
 
     try:
         client = OpenAI(api_key=api_key)
-    except Exception as e:
+    except OpenAIError as e:
         print(f"Failed to initialize OpenAI client: {e}")
         return
 
