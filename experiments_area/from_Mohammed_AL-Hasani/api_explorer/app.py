@@ -1,6 +1,4 @@
 
-# mypy: explicit_package_bases
-
 import requests
 
 
