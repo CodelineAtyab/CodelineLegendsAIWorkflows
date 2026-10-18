@@ -82,9 +82,12 @@ def make_name(client, first_question):
 
     words = reply.lower().split()
     words = [w.strip(".,!?:;\"'") for w in words]
+    words = [w for w in words if w]
     words = words[:2]
-    if len(words) == 0:
+
+    if len(words) < 2:
         return "new_session"
+
     return "_".join(words)
 
 
