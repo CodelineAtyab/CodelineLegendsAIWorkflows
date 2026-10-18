@@ -1,0 +1,15 @@
+{a: 1, an: 0, the: 0} a bird can fly.
+{a: 0, an: 1, the: 0} an idea is great.
+{a: 1, an: 0, the: 0} a friend is kind.
+{a: 0, an: 1, the: 0} an ant is tiny.
+{a: 1, an: 0, the: 0} a cat is sleeping.
+{a: 1, an: 0, the: 0} a dog is running.
+{a: 0, an: 0, the: 1} the weather is nice.
+{a: 1, an: 0, the: 0} a flower is beautiful.
+{a: 0, an: 0, the: 1} the day is sunny.
+{a: 0, an: 1, the: 0} an orange is sweet.
+{a: 0, an: 1, the: 0} an owl can fly.
+{a: 0, an: 1, the: 0} an egg is small.
+{a: 0, an: 0, the: 1} the water is cold.
+{a: 0, an: 0, the: 1} the sky is blue.
+{a: 0, an: 0, the: 1} the moon is shining.
