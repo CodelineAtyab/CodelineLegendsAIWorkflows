@@ -1,3 +1,5 @@
+import json
+
 import requests
 
 
@@ -22,12 +24,8 @@ def get_travel_data(
     }
 
     body = {
-        "origin": {
-            "address": source,
-        },
-        "destination": {
-            "address": destination,
-        },
+        "origin": {"address": source},
+        "destination": {"address": destination},
         "travelMode": "DRIVE",
         "routingPreference": "TRAFFIC_AWARE",
     }
@@ -35,7 +33,7 @@ def get_travel_data(
     response = requests.post(
         url,
         headers=headers,
-        json=body,
+        data=json.dumps(body),
         timeout=10,
     )
     response.raise_for_status()
