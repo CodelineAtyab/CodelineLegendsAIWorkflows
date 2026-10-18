@@ -123,8 +123,8 @@ def next_session_id(index):
 def ask_model(client, messages):
     """Send the messages to the model and return the reply text, or None on failure."""
     try:
-        response = client.responses.create(model=MODEL, input=messages)
-        return response.output_text.strip()
+        response = client.chat.completions.create(model=MODEL, messages=messages)
+        return response.choices[0].message.content.strip()
     except OpenAIError as error:
         print(
             f"Sorry, the model could not be reached ({type(error).__name__}). Please try again."
