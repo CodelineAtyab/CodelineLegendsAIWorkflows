@@ -1,3 +1,4 @@
+
 import requests
 
 
@@ -27,7 +28,15 @@ def fetch_travel_data(source, destination):
     }
 
     response = requests.post(url, headers=headers, json=body, timeout=30)
-    response.raise_for_status()
+
+    # Show Google's error message if the API fails
+    if not response.ok:
+        try:
+            message = response.json().get("error", {}).get("message", "API error")
+        except ValueError:
+            message = "Google API request failed"
+
+        raise ValueError(message)
 
     return response.json()
 
@@ -38,7 +47,7 @@ def get_travel_time(data):
         raise ValueError("No route found")
 
     seconds = float(data["routes"][0]["duration"].rstrip("s"))
-    total = int((seconds + 30) // 60)
+    total = round(seconds / 60)
 
     hours, minutes = divmod(total, 60)
 
