@@ -1,6 +1,6 @@
+from typing import Any
 
 import requests
-from typing import Any
 
 
 # Reads API key from a text file.
