@@ -28,7 +28,7 @@ def fetch_travel_data(source, destination):
 
     response = requests.post(url, headers=headers, json=body, timeout=30)
 
-    # Show Google's error message if the API fails
+    # Show error message 
     if not response.ok:
         try:
             message = response.json().get("error", {}).get("message", "API error")
