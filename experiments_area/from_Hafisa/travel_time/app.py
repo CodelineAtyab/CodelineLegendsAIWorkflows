@@ -1,104 +1,89 @@
 import requests
 
 
-def read_api_key():
-    # Read the secret key from a local file so it is not committed to GitHub.
-    with open("api_key.txt", "r") as file:
-        api_key = file.read().strip()
-
-    if not api_key:
-        raise ValueError("API key file is empty")
-
-    return api_key
+# Read API key from file
+def get_api_key():
+    with open("api_key_file.txt", "r") as file:
+        return file.read().strip()
 
 
-def get_coordinates(place, api_key):
-    # TomTom Search API converts a place name into latitude and longitude.
-    url = f"https://api.tomtom.com/search/2/geocode/{place}.json"
+# Fetch travel data from Google Routes API
+def fetch_travel_data(source, destination):
+    api_key = get_api_key()
 
-    params = {
-        "key": api_key,
-        "limit": 1,
+    url = "https://routes.googleapis.com/directions/v2:computeRoutes"
+
+    headers = {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": api_key,
+        "X-Goog-FieldMask": "routes.duration",
     }
 
-    response = requests.get(url, params=params)
-    response.raise_for_status()
-    data = response.json()
-
-    results = data.get("results", [])
-    if not results:
-        raise ValueError(f"Could not find location: {place}")
-
-    position = results[0]["position"]
-    return position["lat"], position["lon"]
-
-
-def get_travel_data(source, destination, api_key):
-    # The Routing API needs coordinates, so first look up both places.
-    source_lat, source_lon = get_coordinates(source, api_key)
-    destination_lat, destination_lon = get_coordinates(destination, api_key)
-
-    # Request a car route and include current traffic in the travel time.
-    locations = f"{source_lat},{source_lon}:{destination_lat},{destination_lon}"
-    url = f"https://api.tomtom.com/routing/1/calculateRoute/{locations}/json"
-
-    params = {
-        "travelMode": "car",
-        "traffic": "true",
-        "computeTravelTimeFor": "all",
-        "key": api_key,
+    body = {
+        "origin": {"address": source},
+        "destination": {"address": destination},
+        "travelMode": "DRIVE",
+        "routingPreference": "TRAFFIC_AWARE",
     }
 
-    response = requests.get(url, params=params)
-    response.raise_for_status()
+    response = requests.post(url, headers=headers, json=body, timeout=30)
+
+    # Show Google's error message if the API fails
+    if not response.ok:
+        try:
+            message = response.json().get("error", {}).get("message", "API error")
+        except ValueError:
+            message = "Google API request failed"
+
+        raise ValueError(message)
+
     return response.json()
 
 
-def extract_travel_seconds(data):
-    # Read the traffic-aware travel time from TomTom's nested JSON response.
-    routes = data.get("routes", [])
-    if not routes:
-        raise ValueError("Could not find route")
+# Convert travel time into hours and minutes
+def get_travel_time(data):
+    if not data.get("routes"):
+        raise ValueError("No route found")
 
-    summary = routes[0]["summary"]
-    return summary["liveTrafficIncidentsTravelTimeInSeconds"]
+    seconds = float(data["routes"][0]["duration"].rstrip("s"))
+    total = round(seconds / 60)
 
+    hours, minutes = divmod(total, 60)
 
-def format_time(seconds):
-    # Convert seconds into the exact hours/minutes wording required by the task.
-    minutes = round(seconds / 60)
-    hours = minutes // 60
-    remaining_minutes = minutes % 60
+    h = "hour" if hours == 1 else "hours"
+    m = "minute" if minutes == 1 else "minutes"
 
     if hours == 0:
-        return f"{minutes} minutes"
+        return f"{minutes} {m}"
+    if minutes == 0:
+        return f"{hours} {h}"
 
-    hour_word = "hour" if hours == 1 else "hours"
-
-    if remaining_minutes == 0:
-        return f"{hours} {hour_word}"
-
-    return f"{hours} {hour_word} {remaining_minutes} minutes"
+    return f"{hours} {h} {minutes} {m}"
 
 
+# Run
 def main():
+    source = input("Enter the source: ").strip()
+    destination = input("Enter the destination: ").strip()
+
     try:
-        api_key = read_api_key()
-
-        source = input("Source: ")
-        destination = input("Destination: ")
-
-        data = get_travel_data(source, destination, api_key)
-        seconds = extract_travel_seconds(data)
-        travel_time = format_time(seconds)
+        data = fetch_travel_data(source, destination)
+        travel_time = get_travel_time(data)
 
         print(
-            f"Driving from {source} to {destination} takes about "
-            f"{travel_time} with current traffic."
+            f"Driving from {source} to {destination} "
+            f"takes about {travel_time} with current traffic."
         )
 
-    except (OSError, ValueError, KeyError, IndexError, requests.RequestException) as error:
-        print(f"Could not get the travel time: {error}")
+    except (
+        requests.RequestException,
+        OSError,
+        KeyError,
+        IndexError,
+        TypeError,
+        ValueError,
+    ) as e:
+        print(f"Could not get the travel time: {e}")
 
 
 if __name__ == "__main__":
