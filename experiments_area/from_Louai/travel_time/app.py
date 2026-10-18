@@ -4,13 +4,6 @@ import requests
 
 
 def get_api_key(file_path="key.txt"):
-
-
-    api_key = os.getenv("MAPS_API_KEY")
-    if api_key:
-        return api_key.strip()
-
-
     try:
         with open(file_path, "r") as file:
             return file.read().strip()
@@ -34,11 +27,11 @@ def fetch_travel_time(source, destination, api_key):
         "destination": {"address": destination},
         "travelMode": "DRIVE",
         "routingPreference": "TRAFFIC_AWARE",
-        "departureTime": "now"
+       
     }
 
     try:
-        response = requests.post(url, json=payload, headers=headers)
+        response = requests.post(url, json=payload, headers=headers, timeout=30)
         response.raise_for_status()
         return response.json()
     except requests.exceptions.RequestException:
