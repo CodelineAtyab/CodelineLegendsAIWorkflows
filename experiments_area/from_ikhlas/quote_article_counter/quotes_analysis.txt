@@ -1,0 +1,15 @@
+{a: 0, an: 0, the: 1} The secret of getting ahead is getting started.
+{a: 2, an: 0, the: 0} A person who never made a mistake never tried anything new.
+{a: 0, an: 0, the: 1} The purpose of life is to contribute in some way.
+{a: 1, an: 0, the: 0} A calm mind brings inner strength.
+{a: 2, an: 0, the: 0} A good book is a great friend.
+{a: 0, an: 0, the: 2} The harder you work, the luckier you get.
+{a: 1, an: 0, the: 0} A little progress each day adds up to big results.
+{a: 0, an: 0, the: 1} The only way to do great work is to love what you do.
+{a: 0, an: 1, the: 1} An idea can change the world.
+{a: 0, an: 0, the: 2} The more you learn, the more you grow.
+{a: 0, an: 1, the: 1} An investment in knowledge pays the best interest.
+{a: 0, an: 0, the: 1} The best preparation for tomorrow is doing your best today.
+{a: 0, an: 1, the: 1} An opportunity rarely arrives at the perfect time.
+{a: 0, an: 0, the: 2} The journey matters more than the destination.
+{a: 3, an: 0, the: 0} A journey of a thousand miles begins with a single step.
