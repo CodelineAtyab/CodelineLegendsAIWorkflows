@@ -42,20 +42,23 @@ def generate_session_name(client, first_question):
         messages=[
             {
                 "role": "system",
-                "content": "Name this chat in exactly two words. Reply with only the two words.",
+                "content": "Name this chat in two words. Reply with only the name.",
             },
             {"role": "user", "content": first_question},
         ],
     )
 
     title = response.choices[0].message.content or ""
-    title = title.lower().replace(",", "").replace(".", "")
-    words = title.split()
+    title = title.lower()
 
+    for mark in ".,!?:;'\"":
+        title = title.replace(mark, "")
+
+    words = title.split()
     if len(words) < 2:
         return "new_session"
 
-    return "_".join(words[:2])
+    return words[0] + "_" + words[1]
 
 
 def get_assistant_reply(client, messages):
@@ -65,6 +68,11 @@ def get_assistant_reply(client, messages):
 
 def main():
     load_dotenv()
+
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        print("Please add OPENAI_API_KEY to your .env file first.")
+        return
 
     try:
         index = load_session_index()
@@ -80,8 +88,8 @@ def main():
         print("Chat ended.")
         return
 
-    session_name = ""
     messages = []
+    session_name = ""
     is_new_session = True
 
     if requested_name in index:
@@ -91,15 +99,11 @@ def main():
         except (OSError, json.JSONDecodeError) as error:
             print("Could not load that session:", error)
             return
+
         is_new_session = False
         print("Resumed session:", session_name)
     elif requested_name:
         print("No session called", requested_name + ". Starting a new one.")
-
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        print("Add OPENAI_API_KEY to your .env file first.")
-        return
 
     client = OpenAI(api_key=api_key)
 
@@ -117,19 +121,18 @@ def main():
             if is_new_session:
                 session_name = generate_session_name(client, question)
 
-                number = 2
                 original_name = session_name
+                number = 2
                 while session_name in index:
-                    session_name = original_name + str(number)
+                    session_name = original_name + "_" + str(number)
                     number += 1
 
-                session_id = "session-" + str(len(index) + 1)
-                index[session_name] = session_id
+                index[session_name] = "session-" + str(len(index) + 1)
 
             messages.append({"role": "user", "content": question})
             reply = get_assistant_reply(client, messages)
-        except OpenAIError:
-            print("Could not contact OpenAI. Check your API key and connection.")
+        except OpenAIError as error:
+            print("Could not contact OpenAI:", error)
             return
 
         messages.append({"role": "assistant", "content": reply})
