@@ -2,7 +2,6 @@
 name = "travel-time-finder"
 version = "0.1.0"
 description = "Estimate driving time using current traffic"
-readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "requests>=2.34.2",

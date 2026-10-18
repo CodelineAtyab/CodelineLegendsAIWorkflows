@@ -26,36 +26,31 @@ def get_travel_time(source, destination, key):
 
 
 def format_time(data):
-    try:
-        duration = data["routes"][0]["duration"]
-    except (IndexError, KeyError, TypeError) as error:
-        raise ValueError("No route was returned by Google Maps.") from error
+    duration = data["routes"][0]["duration"]
+    seconds = int(duration[:-1])
+    hours = seconds // 3600
+    minutes = (seconds % 3600) // 60
 
-    if not isinstance(duration, str) or not duration.endswith("s"):
-        raise ValueError("Traffic-aware travel time was not returned.")
+    if hours == 1:
+        hour_text = "1 hour"
+    else:
+        hour_text = f"{hours} hours"
 
-    try:
-        seconds = float(duration[:-1])
-    except ValueError as error:
-        raise ValueError("Google Maps returned an invalid travel time.") from error
+    if minutes == 1:
+        minute_text = "1 minute"
+    else:
+        minute_text = f"{minutes} minutes"
 
-    minutes = int(seconds / 60 + 0.5)
-    hours, remaining_minutes = divmod(minutes, 60)
-
-    parts = []
-    if hours:
-        unit = "hour" if hours == 1 else "hours"
-        parts.append(f"{hours} {unit}")
-    if remaining_minutes or not parts:
-        unit = "minute" if remaining_minutes == 1 else "minutes"
-        parts.append(f"{remaining_minutes} {unit}")
-
-    return " ".join(parts)
+    if hours == 0:
+        return minute_text
+    if minutes == 0:
+        return hour_text
+    return hour_text + " " + minute_text
 
 
 def main():
-    source = input("Enter source: ")
-    destination = input("Enter destination: ")
+    source = input("Enter source: ").strip()
+    destination = input("Enter destination: ").strip()
 
     try:
         key = read_key()
@@ -68,28 +63,16 @@ def main():
     except requests.exceptions.HTTPError as error:
         response = error.response
         if response is None:
-            details = str(error)
+            reason = "Google Routes API request failed"
         else:
-            try:
-                details = response.json().get("error", {}).get("message", "")
-            except (AttributeError, ValueError):
-                details = ""
-            details = details or response.text.strip() or str(error)
-            details = (
-                f"Google Routes API returned HTTP {response.status_code}: {details}"
-            )
-        print("Could not get the travel time:", details)
-    except requests.exceptions.RequestException as error:
-        print("Could not connect to Google Routes API:", str(error))
-    except (
-        OSError,
-        ValueError,
-        KeyError,
-        IndexError,
-        TypeError,
-        AttributeError,
-    ) as error:
-        print("Could not get the travel time:", str(error))
+            reason = f"Google Routes API returned HTTP {response.status_code}"
+        print(f"Could not get the travel time: {reason}")
+    except requests.exceptions.RequestException:
+        print("Could not get the travel time: no internet connection")
+    except (KeyError, IndexError):
+        print("Could not get the travel time: Google did not return a route")
+    except (OSError, ValueError, TypeError) as error:
+        print(f"Could not get the travel time: {error}")
 
 
 if __name__ == "__main__":
