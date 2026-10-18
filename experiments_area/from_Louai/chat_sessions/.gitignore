@@ -1,3 +1,4 @@
 .env
 sessions/
 .venv/
+chat_history.json
