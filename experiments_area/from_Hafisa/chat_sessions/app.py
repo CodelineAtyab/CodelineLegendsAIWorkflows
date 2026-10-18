@@ -2,8 +2,7 @@ import json
 import os
 
 from dotenv import load_dotenv
-from openai import OpenAI
-
+from openai import APIError, OpenAI
 
 load_dotenv()
 
@@ -21,8 +20,12 @@ def load_index():
     except FileNotFoundError:
         return {}
 
-    except Exception as error:
+    except json.JSONDecodeError as error:
         print("Could not read session index:", error)
+        return {}
+
+    except OSError as error:
+        print("Could not open session index:", error)
         return {}
 
 
@@ -31,7 +34,7 @@ def save_index(index):
         with open(INDEX_FILE, "w") as file:
             json.dump(index, file, indent=4)
 
-    except Exception as error:
+    except OSError as error:
         print("Could not save session index:", error)
 
 
@@ -45,8 +48,12 @@ def load_session(session_name):
     except FileNotFoundError:
         return []
 
-    except Exception as error:
-        print("Could not load session:", error)
+    except json.JSONDecodeError as error:
+        print("Could not read session:", error)
+        return []
+
+    except OSError as error:
+        print("Could not open session:", error)
         return []
 
 
@@ -59,7 +66,7 @@ def save_session(session_name, messages):
         with open(path, "w") as file:
             json.dump(messages, file, indent=4)
 
-    except Exception as error:
+    except OSError as error:
         print("Could not save session:", error)
 
 
@@ -70,7 +77,10 @@ def generate_session_name(first_question):
             messages=[
                 {
                     "role": "system",
-                    "content": "Create exactly two simple words for a chat session name. Reply with only two words.",
+                    "content": (
+                        "Create exactly two simple words for a chat session name. "
+                        "Reply with only two words."
+                    ),
                 },
                 {
                     "role": "user",
@@ -94,7 +104,7 @@ def generate_session_name(first_question):
 
         return "_".join(words[:2])
 
-    except Exception as error:
+    except APIError as error:
         print("Could not create session name:", error)
         return "new_session"
 
@@ -108,7 +118,7 @@ def chat_with_model(messages):
 
         return response.choices[0].message.content
 
-    except Exception as error:
+    except APIError as error:
         print("Could not get AI reply:", error)
         return None
 
@@ -144,7 +154,6 @@ def main():
             session_id = f"session-{len(index) + 1}"
 
             index[session_name] = session_id
-
             save_index(index)
 
             print(f"New session: {session_name}")
@@ -155,8 +164,6 @@ def main():
                 "content": user_message,
             }
         )
-
-        save_session(session_name, messages)
 
         assistant_reply = chat_with_model(messages)
 
