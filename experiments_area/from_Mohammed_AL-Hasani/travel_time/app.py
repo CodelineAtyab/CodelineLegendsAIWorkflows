@@ -1,5 +1,3 @@
-from typing import Any
-
 import requests
 
 
@@ -23,7 +21,7 @@ def get_travel_data(
         "X-Goog-FieldMask": "routes.duration",
     }
 
-    params: dict[str, Any] = {
+    body = {
         "origin": {
             "address": source,
         },
@@ -37,7 +35,7 @@ def get_travel_data(
     response = requests.post(
         url,
         headers=headers,
-        json=params,
+        json=body,
         timeout=10,
     )
     response.raise_for_status()
@@ -46,19 +44,21 @@ def get_travel_data(
 
 # Converts seconds into hours and minutes.
 def format_time(seconds: float) -> str:
-    minutes = round(seconds / 60)
-    hours = minutes // 60
-    minutes = minutes % 60
+    total_minutes = round(seconds / 60)
+    hours = total_minutes // 60
+    minutes = total_minutes % 60
 
-    if hours == 0:
-        return f"{minutes} minutes"
+    parts = []
 
-    hour_text = "hour" if hours == 1 else "hours"
+    if hours > 0:
+        hour_text = "hour" if hours == 1 else "hours"
+        parts.append(f"{hours} {hour_text}")
 
-    if minutes == 0:
-        return f"{hours} {hour_text}"
+    if minutes > 0 or hours == 0:
+        minute_text = "minute" if minutes == 1 else "minutes"
+        parts.append(f"{minutes} {minute_text}")
 
-    return f"{hours} {hour_text} {minutes} minutes"
+    return " ".join(parts)
 
 
 # Controls the main program.
@@ -80,7 +80,7 @@ def main() -> None:
         if not duration:
             raise ValueError("Travel duration is unavailable.")
 
-        seconds = float(duration.removesuffix("s"))
+        seconds = float(duration[:-1])
         travel_time = format_time(seconds)
 
         print(
