@@ -1,4 +1,4 @@
 .env
 session_index.json
-session_index.json.tmp
 sessions/
+.vscode/
