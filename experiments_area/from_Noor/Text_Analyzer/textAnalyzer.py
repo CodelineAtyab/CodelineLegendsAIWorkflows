@@ -1,5 +1,3 @@
-from email.mime import text
-
 def num_words(text):
     return len(text.split())
 
@@ -10,6 +8,7 @@ def num_spaces(text):
 
 def num_uppercase_chars(text):
     return sum(1 for char in text if char.isupper())
+
 
 def text_analyzer(count_words=True, count_spaces=True, count_uppercase_chars=True):
     def decorator(func):
@@ -27,15 +26,23 @@ def text_analyzer(count_words=True, count_spaces=True, count_uppercase_chars=Tru
                 data.append(f"No. of Uppercase Chars: {uppercase_chars}")
             else:
                 return news
-               
+
             summary = "[ " + ", ".join(data) + "] "
 
             return summary + news
+
         return wrapper
+
     return decorator
+
 
 @text_analyzer()
 def get_news(news):
     return news
 
-print(get_news("The Codeline Legends team is learning Python decorators in Muscat this week.")  )
+
+print(
+    get_news(
+        "The Codeline Legends team is learning Python decorators in Muscat this week."
+    )
+)
