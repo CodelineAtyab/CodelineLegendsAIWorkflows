@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#070a24" />
+  <title>Quote Mac — Legends Web App</title>
+  <style>
+    :root {
+      --sign-width: min(600px, 86vw);
+      --rope-height: clamp(110px, 22vh, 200px);
+      --brass: #e6c184;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100svh;
+      overflow-x: hidden;
+      background: #05040f;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Animated Mac-style wallpaper                                       */
+    /* ------------------------------------------------------------------ */
+
+    .wallpaper {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+      background:
+        radial-gradient(140% 120% at 10% 0%, #1a2b6b 0%, transparent 55%),
+        radial-gradient(120% 100% at 90% 100%, #3a1155 0%, transparent 60%),
+        linear-gradient(160deg, #070a24 0%, #0a1038 45%, #120a2e 100%);
+    }
+
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(70px);
+      opacity: 0.8;
+      will-change: transform;
+    }
+
+    .blob-1 {
+      width: 78vmax;
+      height: 78vmax;
+      top: -38%;
+      left: -22%;
+      background: radial-gradient(circle, rgba(58, 120, 255, 0.6) 0%, transparent 68%);
+      animation: drift-a 27s ease-in-out infinite alternate;
+    }
+
+    .blob-2 {
+      width: 66vmax;
+      height: 66vmax;
+      right: -18%;
+      bottom: -38%;
+      background: radial-gradient(circle, rgba(255, 62, 172, 0.4) 0%, transparent 68%);
+      animation: drift-b 33s ease-in-out infinite alternate;
+    }
+
+    .blob-3 {
+      width: 52vmax;
+      height: 52vmax;
+      top: 18%;
+      left: 44%;
+      background: radial-gradient(circle, rgba(40, 235, 200, 0.3) 0%, transparent 68%);
+      animation: drift-c 23s ease-in-out infinite alternate;
+    }
+
+    .blob-4 {
+      width: 42vmax;
+      height: 42vmax;
+      bottom: -6%;
+      left: -4%;
+      background: radial-gradient(circle, rgba(255, 150, 70, 0.24) 0%, transparent 68%);
+      animation: drift-d 29s ease-in-out infinite alternate;
+    }
+
+    @keyframes drift-a {
+      from { transform: translate3d(-4%, -3%, 0) scale(1) rotate(0deg); }
+      to   { transform: translate3d(7%, 6%, 0) scale(1.16) rotate(10deg); }
+    }
+
+    @keyframes drift-b {
+      from { transform: translate3d(3%, 2%, 0) scale(1.08) rotate(0deg); }
+      to   { transform: translate3d(-8%, -6%, 0) scale(0.94) rotate(-12deg); }
+    }
+
+    @keyframes drift-c {
+      from { transform: translate3d(-6%, 4%, 0) scale(0.95); }
+      to   { transform: translate3d(8%, -8%, 0) scale(1.18); }
+    }
+
+    @keyframes drift-d {
+      from { transform: translate3d(0, 0, 0) scale(1.05); }
+      to   { transform: translate3d(6%, -7%, 0) scale(0.92); }
+    }
+
+    /* Film-grain + vignette so the gradient feels like a real wallpaper. */
+    .grain {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.055;
+      mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    .wallpaper::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(
+        120% 90% at 50% 38%,
+        transparent 38%,
+        rgba(2, 2, 12, 0.55) 100%
+      );
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Menu bar                                                           */
+    /* ------------------------------------------------------------------ */
+
+    .menubar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0 14px;
+      background: rgba(10, 12, 32, 0.32);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 1px 18px rgba(0, 0, 0, 0.18);
+      backdrop-filter: blur(20px) saturate(160%);
+      -webkit-backdrop-filter: blur(20px) saturate(160%);
+      color: rgba(255, 255, 255, 0.92);
+      font-size: 13px;
+      letter-spacing: 0.01em;
+      user-select: none;
+    }
+
+    .menubar-left,
+    .menubar-right {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      min-width: 0;
+    }
+
+    .menubar-right {
+      gap: 14px;
+      font-variant-numeric: tabular-nums;
+      color: rgba(255, 255, 255, 0.82);
+    }
+
+    .apple {
+      width: 15px;
+      height: 15px;
+      display: block;
+      opacity: 0.95;
+    }
+
+    .menu-item {
+      opacity: 0.82;
+      white-space: nowrap;
+    }
+
+    .menu-item.is-active {
+      opacity: 1;
+      font-weight: 600;
+    }
+
+    .battery {
+      position: relative;
+      width: 23px;
+      height: 11px;
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      border-radius: 3px;
+      padding: 1.5px;
+    }
+
+    .battery::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: -3.5px;
+      width: 2px;
+      height: 5px;
+      transform: translateY(-50%);
+      border-radius: 0 1px 1px 0;
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    .battery-level {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border-radius: 1.5px;
+      background: rgba(255, 255, 255, 0.85);
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Hanging sign                                                       */
+    /* ------------------------------------------------------------------ */
+
+    .stage {
+      position: relative;
+      z-index: 1;
+      min-height: 100svh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: max(60px, 9vh) 1rem 2rem;
+    }
+
+    .hanger {
+      position: relative;
+      width: var(--sign-width);
+      transform-origin: 50% 0;
+      animation: swing 6.8s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
+      will-change: transform;
+    }
+
+    @keyframes swing {
+      from { transform: rotate(-2.4deg); }
+      to   { transform: rotate(2.4deg); }
+    }
+
+    .ropes {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: var(--rope-height);
+      overflow: visible;
+    }
+
+    .rope-shadow {
+      fill: none;
+      stroke: rgba(0, 0, 0, 0.45);
+      stroke-width: 5.5;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .rope {
+      fill: none;
+      stroke: url(#ropeGradient);
+      stroke-width: 2.4;
+      stroke-linecap: round;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .hook {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      z-index: 2;
+      width: 20px;
+      height: 20px;
+      transform: translateX(-50%);
+      border: 3px solid var(--brass);
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #2a1b0d, #0b0703 72%);
+      box-shadow:
+        0 2px 7px rgba(0, 0, 0, 0.6),
+        inset 0 1px 1px rgba(255, 235, 190, 0.55);
+    }
+
+    .sign {
+      position: relative;
+      width: 100%;
+      min-height: clamp(168px, 24vh, 248px);
+      margin-top: calc(var(--rope-height) - 2px);
+      padding: clamp(2rem, 4vw, 2.9rem) clamp(1.6rem, 4vw, 2.9rem);
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(255, 224, 170, 0.34);
+      border-radius: 20px;
+      background:
+        radial-gradient(130% 90% at 18% -10%, rgba(255, 236, 200, 0.18), transparent 52%),
+        repeating-linear-gradient(
+          93deg,
+          rgba(0, 0, 0, 0.055) 0 2px,
+          rgba(255, 255, 255, 0.012) 2px 7px,
+          transparent 7px 11px
+        ),
+        linear-gradient(158deg, #7a4a28 0%, #5a3219 38%, #45240f 68%, #341a0a 100%);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 240, 210, 0.28),
+        inset 0 -3px 14px rgba(0, 0, 0, 0.5),
+        0 26px 50px -18px rgba(0, 0, 0, 0.8),
+        0 10px 18px -8px rgba(0, 0, 0, 0.5);
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      transition: box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+
+    .sign::before {
+      content: "";
+      position: absolute;
+      inset: 9px;
+      border: 1px solid rgba(255, 224, 170, 0.18);
+      border-radius: 14px;
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.18);
+      pointer-events: none;
+    }
+
+    .sign:hover {
+      border-color: rgba(255, 232, 190, 0.52);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 240, 210, 0.28),
+        inset 0 -3px 14px rgba(0, 0, 0, 0.5),
+        0 26px 50px -18px rgba(0, 0, 0, 0.8),
+        0 10px 18px -8px rgba(0, 0, 0, 0.5),
+        0 0 42px rgba(255, 190, 90, 0.14);
+    }
+
+    .sign:active {
+      box-shadow:
+        inset 0 2px 8px rgba(0, 0, 0, 0.35),
+        0 18px 34px -18px rgba(0, 0, 0, 0.8);
+    }
+
+    .sign:focus-visible {
+      outline: 2px dashed rgba(255, 255, 255, 0.7);
+      outline-offset: 6px;
+    }
+
+    .screw {
+      position: absolute;
+      top: -8px;
+      z-index: 3;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #f8e3b0, #c19048 52%, #5b3a16 100%);
+      box-shadow:
+        0 2px 5px rgba(0, 0, 0, 0.55),
+        inset 0 1px 1px rgba(255, 245, 215, 0.65);
+      pointer-events: none;
+    }
+
+    .screw::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 9px;
+      height: 1.4px;
+      border-radius: 1px;
+      background: rgba(40, 24, 8, 0.75);
+      transform: translate(-50%, -50%) rotate(-24deg);
+    }
+
+    .screw-left {
+      left: 7%;
+      transform: translateX(-50%);
+    }
+
+    .screw-right {
+      right: 7%;
+      transform: translateX(50%);
+    }
+
+    .deco-mark {
+      position: absolute;
+      z-index: 1;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(2.4rem, 5vw, 3.6rem);
+      line-height: 1;
+      color: rgba(255, 214, 150, 0.2);
+      pointer-events: none;
+    }
+
+    .deco-open {
+      top: 0.35rem;
+      left: 1.1rem;
+    }
+
+    .deco-close {
+      right: 1.1rem;
+      bottom: 0.1rem;
+    }
+
+    #quote {
+      position: relative;
+      z-index: 2;
+      max-width: 46ch;
+      margin: 0;
+      font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia,
+        "Times New Roman", serif;
+      font-size: clamp(1.08rem, 0.9rem + 1.05vw, 1.52rem);
+      font-weight: 500;
+      line-height: 1.5;
+      letter-spacing: 0.005em;
+      text-align: center;
+      text-wrap: balance;
+      overflow-wrap: break-word;
+      color: #fdf2dd;
+      text-shadow:
+        0 1px 0 rgba(0, 0, 0, 0.55),
+        0 8px 18px rgba(0, 0, 0, 0.35);
+      transition: opacity 0.28s ease, transform 0.28s ease, filter 0.28s ease;
+    }
+
+    #quote.is-changing {
+      opacity: 0;
+      transform: translateY(7px) scale(0.99);
+      filter: blur(2px);
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Controls                                                           */
+    /* ------------------------------------------------------------------ */
+
+    .controls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.85rem;
+      margin-top: clamp(1.6rem, 5.5vh, 3.2rem);
+      text-align: center;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0.72rem 1.35rem;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      border-radius: 999px;
+      background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.22),
+        rgba(255, 255, 255, 0.1)
+      );
+      box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35);
+      backdrop-filter: blur(16px) saturate(150%);
+      -webkit-backdrop-filter: blur(16px) saturate(150%);
+      color: #fff;
+      font: 500 14px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        Helvetica, Arial, sans-serif;
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease,
+        background 0.18s ease;
+    }
+
+    .pill:hover {
+      transform: translateY(-1px);
+      background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.3),
+        rgba(255, 255, 255, 0.14)
+      );
+      box-shadow:
+        0 14px 34px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    }
+
+    .pill:active {
+      transform: scale(0.98);
+    }
+
+    .pill:disabled {
+      opacity: 0.6;
+      cursor: wait;
+      transform: none;
+    }
+
+    .pill:focus-visible {
+      outline: 2px solid #9fc4ff;
+      outline-offset: 3px;
+    }
+
+    .pill svg {
+      width: 14px;
+      height: 14px;
+      flex: none;
+    }
+
+    .hint {
+      margin: 0;
+      font-size: 12px;
+      letter-spacing: 0.01em;
+      color: rgba(255, 255, 255, 0.52);
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Small screens / accessibility                                      */
+    /* ------------------------------------------------------------------ */
+
+    @media (max-width: 700px) {
+      .menu-item.secondary {
+        display: none;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .clock-date {
+        display: none;
+      }
+
+      .menubar-left {
+        gap: 12px;
+      }
+    }
+
+    @media (max-height: 640px) {
+      :root {
+        --rope-height: clamp(76px, 14vh, 120px);
+      }
+
+      .stage {
+        padding-top: 48px;
+      }
+
+      .sign {
+        min-height: 150px;
+        padding-top: 1.6rem;
+        padding-bottom: 1.6rem;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hanger,
+      .blob {
+        animation: none !important;
+      }
+
+      #quote,
+      .sign,
+      .pill {
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wallpaper" aria-hidden="true">
+    <span class="blob blob-1"></span>
+    <span class="blob blob-2"></span>
+    <span class="blob blob-3"></span>
+    <span class="blob blob-4"></span>
+    <span class="grain"></span>
+  </div>
+
+  <header class="menubar">
+    <nav class="menubar-left" aria-label="Application menu">
+      <svg class="apple" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path
+          fill="currentColor"
+          d="M16.37 1.43c0 1.14-.42 2.2-1.25 3.18-.99 1.17-2.14 1.85-3.4 1.75-.03-.14-.05-.31-.05-.5 0-1.1.46-2.18 1.28-3.06.41-.45.93-.82 1.56-1.12.63-.29 1.22-.45 1.78-.48.02.08.03.16.03.23zm3.56 15.13c-.47 1.08-.7 1.56-1.3 2.51-.84 1.32-2.03 2.96-3.5 2.97-1.3.01-1.64-.85-3.41-.84-1.77.01-2.14.86-3.44.85-1.47-.01-2.6-1.5-3.44-2.82-2.36-3.7-2.6-8.04-1.15-10.35.97-1.55 2.5-2.45 3.93-2.45 1.46 0 2.38.86 3.59.86 1.17 0 1.88-.86 3.57-.86 1.28 0 2.63.7 3.59 1.9-3.15 1.73-2.64 6.23.6 7.23z"
+        />
+      </svg>
+      <span class="menu-item is-active">Quotes</span>
+      <span class="menu-item secondary">File</span>
+      <span class="menu-item secondary">Edit</span>
+      <span class="menu-item secondary">View</span>
+      <span class="menu-item secondary">Window</span>
+      <span class="menu-item secondary">Help</span>
+    </nav>
+
+    <div class="menubar-right">
+      <span class="battery" aria-hidden="true"><span class="battery-level"></span></span>
+      <span class="clock-date" id="clock-date"></span>
+      <span class="clock-time" id="clock-time"></span>
+    </div>
+  </header>
+
+  <main class="stage">
+    <div class="hanger">
+      <svg
+        class="ropes"
+        viewBox="0 0 100 100"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <defs>
+          <linearGradient id="ropeGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#f3d9a4" />
+            <stop offset="55%" stop-color="#cf9f5f" />
+            <stop offset="100%" stop-color="#a9773c" />
+          </linearGradient>
+        </defs>
+        <path class="rope-shadow" d="M50 0 L7 100" />
+        <path class="rope-shadow" d="M50 0 L93 100" />
+        <path class="rope" d="M50 0 L7 100" />
+        <path class="rope" d="M50 0 L93 100" />
+      </svg>
+
+      <span class="hook" aria-hidden="true"></span>
+
+      <div
+        class="sign"
+        id="sign"
+        role="button"
+        tabindex="0"
+        aria-label="Quote sign. Activate for a new quote."
+      >
+        <span class="screw screw-left" aria-hidden="true"></span>
+        <span class="screw screw-right" aria-hidden="true"></span>
+        <span class="deco-mark deco-open" aria-hidden="true">&ldquo;</span>
+        <span class="deco-mark deco-close" aria-hidden="true">&rdquo;</span>
+
+        <div class="sign-inner">
+          <blockquote id="quote" aria-live="polite">
+            Fetching a fresh joke&hellip;
+          </blockquote>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="pill" id="refresh" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path
+            fill="currentColor"
+            d="M12 1.8l1.9 5.75 5.75 1.9-5.75 1.9L12 17.1l-1.9-5.75-5.75-1.9 5.75-1.9L12 1.8zm7.1 12.6l.9 2.75 2.75.9-2.75.9-.9 2.75-.9-2.75-2.75-.9 2.75-.9.9-2.75z"
+          />
+        </svg>
+        New quote
+      </button>
+      <p class="hint">Click the sign or press N for another joke</p>
+    </div>
+  </main>
+
+  <noscript>
+    <p style="position: fixed; inset: auto 1rem 1rem; text-align: center">
+      Enable JavaScript to load quotes from <code>/home</code>.
+    </p>
+  </noscript>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const FALLBACK_QUOTES = [
+        "I'm not arguing, I'm just explaining why I'm right.",
+        "I used to think I was indecisive, but now I'm not so sure.",
+        "I'm not lazy, I'm on energy saving mode.",
+        "I told my computer I needed a break, and it said: no problem, I'll go to sleep.",
+      ];
+
+      const quoteEl = document.getElementById("quote");
+      const signEl = document.getElementById("sign");
+      const refreshBtn = document.getElementById("refresh");
+      const clockDateEl = document.getElementById("clock-date");
+      const clockTimeEl = document.getElementById("clock-time");
+
+      const AUTO_ROTATE_MS = 10000;
+      const SWAP_MS = 280;
+
+      let currentQuote = quoteEl.textContent.trim();
+      let busy = false;
+      let autoTimer = null;
+
+      const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+      /** Pull a random joke from GET /home and keep only the quote text. */
+      async function fetchQuote() {
+        try {
+          const response = await fetch("/home", {
+            cache: "no-store",
+            headers: { Accept: "text/html" },
+          });
+
+          if (!response.ok) {
+            throw new Error("HTTP " + response.status);
+          }
+
+          const html = await response.text();
+          const doc = new DOMParser().parseFromString(html, "text/html");
+          const text = doc.querySelector("h1")?.textContent?.replace(/\s+/g, " ").trim();
+
+          if (!text) {
+            throw new Error("No <h1> quote found in /home response");
+          }
+
+          return text;
+        } catch (error) {
+          console.warn("Could not reach /home, using a local quote.", error);
+          return FALLBACK_QUOTES[Math.floor(Math.random() * FALLBACK_QUOTES.length)];
+        }
+      }
+
+      /** Fetch a fresh quote (avoiding an immediate repeat) and swap it in with a fade. */
+      async function changeQuote(isManual = false) {
+        if (busy) return;
+        busy = true;
+        refreshBtn.disabled = true;
+
+        let nextQuote = await fetchQuote();
+
+        // The server picks randomly, so a small retry avoids showing the same text twice.
+        for (let attempt = 0; attempt < 2 && nextQuote === currentQuote; attempt += 1) {
+          nextQuote = await fetchQuote();
+        }
+
+        quoteEl.classList.add("is-changing");
+        await wait(SWAP_MS);
+
+        currentQuote = nextQuote;
+        quoteEl.textContent = nextQuote;
+        quoteEl.classList.remove("is-changing");
+
+        busy = false;
+        refreshBtn.disabled = false;
+
+        if (isManual) startAutoRotate();
+      }
+
+      function startAutoRotate() {
+        clearInterval(autoTimer);
+        autoTimer = setInterval(() => changeQuote(false), AUTO_ROTATE_MS);
+      }
+
+      function updateClock() {
+        const now = new Date();
+        clockDateEl.textContent = now.toLocaleDateString(undefined, {
+          weekday: "short",
+          month: "short",
+          day: "numeric",
+        });
+        clockTimeEl.textContent = now.toLocaleTimeString(undefined, {
+          hour: "numeric",
+          minute: "2-digit",
+        });
+      }
+
+      signEl.addEventListener("click", () => changeQuote(true));
+
+      signEl.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          changeQuote(true);
+        }
+      });
+
+      refreshBtn.addEventListener("click", () => changeQuote(true));
+
+      document.addEventListener("keydown", (event) => {
+        if (
+          event.key.toLowerCase() === "n" &&
+          !event.ctrlKey &&
+          !event.metaKey &&
+          !event.altKey
+        ) {
+          event.preventDefault();
+          changeQuote(true);
+        }
+      });
+
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+          clearInterval(autoTimer);
+        } else {
+          startAutoRotate();
+        }
+      });
+
+      updateClock();
+      setInterval(updateClock, 15000);
+      changeQuote(false);
+      startAutoRotate();
+    })();
+  </script>
+</body>
+</html>
