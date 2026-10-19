@@ -1,9 +1,8 @@
 import json
 import os
-import uuid
 
 from dotenv import load_dotenv
-from openai import OpenAI
+from openai import OpenAI, OpenAIError
 
 SESSION_INDEX_FILE = "session_index.json"
 SESSIONS_DIR = "sessions"
@@ -69,9 +68,23 @@ def get_openai_client():
 
     try:
         return OpenAI(api_key=api_key)
-    except Exception as error:
+    except OpenAIError as error:
         print(f"Could not create the OpenAI client: {error}")
         return None
+
+
+def unique_session_name(base_name, index):
+    """Return a session name that is not already in the index.
+
+    If base_name is taken, append _2, _3, and so on until the name is free.
+    This prevents a new session from overwriting an existing conversation.
+    """
+    if base_name not in index:
+        return base_name
+    counter = 2
+    while f"{base_name}_{counter}" in index:
+        counter += 1
+    return f"{base_name}_{counter}"
 
 
 def generate_two_word_session_name(client, question):
@@ -86,10 +99,11 @@ def generate_two_word_session_name(client, question):
                 {"role": "user", "content": question},
             ],
         )
-        content = response.choices[0].message.content or ""
-    except Exception as error:
+    except OpenAIError as error:
         print(f"Could not generate a session name: {error}")
         return "new_session"
+
+    content = response.choices[0].message.content or ""
 
     words = content.strip().lower().split()
     if len(words) < 2:
@@ -107,15 +121,13 @@ def main():
     session_name = input("Enter a session name (or press Enter to start a new session): ").strip()
 
     new_session = False
-    session_id = None
     history = []
     session_path = None
 
     if session_name == "":
         new_session = True
     elif session_name in index:
-        session_id = index[session_name]
-        session_path = os.path.join(SESSIONS_DIR, f"{session_id}.json")
+        session_path = os.path.join(SESSIONS_DIR, f"{session_name}.json")
         history = load_session_history(session_path)
     else:
         print(f"No session called {session_name}. Starting a new one.")
@@ -127,9 +139,9 @@ def main():
             print("Goodbye!")
             return
 
-        session_name = generate_two_word_session_name(client, first_question)
-        session_id = str(uuid.uuid4())
-        session_path = os.path.join(SESSIONS_DIR, f"{session_id}.json")
+        generated_name = generate_two_word_session_name(client, first_question)
+        session_name = unique_session_name(generated_name, index)
+        session_path = os.path.join(SESSIONS_DIR, f"{session_name}.json")
         history = [{"role": "user", "content": first_question}]
 
         try:
@@ -138,14 +150,14 @@ def main():
                 messages=history,
             )
             answer = response.choices[0].message.content or ""
-        except Exception as error:
+        except OpenAIError as error:
             print(f"API error: {error}")
             return
 
         print("Assistant:", answer)
         history.append({"role": "assistant", "content": answer})
         save_session_history(history, session_path)
-        index[session_name] = session_id
+        index[session_name] = session_name
         save_session_index(index)
 
     while True:
@@ -164,7 +176,7 @@ def main():
                 messages=history,
             )
             answer = response.choices[0].message.content or ""
-        except Exception as error:
+        except OpenAIError as error:
             print(f"API error: {error}")
             history.pop()
             continue
