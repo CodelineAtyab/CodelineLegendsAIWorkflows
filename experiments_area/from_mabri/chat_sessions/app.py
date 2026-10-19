@@ -5,8 +5,6 @@ from dotenv import load_dotenv
 from openai import OpenAI, OpenAIError
 
 MODEL = "gpt-4.1-mini"
-FALLBACK_SESSION_NAME = "new_session"
-EXIT_COMMANDS = ("exit", "EXIT")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 SESSIONS_DIR = os.path.join(BASE_DIR, "sessions")
@@ -78,19 +76,6 @@ def ask_session_name(index):
         return name
     print(f"No session called {name}. Starting a new one.")
     return None
-
-
-def clean_session_name(raw_name):
-    """Turn the model's reply into exactly two lower-case words joined by '_'."""
-    without_apostrophes = raw_name.lower().replace("'", "").replace("’", "")
-    letters_only = "".join(
-        char if char.isascii() and char.isalnum() else " "
-        for char in without_apostrophes
-    )
-    words = letters_only.split()[:2]
-    if not words:
-        return FALLBACK_SESSION_NAME
-    return "_".join(words)
 
 
 def make_unique(name, index):
