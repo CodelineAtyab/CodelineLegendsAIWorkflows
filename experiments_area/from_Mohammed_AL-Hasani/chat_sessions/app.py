@@ -4,6 +4,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 from openai import OpenAI
+from openai.types.chat import ChatCompletionMessageParam
 
 from utils.cli_args import clean_session_name, is_exit_word, parse_args
 
@@ -28,7 +29,7 @@ def save_index(index: dict[str, str]) -> None:
     )
 
 
-def load_history(session_id: str) -> list[dict[str, str]]:
+def load_history(session_id: str) -> list[ChatCompletionMessageParam]:
     """Load a session's message history."""
     path = SESSIONS_FOLDER / f"{session_id}.json"
 
@@ -38,7 +39,10 @@ def load_history(session_id: str) -> list[dict[str, str]]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def save_history(session_id: str, history: list[dict[str, str]]) -> None:
+def save_history(
+    session_id: str,
+    history: list[ChatCompletionMessageParam],
+) -> None:
     """Save a session's message history."""
     SESSIONS_FOLDER.mkdir(parents=True, exist_ok=True)
     path = SESSIONS_FOLDER / f"{session_id}.json"
@@ -48,9 +52,6 @@ def save_history(session_id: str, history: list[dict[str, str]]) -> None:
 def create_session(question: str, index: dict[str, str]) -> str:
     """Create a unique session name based on the question."""
     name = clean_session_name(question)
-
-    if name == "new_session":
-        name = "new_session"
 
     original_name = name
     number = 2
@@ -67,7 +68,7 @@ def create_session(question: str, index: dict[str, str]) -> str:
 
 def ask_question(
     client: OpenAI,
-    history: list[dict[str, str]],
+    history: list[ChatCompletionMessageParam],
     question: str,
 ) -> str:
     """Send a question with the conversation history."""
