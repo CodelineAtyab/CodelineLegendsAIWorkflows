@@ -9,6 +9,6 @@ This command-line app estimates driving time with current traffic using Google M
 3. Create a local file named `api_key_file.txt` next to `app.py` and put that **same existing key** inside it. This file is ignored by Git; keep it private.
 4. Run `uv run python app.py`, then enter the start and destination as addresses.
 
-The program requests only the route duration. Google's `TRAFFIC_AWARE_OPTIMAL` routing preference uses traffic data, and with no departure time the estimate is for now. Routes API usage may be billed according to your Google Maps Platform plan.
+The program requests only the route duration. Google's `TRAFFIC_AWARE` routing preference uses live traffic data, and with no departure time the estimate is for now. Routes API usage may be billed according to your Google Maps Platform plan.
 
-If Google returns `PERMISSION_DENIED` or says the API is not enabled, check that Routes API is enabled in the **same project as the key** and that the key's API and application restrictions allow this request.
+If something goes wrong, the app prints `Could not get the travel time:` followed by the reason (for example Google's own message). If that message says the API key is not valid or the API is not enabled, check that Routes API is enabled in the **same project as the key** and that the key's API and application restrictions allow this request.
