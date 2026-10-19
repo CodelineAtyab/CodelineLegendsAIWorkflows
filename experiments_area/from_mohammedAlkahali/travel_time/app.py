@@ -56,7 +56,7 @@ def main():
         print("Could not get the travel time: key file not found")
     except requests.RequestException:
         print("Could not get the travel time: request failed (check internet or key)")
-    except KeyError, IndexError:
+    except (KeyError, IndexError):
         print("Could not get the travel time: place not found")
     else:
         print(
