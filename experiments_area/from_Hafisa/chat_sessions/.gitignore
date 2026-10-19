@@ -1,3 +1,4 @@
 .env
 sessions/
 sessions_index.json
+.venv/

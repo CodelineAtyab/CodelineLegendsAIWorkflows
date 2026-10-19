@@ -2,11 +2,9 @@ import json
 import os
 
 from dotenv import load_dotenv
-from openai import APIError, OpenAI
+from openai import APIError, OpenAI, OpenAIError
 
 load_dotenv()
-
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 INDEX_FILE = "sessions_index.json"
 SESSIONS_FOLDER = "sessions"
@@ -70,7 +68,7 @@ def save_session(session_name, messages):
         print("Could not save session:", error)
 
 
-def generate_session_name(first_question):
+def generate_session_name(first_question, client):
     try:
         response = client.chat.completions.create(
             model="gpt-4.1-mini",
@@ -125,14 +123,12 @@ def get_next_session_id(index):
 
     for session_id in index.values():
         number = int(session_id.split("-")[1])
-
-        if number > highest_number:
-            highest_number = number
+        highest_number = max(highest_number, number)
 
     return f"session-{highest_number + 1}"
 
 
-def chat_with_model(messages):
+def chat_with_model(messages, client):
     try:
         response = client.chat.completions.create(
             model="gpt-4.1-mini",
@@ -147,6 +143,19 @@ def chat_with_model(messages):
 
 
 def main():
+    api_key = os.getenv("OPENAI_API_KEY")
+
+    if api_key is None:
+        print("Could not start chat: OPENAI_API_KEY is missing.")
+        return
+
+    try:
+        client = OpenAI(api_key=api_key)
+
+    except OpenAIError as error:
+        print("Could not start chat:", error)
+        return
+
     index = load_index()
 
     session_name = input(
@@ -167,12 +176,15 @@ def main():
     while True:
         user_message = input("You: ")
 
-        if user_message.lower() == "exit":
+        if user_message.strip().lower() == "exit":
             print("Chat ended.")
             break
 
         if session_name == "":
-            session_name = generate_session_name(user_message)
+            session_name = generate_session_name(
+                user_message,
+                client,
+            )
 
             session_name = make_unique_name(
                 session_name,
@@ -182,6 +194,7 @@ def main():
             session_id = get_next_session_id(index)
 
             index[session_name] = session_id
+
             save_index(index)
 
             print(f"New session: {session_name}")
@@ -193,7 +206,10 @@ def main():
             }
         )
 
-        assistant_reply = chat_with_model(messages)
+        assistant_reply = chat_with_model(
+            messages,
+            client,
+        )
 
         if assistant_reply is None:
             continue
