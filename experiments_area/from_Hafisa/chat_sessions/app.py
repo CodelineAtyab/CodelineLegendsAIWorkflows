@@ -109,6 +109,29 @@ def generate_session_name(first_question):
         return "new_session"
 
 
+def make_unique_name(session_name, index):
+    original_name = session_name
+    number = 2
+
+    while session_name in index:
+        session_name = f"{original_name}_{number}"
+        number += 1
+
+    return session_name
+
+
+def get_next_session_id(index):
+    highest_number = 0
+
+    for session_id in index.values():
+        number = int(session_id.split("-")[1])
+
+        if number > highest_number:
+            highest_number = number
+
+    return f"session-{highest_number + 1}"
+
+
 def chat_with_model(messages):
     try:
         response = client.chat.completions.create(
@@ -151,7 +174,12 @@ def main():
         if session_name == "":
             session_name = generate_session_name(user_message)
 
-            session_id = f"session-{len(index) + 1}"
+            session_name = make_unique_name(
+                session_name,
+                index,
+            )
+
+            session_id = get_next_session_id(index)
 
             index[session_name] = session_id
             save_index(index)
@@ -177,7 +205,10 @@ def main():
             }
         )
 
-        save_session(session_name, messages)
+        save_session(
+            session_name,
+            messages,
+        )
 
         print("Assistant:", assistant_reply)
 
