@@ -1,4 +1,6 @@
 
+from typing import Any
+
 import requests
 
 
@@ -22,7 +24,7 @@ def get_travel_data(
         "X-Goog-FieldMask": "routes.duration",
     }
 
-    body = {
+    body: dict[str, Any] = {
         "origin": {"address": source},
         "destination": {"address": destination},
         "travelMode": "DRIVE",
