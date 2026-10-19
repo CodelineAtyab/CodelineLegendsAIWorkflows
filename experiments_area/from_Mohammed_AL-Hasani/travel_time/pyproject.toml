@@ -1,0 +1,12 @@
+
+[project]
+name = "travel-time"
+version = "0.1.0"
+description = "Travel time finder using Google Maps"
+authors = [
+    { name = "Mohammed98112", email = "seaomn27@gmail.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "requests>=2.34.2",
+]

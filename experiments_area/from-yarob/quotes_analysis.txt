@@ -1,0 +1,15 @@
+{a: 0, an: 0, the: 0} It does not matter how slowly you go as long as you do not stop.
+{a: 0, an: 0, the: 3} In the end, it's not the years in your life that count. It's the life in your years.
+{a: 0, an: 0, the: 0} Spread love everywhere you go. Let no one ever come to you without leaving happier.
+{a: 0, an: 0, the: 0} Life is what happens when you're busy making other plans.
+{a: 0, an: 0, the: 0} Do what you can, with what you have, where you are.
+{a: 0, an: 0, the: 1} The only limit to our realization of tomorrow will be our doubts of today.
+{a: 0, an: 0, the: 2} You must be the change you wish to see in the world.
+{a: 0, an: 0, the: 0} It always seems impossible until it's done.
+{a: 0, an: 0, the: 1} Not how long, but how well you have lived is the main thing.
+{a: 1, an: 0, the: 2} The best time to plant a tree was 20 years ago. The second best time is now.
+{a: 0, an: 0, the: 0} What lies behind us and what lies before us are tiny matters compared to what lies within us.
+{a: 0, an: 1, the: 0} An unexamined life is not worth living.
+{a: 0, an: 0, the: 1} The only way to do great work is to love what you do.
+{a: 0, an: 0, the: 1} You miss 100% of the shots you don't take.
+{a: 0, an: 0, the: 0} Happiness depends upon ourselves.

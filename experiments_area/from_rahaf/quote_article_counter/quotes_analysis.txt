@@ -1,0 +1,15 @@
+{a: 0, an: 1, the: 1} An early morning by the sea feels refreshing.
+{a: 1, an: 0, the: 2} A peaceful evening by the ocean makes the heart happy.
+{a: 1, an: 0, the: 1} A boat sailing across the sea looks peaceful.
+{a: 1, an: 0, the: 2} A walk along the beach brings peace to the mind.
+{a: 0, an: 0, the: 2} The sound of the waves helps people relax.
+{a: 2, an: 0, the: 1} A dolphin swimming in the sea is a beautiful sight.
+{a: 2, an: 0, the: 1} A sunset over the ocean is a beautiful sight.
+{a: 0, an: 0, the: 1} The deep blue sea is full of mysteries.
+{a: 0, an: 0, the: 2} The sea becomes magical under the moonlight.
+{a: 0, an: 0, the: 1} The ocean's vastness inspires awe and wonder.
+{a: 0, an: 1, the: 1} An underwater adventure reveals the beauty of marine life.
+{a: 0, an: 0, the: 2} The waves dance gently along the shore.
+{a: 0, an: 1, the: 1} An adventure in the ocean can be unforgettable.
+{a: 0, an: 1, the: 1} An ocean breeze makes the day feel fresh.
+{a: 0, an: 0, the: 2} The ocean connects different places around the world.
