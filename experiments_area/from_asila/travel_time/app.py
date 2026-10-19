@@ -72,6 +72,10 @@ def main():
     source = input("Enter starting place: ")
     destination = input("Enter destination: ")
 
+    if not source or not destination:
+        print("Could not get the travel time: Enter both places")
+        return
+    
     try:
         api_key = read_api_key()
         duration = get_travel_time(source, destination, api_key)
