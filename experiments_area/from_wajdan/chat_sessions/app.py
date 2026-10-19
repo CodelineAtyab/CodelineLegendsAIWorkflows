@@ -11,59 +11,31 @@ MODEL = "gpt-4.1-mini"
 
 
 def load_index():
-    """Read and validate the dictionary of session names and IDs."""
+    """Read the saved session index."""
     if not os.path.exists(INDEX_FILE):
         return {}
 
     try:
         with open(INDEX_FILE, "r", encoding="utf-8") as file:
             index = json.load(file)
-    except json.JSONDecodeError:
-        raise ValueError("The session index contains malformed JSON.")
-    except OSError:
-        raise OSError("The session index could not be read.")
-
-    if not isinstance(index, dict):
-        raise ValueError("The session index must be a JSON dictionary.")
-
-    session_ids = []
-    for name, session_id in index.items():
-        if not isinstance(name, str) or not name:
-            raise ValueError("The session index contains an invalid name.")
-        if name != os.path.basename(name) or "/" in name or "\\" in name:
-            raise ValueError("The session index contains an unsafe name.")
-        if not isinstance(session_id, str) or not session_id:
-            raise ValueError("The session index contains an invalid ID.")
-        if session_id in session_ids:
-            raise ValueError("The session index contains duplicate IDs.")
-        session_ids.append(session_id)
+    except json.JSONDecodeError as error:
+        raise ValueError("The session index contains malformed JSON.") from error
+    except OSError as error:
+        raise OSError("The session index could not be read.") from error
 
     return index
 
 
 def load_history(session_name):
-    """Read and validate one saved conversation."""
+    """Read one saved conversation."""
     file_name = os.path.join(SESSIONS_FOLDER, session_name + ".json")
     try:
         with open(file_name, "r", encoding="utf-8") as file:
             history = json.load(file)
-    except json.JSONDecodeError:
-        raise ValueError(f"The history for {session_name} contains malformed JSON.")
-    except OSError:
-        raise OSError(f"The history for {session_name} could not be read.")
-
-    if not isinstance(history, list):
-        raise ValueError(f"The history for {session_name} must be a list.")
-
-    for message in history:
-        if not isinstance(message, dict):
-            raise ValueError(f"The history for {session_name} contains invalid data.")
-        if len(message) != 2 or "role" not in message or "content" not in message:
-            raise ValueError(f"The history for {session_name} contains invalid data.")
-        if message["role"] not in ("user", "assistant"):
-            raise ValueError(f"The history for {session_name} contains an invalid role.")
-        if not isinstance(message["content"], str):
-            raise ValueError(f"The history for {session_name} contains invalid content.")
+    except json.JSONDecodeError as error:
+        raise ValueError(f"The history for {session_name} contains malformed JSON.") from error
+    except OSError as error:
+        raise OSError(f"The history for {session_name} could not be read.") from error
 
     return history
 
