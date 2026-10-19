@@ -1,0 +1,19 @@
+[project]
+name = "our-jokes-api"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { email = "syed.atyab.hussain.om@gmail.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "fastapi[standard]>=0.147.0",
+]
+
+[project.scripts]
+our-jokes-api = "our_jokes_api:main"
+
+[build-system]
+requires = ["uv_build>=0.12.23,<0.13.0"]
+build-backend = "uv_build"
