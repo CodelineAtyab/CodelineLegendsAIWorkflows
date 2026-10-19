@@ -4,7 +4,6 @@ import os
 from dotenv import load_dotenv
 from openai import OpenAI, OpenAIError
 
-
 INDEX_FILE = "session_index.json"
 SESSIONS_FOLDER = "sessions"
 MODEL = "gpt-4.1-mini"
@@ -33,7 +32,9 @@ def load_history(session_name):
         with open(file_name, "r", encoding="utf-8") as file:
             history = json.load(file)
     except json.JSONDecodeError as error:
-        raise ValueError(f"The history for {session_name} contains malformed JSON.") from error
+        raise ValueError(
+            f"The history for {session_name} contains malformed JSON."
+        ) from error
     except OSError as error:
         raise OSError(f"The history for {session_name} could not be read.") from error
 
@@ -60,7 +61,7 @@ def choose_session(index):
     """Ask for a session name and return its name and history."""
     try:
         name = input("Session name (Enter for a new session): ").strip()
-    except (EOFError, KeyboardInterrupt):
+    except EOFError, KeyboardInterrupt:
         print("\nGoodbye.")
         return None, None, True
 
@@ -82,7 +83,10 @@ def choose_session(index):
 def make_session_name(client, first_question, index):
     """Ask the model for two words and make a safe, unique file name."""
     messages = [
-        {"role": "system", "content": "Return only two words that describe the user's question."},
+        {
+            "role": "system",
+            "content": "Return only two words that describe the user's question.",
+        },
         {"role": "user", "content": first_question},
     ]
     answer = ask_openai(client, messages, "naming")
@@ -109,7 +113,9 @@ def make_session_name(client, first_question, index):
     # Add a number instead of overwriting an old session.
     name = base_name
     number = 2
-    while name in index or os.path.exists(os.path.join(SESSIONS_FOLDER, name + ".json")):
+    while name in index or os.path.exists(
+        os.path.join(SESSIONS_FOLDER, name + ".json")
+    ):
         first_word, second_word = base_name.split("_", 1)
         name = first_word + "_" + second_word + str(number)
         number += 1
@@ -123,12 +129,16 @@ def ask_openai(client, messages, purpose):
     except OpenAIError as error:
         if type(error).__name__ == "RateLimitError":
             error_code = getattr(error, "code", None) or "unknown"
-            raise RuntimeError(f"RateLimitError code: {error_code}. Check your usage limits.")
-        raise RuntimeError(f"The OpenAI {purpose} request failed. Check your key, billing, or connection.")
+            raise RuntimeError(
+                f"RateLimitError code: {error_code}. Check your usage limits."
+            )
+        raise RuntimeError(
+            f"The OpenAI {purpose} request failed. Check your key, billing, or connection."
+        )
 
     try:
         text = response.choices[0].message.content
-    except (AttributeError, IndexError, TypeError):
+    except AttributeError, IndexError, TypeError:
         raise RuntimeError(f"The OpenAI {purpose} response was malformed.")
     if not isinstance(text, str) or text.strip() == "":
         raise RuntimeError(f"The OpenAI {purpose} response was empty.")
@@ -139,7 +149,13 @@ def main():
     # Load the key before creating the OpenAI client.
     load_dotenv()
     api_key = os.getenv("OPENAI_API_KEY", "").strip()
-    placeholder_keys = ("your-key", "your_api_key_here", "your-api-key", "replace-me", "changeme")
+    placeholder_keys = (
+        "your-key",
+        "your_api_key_here",
+        "your-api-key",
+        "replace-me",
+        "changeme",
+    )
     if not api_key:
         print("OPENAI_API_KEY is missing. Add your real key to .env.")
         return
@@ -168,7 +184,7 @@ def main():
         prompt = "First question: " if new_session else "You: "
         try:
             user_message = input(prompt).strip()
-        except (EOFError, KeyboardInterrupt):
+        except EOFError, KeyboardInterrupt:
             print("\nGoodbye.")
             return
 
