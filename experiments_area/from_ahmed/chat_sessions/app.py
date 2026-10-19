@@ -1,15 +1,18 @@
 import json
 import os
-import re
+import sys
 from dotenv import load_dotenv
 from openai import OpenAI, OpenAIError
+
+from utils.cli_args import clean_session_name, is_exit_word, parse_args
 
 INDEX_FILE = "session_index.json"
 SESSIONS_DIR = "sessions"
 MODEL_NAME = "gpt-4.1-mini"
 
 
-def load_session_index():
+def load_session_index() -> dict[str, str]:
+    """Read saved session mapping, returning an empty dict if not found."""
     if not os.path.exists(INDEX_FILE):
         return {}
     try:
@@ -20,7 +23,8 @@ def load_session_index():
         return {}
 
 
-def load_history(session_name):
+def load_history(session_name: str) -> list[dict[str, str]] | None:
+    """Load session conversation history from disk."""
     file_path = os.path.join(SESSIONS_DIR, f"{session_name}.json")
     try:
         with open(file_path, "r", encoding="utf-8") as f:
@@ -30,7 +34,8 @@ def load_history(session_name):
         return None
 
 
-def save_session(index, session_name, history):
+def save_session(index: dict[str, str], session_name: str, history: list[dict[str, str]]) -> None:
+    """Save history to session JSON file and update index."""
     try:
         os.makedirs(SESSIONS_DIR, exist_ok=True)
         file_path = os.path.join(SESSIONS_DIR, f"{session_name}.json")
@@ -43,7 +48,8 @@ def save_session(index, session_name, history):
         print(f"Could not save session data: {e}")
 
 
-def ask_model(client, messages):
+def ask_model(client: OpenAI, messages: list[dict[str, str]]) -> str:
+    """Call GPT-4.1 mini and return trimmed response text."""
     try:
         response = client.chat.completions.create(
             model=MODEL_NAME,
@@ -54,7 +60,8 @@ def ask_model(client, messages):
         raise RuntimeError(f"OpenAI API call failed: {e}")
 
 
-def generate_two_word_name(client, first_question, existing_index):
+def generate_two_word_name(client: OpenAI, first_question: str, existing_index: dict[str, str]) -> str:
+    """Request a 2-word title from the model and ensure unique file name."""
     prompt = [
         {
             "role": "system",
@@ -63,14 +70,8 @@ def generate_two_word_name(client, first_question, existing_index):
         {"role": "user", "content": first_question}
     ]
     try:
-        reply = ask_model(client, prompt)
-        words = re.findall(r"[a-zA-Z0-9]+", reply.lower())
-        if len(words) >= 2:
-            base_name = f"{words[0]}_{words[1]}"
-        elif len(words) == 1:
-            base_name = f"{words[0]}_chat"
-        else:
-            base_name = "new_session"
+        raw_reply = ask_model(client, prompt)
+        base_name = clean_session_name(raw_reply)
     except Exception:
         base_name = "new_session"
 
@@ -82,7 +83,8 @@ def generate_two_word_name(client, first_question, existing_index):
     return name
 
 
-def select_session(index):
+def select_session(index: dict[str, str]) -> tuple[str | None, list[dict[str, str]] | None, bool]:
+    """Prompt user interactively to pick or start a session."""
     try:
         name_input = input("Enter session name (press Enter for a new session): ").strip()
     except (EOFError, KeyboardInterrupt):
@@ -104,20 +106,8 @@ def select_session(index):
     return name_input, history, False
 
 
-def main():
-    load_dotenv()
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        print("Error: OPENAI_API_KEY not found in environment or .env file.")
-        return
-
-    try:
-        client = OpenAI(api_key=api_key)
-    except Exception as e:
-        print(f"Failed to initialize OpenAI client: {e}")
-        return
-
-    index = load_session_index()
+def run_interactive(client: OpenAI, index: dict[str, str]) -> None:
+    """Run interactive terminal chat loop."""
     session_name, history, should_exit = select_session(index)
     if should_exit:
         return
@@ -137,7 +127,7 @@ def main():
         if not user_input:
             continue
 
-        if user_input.lower() == "exit":
+        if is_exit_word(user_input):
             print("Session ended.")
             break
 
@@ -161,6 +151,57 @@ def main():
         print(f"Assistant: {assistant_reply}\n")
 
         save_session(index, session_name, history)
+
+
+def run_non_interactive(client: OpenAI, index: dict[str, str], session_arg: str | None, question: str) -> None:
+    """Run one-shot question without interactive prompts."""
+    if session_arg is not None:
+        if session_arg not in index:
+            raise SystemExit(f"Error: session '{session_arg}' does not exist.")
+        session_name = session_arg
+        history = load_history(session_name)
+        if history is None:
+            raise SystemExit(f"Error: could not read history for session '{session_name}'.")
+    else:
+        session_name = generate_two_word_name(client, question, index)
+        session_id = f"session-{len(index) + 1}"
+        index[session_name] = session_id
+        history = []
+
+    history.append({"role": "user", "content": question})
+
+    try:
+        reply = ask_model(client, history)
+    except RuntimeError as e:
+        raise SystemExit(f"Error: {e}")
+
+    history.append({"role": "assistant", "content": reply})
+
+    print(f"Session: {session_name}")
+    print(f"Assistant: {reply}")
+
+    save_session(index, session_name, history)
+
+
+def main() -> None:
+    session_arg, question_arg = parse_args(sys.argv)
+
+    load_dotenv()
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise SystemExit("Error: OPENAI_API_KEY not found in environment or .env file.")
+
+    try:
+        client = OpenAI(api_key=api_key)
+    except Exception as e:
+        raise SystemExit(f"Error: failed to initialize OpenAI client: {e}")
+
+    index = load_session_index()
+
+    if question_arg is None:
+        run_interactive(client, index)
+    else:
+        run_non_interactive(client, index, session_arg, question_arg)
 
 
 if __name__ == "__main__":
