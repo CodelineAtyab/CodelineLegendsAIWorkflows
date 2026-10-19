@@ -1,4 +1,3 @@
-import json
 
 import requests
 
@@ -31,10 +30,10 @@ def get_travel_data(
     }
 
     response = requests.post(
-        url,
-        headers=headers,
-        data=json.dumps(body),
-        timeout=10,
+    url,
+    headers=headers,
+    json=body,
+    timeout=10,
     )
     response.raise_for_status()
     return response.json()
