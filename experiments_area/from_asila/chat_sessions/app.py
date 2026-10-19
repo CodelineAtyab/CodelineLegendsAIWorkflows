@@ -4,13 +4,11 @@ import os
 from pathlib import Path
 
 from dotenv import load_dotenv
-from openai import OpenAI
+from openai import OpenAI, OpenAIError
 
 # Load OPENAI_API_KEY from .env. The key stays out of your code.
 load_dotenv()
 
-# One shared client used for both naming and chat replies.
-client = OpenAI()
 
 # Required model for both calls.
 MODEL = "gpt-4.1-mini"
@@ -75,7 +73,8 @@ def save_history(session_name, history):
         # Create the sessions folder if it does not exist yet.
         os.makedirs(SESSIONS_DIR, exist_ok=True)
         path = SESSIONS_DIR / f"{session_name}.json"
-        with path.open("w", encoding="utf-8") as file:            json.dump(history, file, indent=2)
+        with path.open("w", encoding="utf-8") as file:
+            json.dump(history, file, indent=2)
     except OSError as error:
         print(f"Could not save session {session_name}: {error}")
 
@@ -94,7 +93,7 @@ def ask_session_name(index):
     return None
 
 
-def generate_session_name(first_question, index):
+def generate_session_name(first_question, index, client):
     """Separate model call: two lowercase words joined with underscore."""
     try:
         response = client.chat.completions.create(
@@ -122,7 +121,7 @@ def generate_session_name(first_question, index):
             name = f"{words[0]}_session"
         else:
             name = "new_session"
-    except Exception as error:  # noqa: BLE001
+    except (OpenAIError, IndexError, AttributeError) as error:
         print(f"Could not generate a session name: {error}")
         name = "new_session"
     # Avoid overwriting an existing session when names repeat.
@@ -135,7 +134,7 @@ def generate_session_name(first_question, index):
     return name
 
 
-def chat_with_history(history):
+def chat_with_history(history, client):
     """Send the full conversation and return the assistant reply."""
     try:
         response = client.chat.completions.create(
@@ -143,11 +142,21 @@ def chat_with_history(history):
             messages=history,
         )
         return response.choices[0].message.content
-    except Exception as error:  # noqa: BLE001
+    except (OpenAIError, IndexError, AttributeError) as error:
         print(f"Sorry, the API call failed: {error}")
         return None
 
+
 def main():
+
+    try:
+        client = OpenAI()
+    except OpenAIError:
+        print("Could not start the chat. Check your OpenAI API key in .env.")
+        return
+
+    index = load_index()
+
     index = load_index()
     chosen_name = ask_session_name(index)
 
@@ -165,7 +174,7 @@ def main():
     while True:
         try:
             user_message = input("You: ").strip()
-        except (EOFError, KeyboardInterrupt):
+        except EOFError, KeyboardInterrupt:
             print("\nGoodbye!")
             break
 
@@ -178,7 +187,7 @@ def main():
 
         # First question of a new session gets a model-generated name first.
         if is_new_session and session_name is None:
-            session_name = generate_session_name(user_message, index)
+            session_name = generate_session_name(user_message, index, client)
             session_id = make_session_id(index)
             index[session_name] = session_id
             save_index(index)
@@ -187,7 +196,7 @@ def main():
 
         history.append({"role": "user", "content": user_message})
 
-        reply = chat_with_history(history)
+        reply = chat_with_history(history, client)
         if reply is None:
             # Do not keep a question that was never answered.
             history.pop()
