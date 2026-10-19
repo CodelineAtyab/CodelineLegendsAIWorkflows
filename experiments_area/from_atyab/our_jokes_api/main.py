@@ -1,11 +1,16 @@
 import uvicorn
+from pathlib import Path
 from random import randint
 from quotes import funny_quotes
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi import Request, HTTPException
 
 app = FastAPI()
+
+BASE_DIR = Path(__file__).resolve().parent
+STATIC_DIR = BASE_DIR / "static"
 
 # http://192.168.100.163/home
 @app.get("/home")
@@ -24,6 +29,10 @@ async def add_quote(incoming_request: Request) -> dict:
 
     funny_quotes.append(new_quote)
     return {"message": f"Quote {new_quote} added successfully!"}
+
+# Mount at "/" AFTER the API routes: route matching is in registration order,
+# so /home, /greet and /add_quote win, and everything else is served from static/.
+app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="static")
 
 if __name__ == "__main__":
     # Spawn with workers
