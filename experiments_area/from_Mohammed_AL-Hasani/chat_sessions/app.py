@@ -103,7 +103,8 @@ def run_non_interactive(
     answer = ask_question(client, history, question)
     save_history(session_id, history)
 
-    print(answer)
+    print(f"Session: {session_name}")
+    print(f"Assistant: {answer}")
 
 
 def run_interactive(client: OpenAI) -> None:
