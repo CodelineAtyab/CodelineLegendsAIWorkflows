@@ -4,7 +4,6 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 from openai import OpenAI
-
 from utils.cli_args import clean_session_name, is_exit_word, parse_args
 
 MODEL = "gpt-4.1-mini"
