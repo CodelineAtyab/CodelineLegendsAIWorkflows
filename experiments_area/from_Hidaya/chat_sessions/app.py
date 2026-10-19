@@ -108,30 +108,54 @@ def chat(client, name, history, index, new_session):
         if question.lower() == "exit":
             print("Goodbye!")
             break
+
         if not question:
             continue
+
         if new_session:
             name = generate_name(client, question)
-            # Keep session names unique and two words.
+
+            # Keep session names unique and two words
             base_name = name
             number = 2
             while name in index:
                 name = f"{base_name.split('_')[0]}_{number}"
                 number += 1
+
             session_id = f"session-{len(index) + 1}"
-            index[name] = session_id
-            if not save_json(INDEX_FILE, index):
-                return
-            print(f"Session created: {name}")
-            new_session = False
-        pending_messages = history + [{"role": "user", "content": question}]
+
+        # Add the user's question to the conversation
+        pending_messages = history + [
+            {"role": "user", "content": question}
+        ]
+
+        # Get the AI response
         answer = get_answer(client, pending_messages)
+
         if answer is None:
             continue
-        print(f"AI: {answer}")
-        history = pending_messages + [{"role": "assistant", "content": answer}]
-        if not save_json(SESSIONS_DIR / f"{name}.json", history):
+
+        # Add the AI response to the conversation
+        updated_history = pending_messages + [
+            {"role": "assistant", "content": answer}
+        ]
+
+        # Save the conversation after the AI response
+        if not save_json(SESSIONS_DIR / f"{name}.json", updated_history):
             return
+
+        # Save the index only after the first successful response
+        if new_session:
+            index[name] = session_id
+
+            if not save_json(INDEX_FILE, index):
+                return
+
+            print(f"Session created: {name}")
+            new_session = False
+
+        history = updated_history
+        print(f"AI: {answer}")
 
 
 # Create main()
