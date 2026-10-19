@@ -2,3 +2,5 @@
 __pycache__/
 .env
 chat_session.json
+sessions/
+sessions_index.json
