@@ -5,7 +5,6 @@ from dotenv import load_dotenv
 from openai import OpenAI, OpenAIError
 
 load_dotenv()
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 MODEL = "gpt-4.1-mini"
 INDEX_FILE = "sessions_index.json"
@@ -26,7 +25,7 @@ def load_json(path, default):
             return json.load(f)
     except FileNotFoundError:
         return default
-    except (OSError, json.JSONDecodeError):
+    except OSError, json.JSONDecodeError:
         print("Could not read the file.")
         return default
 
@@ -35,12 +34,14 @@ def get_session_path(name):
     return os.path.join(SESSIONS_DIR, name + ".json")
 
 
-def ask_model(messages):
+def ask_model(client, messages):
     try:
         response = client.chat.completions.create(model=MODEL, messages=messages)
         return response.choices[0].message.content
     except OpenAIError:
-        print("Could not get a reply from the model. Check your key, credits or internet.")
+        print(
+            "Could not get a reply from the model. Check your key, credits or internet."
+        )
         return None
 
 
@@ -57,7 +58,7 @@ def clean_name(text):
     return "_".join(words)
 
 
-def generate_session_name(first_question):
+def generate_session_name(client, first_question):
     naming_messages = [
         {
             "role": "user",
@@ -65,7 +66,7 @@ def generate_session_name(first_question):
             "that name this question: " + first_question,
         }
     ]
-    reply = ask_model(naming_messages)
+    reply = ask_model(client, naming_messages)
     if reply is None:
         return "new_session"
     return clean_name(reply)
@@ -80,8 +81,8 @@ def make_unique_name(name, index):
     return unique
 
 
-def create_session(first_question, index):
-    name = make_unique_name(generate_session_name(first_question), index)
+def create_session(client, first_question, index):
+    name = make_unique_name(generate_session_name(client, first_question), index)
     index[name] = "session-" + str(len(index) + 1)
     save_json(INDEX_FILE, index)
     return name
@@ -100,7 +101,7 @@ def ask_session_name(index):
     return None
 
 
-def chat_loop(index, session_name, chat_messages):
+def chat_loop(client, index, session_name, chat_messages):
     while True:
         question = input("You: ").strip()
 
@@ -111,11 +112,11 @@ def chat_loop(index, session_name, chat_messages):
             continue
 
         if session_name is None:
-            session_name = create_session(question, index)
+            session_name = create_session(client, question, index)
             print(f"Session name: {session_name}")
 
         chat_messages.append({"role": "user", "content": question})
-        reply = ask_model(chat_messages)
+        reply = ask_model(client, chat_messages)
 
         if reply is None:
             chat_messages.pop()
@@ -127,6 +128,12 @@ def chat_loop(index, session_name, chat_messages):
 
 
 def main():
+    try:
+        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    except OpenAIError:
+        print("No API key found. Add OPENAI_API_KEY to your .env file.")
+        return
+
     os.makedirs(SESSIONS_DIR, exist_ok=True)
     index = load_json(INDEX_FILE, {})
 
@@ -138,8 +145,8 @@ def main():
         print(f"Resumed '{session_name}' with {len(chat_messages)} messages.")
 
     try:
-        chat_loop(index, session_name, chat_messages)
-    except (KeyboardInterrupt, EOFError):
+        chat_loop(client, index, session_name, chat_messages)
+    except KeyboardInterrupt, EOFError:
         print("\nBye.")
 
 
