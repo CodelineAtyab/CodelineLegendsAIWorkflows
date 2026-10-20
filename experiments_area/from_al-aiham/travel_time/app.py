@@ -8,45 +8,42 @@ def read_api_key():
 
 
 def get_travel_time(source, destination, api_key):
-    url = "https://maps.googleapis.com/maps/api/distancematrix/json"
+    url = "https://routes.googleapis.com/directions/v2:computeRoutes"
 
-    params = {
-        "origins": source,
-        "destinations": destination,
-        "mode": "driving",
-        "departure_time": "now",
-        "key": api_key,
+    headers = {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": api_key,
+        "X-Goog-FieldMask": "routes.duration",
     }
 
-    response = requests.get(url, params=params, timeout=15)
+    data = {
+        "origin": {"address": source},
+        "destination": {"address": destination},
+        "travelMode": "DRIVE",
+        "routingPreference": "TRAFFIC_AWARE",
+    }
+
+    response = requests.post(
+        url,
+        headers=headers,
+        json=data,
+        timeout=15,
+    )
+
     response.raise_for_status()
 
-    data = response.json()
+    result = response.json()
+    routes = result.get("routes", [])
 
-    if data.get("status") != "OK":
-        raise ValueError(
-            data.get("error_message")
-            or data.get("status", "Unknown API error")
-        )
+    if not routes:
+        raise ValueError("No driving route was found.")
 
-    rows = data.get("rows", [])
+    duration = routes[0].get("duration")
 
-    if not rows or not rows[0].get("elements"):
-        raise ValueError("No route was found.")
+    if duration is None:
+        raise ValueError("Travel time is unavailable.")
 
-    route = rows[0]["elements"][0]
-
-    if route.get("status") != "OK":
-        raise ValueError(
-            f"Route unavailable: {route.get('status')}"
-        )
-
-    traffic = route.get("duration_in_traffic")
-
-    if not traffic or "value" not in traffic:
-        raise ValueError("Traffic-aware travel time is unavailable.")
-
-    return traffic["value"]
+    return float(duration.removesuffix("s"))
 
 
 def format_duration(seconds):
@@ -86,8 +83,14 @@ def main():
             f"takes about {duration} with current traffic."
         )
 
-    except (OSError, ValueError, KeyError, IndexError, TypeError,
-            requests.exceptions.RequestException) as error:
+    except (
+        OSError,
+        ValueError,
+        KeyError,
+        IndexError,
+        TypeError,
+        requests.exceptions.RequestException,
+    ) as error:
         print(f"Could not get the travel time: {error}")
 
 
