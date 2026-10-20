@@ -1,0 +1,12 @@
+[project]
+name = "quote-article-counter"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "ruff>=0.17.0",
+]
