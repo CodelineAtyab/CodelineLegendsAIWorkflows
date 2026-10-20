@@ -18,6 +18,6 @@ appointments: list[dict] = [
         "patient_name": "Fatima",
         "doctor": "Dr. Huda",
         "date": "2026-10-31",
-        "time": "8:00"
+        "time": "08:00"
     }
 ]
