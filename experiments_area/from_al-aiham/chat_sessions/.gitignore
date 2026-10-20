@@ -1,0 +1,7 @@
+.env
+api_key.txt
+.venv/
+__pycache__/
+.pytest_cache/
+sessions/
+sessions_index.json
