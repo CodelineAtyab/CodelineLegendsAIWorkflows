@@ -28,8 +28,9 @@ def get_travel_time(source, destination, key):
 def format_time(data):
     duration = data["routes"][0]["duration"]
     seconds = int(duration[:-1])
-    hours = seconds // 3600
-    minutes = (seconds % 3600) // 60
+    total_minutes = round(seconds / 60)
+    hours = total_minutes // 60
+    minutes = total_minutes % 60
 
     if hours == 1:
         hour_text = "1 hour"
