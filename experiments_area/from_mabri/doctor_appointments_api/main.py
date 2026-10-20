@@ -7,7 +7,7 @@ app = FastAPI()
 
 
 @app.get("/appointments")
-async def get_appointments(doctor: str | None = None, date: str | None = None):
+async def get_appointments(doctor: str | None = None, date: str | None = None) -> dict:
     filtered_appointments = appointments.appointments
     if doctor:
         filtered_appointments = [
@@ -21,7 +21,7 @@ async def get_appointments(doctor: str | None = None, date: str | None = None):
             for appointment in filtered_appointments
             if appointment["date"] == date
         ]
-    return filtered_appointments
+    return {"appointments": filtered_appointments, "count": len(filtered_appointments)}
 
 
 if __name__ == "__main__":
