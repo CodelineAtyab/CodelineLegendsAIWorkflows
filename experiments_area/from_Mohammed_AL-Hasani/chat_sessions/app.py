@@ -1,153 +1,161 @@
 import json
-import os
+import sys
+from pathlib import Path
 
-import openai
 from dotenv import load_dotenv
 from openai import OpenAI
+from openai.types.chat import ChatCompletionMessageParam
+
+from utils.cli_args import clean_session_name, is_exit_word, parse_args
 
 MODEL = "gpt-4.1-mini"
-INDEX_FILE = "sessions_index.json"
-SESSIONS_FOLDER = "sessions"
+INDEX_FILE = Path("sessions_index.json")
+SESSIONS_FOLDER = Path("sessions")
 
 
-def load_index():
-    # name -> id. If the file does not exist yet, start with an empty dict.
-    if not os.path.exists(INDEX_FILE):
-        return {}
-    try:
-        with open(INDEX_FILE, "r") as f:
-            return json.load(f)
-    except (OSError, json.JSONDecodeError):
-        print("Could not read the index file, starting with an empty one.")
+def load_index() -> dict[str, str]:
+    """Load the session-name index."""
+    if not INDEX_FILE.exists():
         return {}
 
-
-def save_index(index):
-    try:
-        with open(INDEX_FILE, "w") as f:
-            json.dump(index, f)
-    except (OSError, TypeError, ValueError):
-        print("Could not save the index file.")
+    return json.loads(INDEX_FILE.read_text(encoding="utf-8"))
 
 
-def load_history(name):
-    # returns the list of messages, or None if the file cannot be read
-    try:
-        with open(SESSIONS_FOLDER + "/" + name + ".json", "r") as f:
-            return json.load(f)
-    except (OSError, json.JSONDecodeError):
-        print("Could not read the saved chat.")
-        return None
+def save_index(index: dict[str, str]) -> None:
+    """Save the session-name index."""
+    INDEX_FILE.write_text(
+        json.dumps(index, indent=2),
+        encoding="utf-8",
+    )
 
 
-def save_history(name, history):
-    try:
-        if not os.path.exists(SESSIONS_FOLDER):
-            os.makedirs(SESSIONS_FOLDER)
-        with open(SESSIONS_FOLDER + "/" + name + ".json", "w") as f:
-            json.dump(history, f)
-    except (OSError, TypeError, ValueError):
-        print("Could not save the chat.")
+def load_history(session_id: str) -> list[ChatCompletionMessageParam]:
+    """Load a session's message history."""
+    path = SESSIONS_FOLDER / f"{session_id}.json"
+
+    if not path.exists():
+        return []
+
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
-def ask_session_name(index):
-    # returns a name to resume, or None for a new session
-    answer = input("Session name (press Enter for a new chat): ").strip()
-    if answer == "":
-        return None
-    if answer in index:
-        return answer
-    print("No session with that name. Starting a new chat.")
-    return None
+def save_history(
+    session_id: str,
+    history: list[ChatCompletionMessageParam],
+) -> None:
+    """Save a session's message history."""
+    SESSIONS_FOLDER.mkdir(parents=True, exist_ok=True)
+    path = SESSIONS_FOLDER / f"{session_id}.json"
+    path.write_text(json.dumps(history, indent=2), encoding="utf-8")
 
 
-def call_model(client, messages):
-    # returns the reply text, or None if something went wrong
-    try:
-        response = client.chat.completions.create(model=MODEL, messages=messages)
-        return response.choices[0].message.content
-    except (openai.APIError, IndexError, AttributeError):
-        print("Something went wrong with the model call. Please try again.")
-        return None
+def create_session(question: str, index: dict[str, str]) -> str:
+    """Create a unique session name based on the question."""
+    name = clean_session_name(question)
 
+    original_name = name
+    number = 2
 
-def make_name(client, first_question):
-    messages = [
-        {"role": "system", "content": "Answer with only two words, nothing else."},
-        {"role": "user", "content": first_question},
-    ]
-    reply = call_model(client, messages)
-    if reply is None:
-        return "new_session"
+    while name in index:
+        name = f"{original_name}_{number}"
+        number += 1
 
-    words = reply.lower().split()
-    words = [w.strip(".,!?:;\"'") for w in words]
-    words = [w for w in words if w]
-    words = words[:2]
-
-    if len(words) < 2:
-        return "new_session"
-
-    return "_".join(words)
-
-
-def create_session(client, index, first_question):
-    name = make_name(client, first_question)
-    if name in index:
-        # do not overwrite an old chat
-        name = name + "_" + str(len(index) + 1)
-    index[name] = "session-" + str(len(index) + 1)
+    index[name] = name
     save_index(index)
+    save_history(name, [])
     return name
 
 
-def chat_loop(client, index, name, history):
-    print("Type exit to stop.")
+def ask_question(
+    client: OpenAI,
+    history: list[ChatCompletionMessageParam],
+    question: str,
+) -> str:
+    """Send a question with the conversation history."""
+    history.append({"role": "user", "content": question})
+
+    response = client.chat.completions.create(
+        model=MODEL,
+        messages=history,
+    )
+
+    answer = response.choices[0].message.content or ""
+    history.append({"role": "assistant", "content": answer})
+    return answer
+
+
+def run_non_interactive(
+    client: OpenAI,
+    session_name: str | None,
+    question: str,
+) -> None:
+    """Ask one question and save the conversation."""
+    index = load_index()
+
+    if session_name is None:
+        session_name = create_session(question, index)
+    elif session_name not in index:
+        raise SystemExit(f"Error: Session '{session_name}' was not found.")
+
+    session_id = index[session_name]
+    history = load_history(session_id)
+
+    answer = ask_question(client, history, question)
+    save_history(session_id, history)
+
+    print(f"Session: {session_name}")
+    print(f"Assistant: {answer}")
+
+
+def run_interactive(client: OpenAI) -> None:
+    """Run the interactive chat loop."""
+    index = load_index()
+    session_name = input("Enter session name: ").strip()
+
+    if not session_name:
+        session_name = create_session("new session", index)
+        index = load_index()
+    elif session_name not in index:
+        index[session_name] = session_name
+        save_index(index)
+        save_history(session_name, [])
+
+    session_id = index[session_name]
+    history = load_history(session_id)
+
+    print("Chat started. Type 'exit' or 'quit' to stop.")
+
     while True:
         question = input("You: ").strip()
-        if question.lower() == "exit":
-            print("Bye!")
+
+        if is_exit_word(question):
+            save_history(session_id, history)
+            print("Chat ended.")
             break
-        if question == "":
+
+        if not question:
+            print("Error: Question cannot be blank.")
             continue
 
-        # first question of a new chat: get the name first
-        if name is None:
-            name = create_session(client, index, question)
-            print("Session name:", name)
-
-        history.append({"role": "user", "content": question})
-        reply = call_model(client, history)
-        if reply is None:
-            history.pop()
-            continue
-
-        print("Assistant:", reply)
-        history.append({"role": "assistant", "content": reply})
-        save_history(name, history)
+        try:
+            answer = ask_question(client, history, question)
+            print(f"Assistant: {answer}")
+            save_history(session_id, history)
+        except (OSError, ValueError, TypeError, KeyError, IndexError) as error:
+            print(f"Error: Could not get a response: {error}")
 
 
-def main():
+def main() -> None:
+    """Start interactive or command-line chat mode."""
     load_dotenv()
-    if not os.getenv("OPENAI_API_KEY"):
-        print("No OPENAI_API_KEY found. Put it in a .env file.")
-        return
+    session_name, question = parse_args(sys.argv)
+
     client = OpenAI()
 
-    index = load_index()
-    name = ask_session_name(index)
-    history = []
-
-    if name is not None:
-        history = load_history(name)
-        if history is None:
-            print("Starting a new chat instead.")
-            name = None
-            history = []
-        else:
-            print("Resumed", name)
-
-    chat_loop(client, index, name, history)
+    if question is None:
+        run_interactive(client)
+    else:
+        run_non_interactive(client, session_name, question)
 
 
 if __name__ == "__main__":
