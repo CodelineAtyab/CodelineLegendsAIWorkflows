@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+
 import uvicorn
 
 from appointments import (
@@ -8,6 +8,7 @@ from appointments import (
     next_id,
 )
 from fastapi import FastAPI, Request
+
 
 # Create FastAPI application
 app = FastAPI()
