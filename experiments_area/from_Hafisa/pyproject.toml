@@ -11,5 +11,5 @@ dependencies = [
 [tool.uv.workspace]
 members = [
     "api_explorer",
-    "chat_sessions/doctor_appointments_api",
+    "doctor_appointments_api",
 ]
