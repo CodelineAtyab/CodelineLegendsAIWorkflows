@@ -1,4 +1,3 @@
-
 appointments: list[dict] = [
     {
         "id": 1,
@@ -23,7 +22,8 @@ appointments: list[dict] = [
     },
 ]
 
-#finds an appointment by id and returns it or None
+
+# finds an appointment by id and returns it or None
 def find_appointment(appointment_id: int) -> dict | None:
     for appointment in appointments:
         if appointment["id"] == appointment_id:
@@ -37,8 +37,7 @@ def get_next_id() -> int:
     highest_id = 0
 
     for appointment in appointments:
-        if appointment["id"] > highest_id:
-            highest_id = appointment["id"]
+        highest_id = max(highest_id, appointment["id"])
 
     return highest_id + 1
 
@@ -62,4 +61,3 @@ def is_doctor_booked(
             return True
 
     return False
-
