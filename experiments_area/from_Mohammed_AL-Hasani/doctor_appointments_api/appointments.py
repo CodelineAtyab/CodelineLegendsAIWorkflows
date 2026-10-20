@@ -1,3 +1,4 @@
+
 appointments: list[dict] = [
     {
         "id": 1,
