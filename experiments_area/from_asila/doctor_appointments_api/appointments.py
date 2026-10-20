@@ -22,3 +22,44 @@ appointments: list[dict] = [
         "time": "09:00",
     },
 ]
+
+#finds an appointment by id and returns it or None
+def find_appointment(appointment_id: int) -> dict | None:
+    for appointment in appointments:
+        if appointment["id"] == appointment_id:
+            return appointment
+
+    return None
+
+
+# creates the next id
+def get_next_id() -> int:
+    highest_id = 0
+
+    for appointment in appointments:
+        if appointment["id"] > highest_id:
+            highest_id = appointment["id"]
+
+    return highest_id + 1
+
+
+# booking-check
+def is_doctor_booked(
+    doctor: str,
+    date: str,
+    time: str,
+    appointment_id: int | None = None,
+) -> bool:
+    for appointment in appointments:
+        if appointment["id"] == appointment_id:
+            continue
+
+        if (
+            appointment["doctor"].lower() == doctor.lower()
+            and appointment["date"] == date
+            and appointment["time"] == time
+        ):
+            return True
+
+    return False
+
