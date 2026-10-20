@@ -1,0 +1,10 @@
+[project]
+name = "travel-time-finder"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "python-dotenv>=1.2.4",
+    "requests>=2.34.2",
+]
