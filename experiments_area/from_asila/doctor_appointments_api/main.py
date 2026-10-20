@@ -1,3 +1,7 @@
+import uvicorn
+from fastapi import FastAPI, Request
+
+
 def main():
     print("Hello from doctor-appointments-api!")
 
