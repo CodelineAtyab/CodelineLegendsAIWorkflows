@@ -1,0 +1,18 @@
+[
+    {
+        "role": "user",
+        "content": "What is the capital of Oman?"
+    },
+    {
+        "role": "assistant",
+        "content": "The capital of Oman is Muscat."
+    },
+    {
+        "role": "user",
+        "content": "And its population?"
+    },
+    {
+        "role": "assistant",
+        "content": "As of recent estimates, the population of Muscat, the capital of Oman, is approximately 1.4 million people. However, population figures can vary depending on the source and the year of the estimate."
+    }
+]
