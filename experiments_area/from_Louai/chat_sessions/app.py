@@ -1,8 +1,11 @@
 import json
 import os
+import sys
 
 from dotenv import load_dotenv
 from openai import OpenAI, OpenAIError
+
+from utils.cli_args import clean_session_name, is_exit_word, parse_args
 
 load_dotenv()
 
@@ -45,19 +48,6 @@ def ask_model(client, messages):
         return None
 
 
-def clean_name(text):
-    cleaned = ""
-    for ch in text.lower():
-        if ch.isalnum():
-            cleaned += ch
-        else:
-            cleaned += " "
-    words = cleaned.split()[:2]
-    if not words:
-        return "new_session"
-    return "_".join(words)
-
-
 def generate_session_name(client, first_question):
     naming_messages = [
         {
@@ -69,7 +59,7 @@ def generate_session_name(client, first_question):
     reply = ask_model(client, naming_messages)
     if reply is None:
         return "new_session"
-    return clean_name(reply)
+    return clean_session_name(reply)
 
 
 def make_unique_name(name, index):
@@ -105,7 +95,7 @@ def chat_loop(client, index, session_name, chat_messages):
     while True:
         question = input("You: ").strip()
 
-        if question.lower() == "exit":
+        if is_exit_word(question):
             break
 
         if question == "":
@@ -127,7 +117,31 @@ def chat_loop(client, index, session_name, chat_messages):
         save_json(get_session_path(session_name), chat_messages)
 
 
+def run_once(client, index, session_name, question):
+    """Answer one question without input(), save the chat, then return."""
+    if session_name is None:
+        chat_messages = []
+        session_name = create_session(client, question, index)
+    else:
+        if session_name not in index:
+            raise SystemExit(f"Error: no session called {session_name}.")
+        chat_messages = load_json(get_session_path(session_name), [])
+
+    chat_messages.append({"role": "user", "content": question})
+    reply = ask_model(client, chat_messages)
+
+    if reply is None:
+        raise SystemExit("Error: could not get a reply from the model.")
+
+    chat_messages.append({"role": "assistant", "content": reply})
+    save_json(get_session_path(session_name), chat_messages)
+
+    print(f"Session: {session_name}")
+    print(f"Assistant: {reply}")
+
+
 def main():
+    session_name, question = parse_args(sys.argv)
     try:
         client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
     except OpenAIError:
@@ -136,6 +150,10 @@ def main():
 
     os.makedirs(SESSIONS_DIR, exist_ok=True)
     index = load_json(INDEX_FILE, {})
+
+    if question is not None:
+        run_once(client, index, session_name, question)
+        return
 
     session_name = ask_session_name(index)
     chat_messages = []
