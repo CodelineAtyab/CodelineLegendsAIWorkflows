@@ -12,6 +12,8 @@ from appointments import (
 app = FastAPI()
 
 #Add the view action
+#it worked with this URL: http://localhost:8000/appointments it will appear appointments
+#it i want for a specific one http://localhost:8000/appointments?doctor=dr.%20aisha
 @app.get("/appointments")
 async def view_appointments(
     doctor: str | None = None,
@@ -32,9 +34,7 @@ async def view_appointments(
 
     return {"appointments": results, "count": len(results)}
 
-def main():
-    print("Hello from doctor-appointments-api!")
 
-
+#added server startup
 if __name__ == "__main__":
-    main()
+    uvicorn.run("main:app", host="0.0.0.0", port=8000)
