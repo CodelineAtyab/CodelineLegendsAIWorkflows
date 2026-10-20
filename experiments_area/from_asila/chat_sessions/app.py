@@ -156,8 +156,7 @@ def main():
         return
 
     index = load_index()
-
-    index = load_index()
+    
     chosen_name = ask_session_name(index)
 
     if chosen_name is None:
