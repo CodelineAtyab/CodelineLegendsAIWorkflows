@@ -1,5 +1,5 @@
+
 import uvicorn
-from fastapi import FastAPI, Request
 
 from appointments import (
     appointments,
@@ -7,13 +7,13 @@ from appointments import (
     is_booked,
     next_id,
 )
+from fastapi import FastAPI, Request
 
 # Create FastAPI application
 app = FastAPI()
 
 
 # 1. GET - View all appointments or filter by doctor/date
-
 @app.get("/appointments")
 async def get_appointments(
     doctor: str | None = None,
@@ -31,7 +31,6 @@ async def get_appointments(
         results.append(appointment)
 
     return {"appointments": results, "count": len(results)}
-
 
 
 # 2. POST - Book a new appointment
