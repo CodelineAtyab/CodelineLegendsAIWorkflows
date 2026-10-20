@@ -41,6 +41,16 @@ def save_index(file_name, index):
 
 
 
+def make_unique_name(name, index):
+    if name not in index:
+        return name
+    number = 2
+    while f"{name}_{number}" in index:
+        number += 1
+    return f"{name}_{number}"
+
+
+
 def generate_session_name(client, first_question):
     response = client.chat.completions.create(
         model="gpt-4.1-mini",
@@ -94,14 +104,7 @@ def main():
             except OpenAIError as error:
                 print(f"Could not generate a session name, using 'new_session' instead: {error}")
                 session_name = "new_session"
-
-            new_id = f"session-{len(index) + 1}"
-            index[session_name] = new_id
-            try:
-                save_index(INDEX_FILE, index)
-            except OSError as error:
-                print(f"Could not save the session index: {error}")
-            is_new = False
+            session_name = make_unique_name(session_name, index)
 
         message.append({"role": "user", "content": user_input})
 
@@ -121,6 +124,10 @@ def main():
 
         try:
             save_session(f"sessions/{session_name}.json", message)
+            if is_new:
+                index[session_name] = f"session-{len(index) + 1}"
+                save_index(INDEX_FILE, index)
+                is_new = False
         except OSError as error:
             print(f"Could not save this session to disk: {error}")
 
