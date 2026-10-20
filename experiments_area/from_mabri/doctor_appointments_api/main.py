@@ -1,5 +1,5 @@
 import uvicorn
-import fastapi as FastAPI
+from fastapi import FastAPI
 import appointments
 
 
