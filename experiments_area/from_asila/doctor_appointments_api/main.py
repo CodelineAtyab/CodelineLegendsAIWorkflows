@@ -35,6 +35,47 @@ async def view_appointments(
     return {"appointments": results, "count": len(results)}
 
 
+#Added post action that adds a new appointment with a new id and returns it
+@app.post("/appointments/book")
+async def book_appointment(incoming_request: Request) -> dict:
+    json_body = await incoming_request.json()
+
+    required_fields = ["patient_name", "doctor", "date", "time"]
+
+    for field in required_fields:
+        if json_body.get(field) is None:
+            return {"error": f"Missing field: {field}"}
+
+    patient_name = json_body.get("patient_name")
+    doctor = json_body.get("doctor")
+    date = json_body.get("date")
+    time = json_body.get("time")
+
+    if is_doctor_booked(doctor, date, time):
+        return {
+            "error": f"{doctor} is already booked on {date} at {time}"
+        }
+
+    new_appointment = {
+        "id": get_next_id(),
+        "patient_name": patient_name,
+        "doctor": doctor,
+        "date": date,
+        "time": time,
+    }
+
+    appointments.append(new_appointment)
+
+    return {
+        "message": "Appointment booked successfully!",
+        "appointment": new_appointment,
+    }
+
+
+
+
+
+
 #added server startup
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000)
