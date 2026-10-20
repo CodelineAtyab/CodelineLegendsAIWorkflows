@@ -1,8 +1,11 @@
 import json
+import sys
 from pathlib import Path
 
 from dotenv import load_dotenv
 from openai import OpenAI, OpenAIError
+
+from utils.cli_args import clean_session_name, is_exit_word, parse_args
 
 BASE_DIR = Path(__file__).parent
 SESSIONS_DIR = BASE_DIR / "sessions"
@@ -70,23 +73,6 @@ def ask_for_session(index):
     return "", False
 
 
-def clean_session_name(model_name):
-    words = model_name.replace("_", " ").replace("-", " ").split()
-    clean_words = []
-
-    for word in words:
-        clean_word = "".join(
-            character for character in word.lower() if character.isalnum()
-        )
-        if clean_word:
-            clean_words.append(clean_word)
-
-    if not clean_words:
-        return "new_session"
-
-    return "_".join(clean_words[:2])
-
-
 def unique_session_name(session_name, index):
     if session_name not in index:
         return session_name
@@ -117,7 +103,7 @@ def chat_loop(client, index, session_name, history, is_new_session):
     while True:
         question = input("You: ").strip()
 
-        if question.lower() == "exit":
+        if is_exit_word(question):
             print("Goodbye!")
             return
 
@@ -155,9 +141,55 @@ def chat_loop(client, index, session_name, history, is_new_session):
             print("The reply was saved, but the session index could not be updated.")
 
 
+def run_non_interactive(client, index, session_name, question):
+    """Answer one command-line question and print only the requested two lines."""
+    is_new_session = session_name is None
+    history = [] if is_new_session else load_history(session_name)
+
+    if not isinstance(history, list):
+        raise SystemExit(f"Error: session {session_name} has invalid history.")
+
+    if is_new_session:
+        session_name = generate_session_name(client, question)
+        session_name = unique_session_name(session_name, index)
+
+    history.append({"role": "user", "content": question})
+    try:
+        answer = call_model(client, history)
+    except OpenAIError:
+        history.pop()
+        raise
+
+    history.append({"role": "assistant", "content": answer})
+    if not save_history(session_name, history):
+        raise SystemExit("Error: could not save session history.")
+
+    if is_new_session:
+        index[session_name] = f"session-{len(index) + 1}"
+    if not save_index(index):
+        raise SystemExit("Error: could not save the session index.")
+
+    answer_line = " ".join(answer.splitlines())
+    print(f"Session: {session_name}")
+    print(f"Assistant: {answer_line}")
+
+
 def main():
+    session_name, question = parse_args(sys.argv)
     load_dotenv()
     index = load_index()
+
+    if question is not None and session_name is not None:
+        if session_name not in index:
+            raise SystemExit(f"Error: no session called {session_name}.")
+
+        try:
+            client = OpenAI()
+            run_non_interactive(client, index, session_name, question)
+        except OpenAIError as error:
+            raise SystemExit(f"Error: {error}") from None
+        return
+
     session_name, is_resumed = ask_for_session(index)
     history = load_history(session_name) if is_resumed else []
 
