@@ -4,7 +4,6 @@ import os
 from dotenv import load_dotenv
 from openai import OpenAI, OpenAIError
 
-
 MODEL = "gpt-4.1-mini"
 INDEX_FILE = "sessions_index.json"
 SESSIONS_FOLDER = "sessions"
