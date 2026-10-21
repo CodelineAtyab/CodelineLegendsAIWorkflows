@@ -1,20 +1,27 @@
-import os
-from dotenv import load_dotenv
-from openai import OpenAI
 import json
+import os
 from pathlib import Path
-#reads the .env file and loads its values into environment variables
+
+from dotenv import load_dotenv
+from openai import APIError, AuthenticationError, OpenAI
+
+# reads the .env file and loads its values into environment variables
 load_dotenv()
-#retrieves the API key without hardcoding it
-api_key = os.getenv("OPENAI_API_KEY")
+# retrieves the API key without hardcoding it
 
-if not api_key:
-    raise ValueError("OPENAI_API_KEY is missing. Check your .env file.")
 
-#configures the API client
-client = OpenAI(api_key=api_key)
-#This function accepts the conversation history and returns the assistant's reply
-def chat_with_model(messages):
+def create_client():
+    api_key = os.getenv("OPENAI_API_KEY")
+
+    if not api_key:
+        print("No API key found. Add OPENAI_API_KEY to your .env file.")
+        return None
+
+    return OpenAI(api_key=api_key)
+
+
+# This function accepts the conversation history and returns the assistant's reply
+def chat_with_model(client, messages):
     response = client.chat.completions.create(
         model="gpt-4.1-mini",
         messages=messages,
@@ -37,7 +44,7 @@ def load_index():
     try:
         with open(INDEX_FILE, "r", encoding="utf-8") as file:
             return json.load(file)
-    except (json.JSONDecodeError, OSError):
+    except json.JSONDecodeError, OSError:
         print("Could not read the session index. Starting with an empty index.")
         return {}
 
@@ -58,7 +65,7 @@ def load_history(session_name):
     try:
         with open(history_file, "r", encoding="utf-8") as file:
             return json.load(file)
-    except (json.JSONDecodeError, OSError):
+    except json.JSONDecodeError, OSError:
         print("Could not read the conversation history.")
         return []
 
@@ -69,8 +76,6 @@ def save_history(session_name, messages):
 
     with open(history_file, "w", encoding="utf-8") as file:
         json.dump(messages, file, indent=4)
-
-
 
 
 def choose_session(index):
@@ -89,8 +94,7 @@ def choose_session(index):
         print(f"No session called '{session_name}'. Please try again.")
 
 
-
-def generate_session_name(question):
+def generate_session_name(client, question):
     messages = [
         {
             "role": "system",
@@ -115,55 +119,73 @@ def generate_session_name(question):
 
     return "_".join(words[:2])
 
-#It creates IDs such as session-1, session-2, and so on.
+
+# It creates IDs such as session-1, session-2, and so on.
 def create_session_id(index):
     return f"session-{len(index) + 1}"
 
 
 def main():
+    client = create_client()
+
+    if client is None:
+        return
+
     index = load_index()
     session_name = choose_session(index)
 
+    # Resume an existing session.
     if session_name:
         messages = load_history(session_name)
+
+    # Create a new session.
     else:
         messages = []
         question = input("You: ").strip()
 
-        if question.lower() == "exit":
+        if question.lower() in ("exit", "quit"):
             return
 
         if not question:
             print("Please enter a question.")
             return
 
-        session_name = generate_session_name(question)
-
-        # Avoid overwriting an existing session with the same name.
+        try:
+            session_name = generate_session_name(client, question)
+        except AuthenticationError:
+            print("Authentication failed. Please check your API key.")
+            return
+        except (APIError, OSError, ValueError) as error:
+            print(f"Sorry, something went wrong: {error}")
+            return
+        # Avoid overwriting an existing session.
         if session_name in index:
             session_name = f"{session_name}_{len(index) + 1}"
 
-        session_id = create_session_id(index)
-        index[session_name] = session_id
-
+        index[session_name] = create_session_id(index)
         messages.append({"role": "user", "content": question})
 
         try:
-            reply = chat_with_model(messages)
+            reply = chat_with_model(client, messages)
             print(f"Assistant: {reply}")
             messages.append({"role": "assistant", "content": reply})
 
             save_index(index)
             save_history(session_name, messages)
 
-        except Exception as error:
+        except AuthenticationError:
+            messages.pop()
+            print("Invalid API key. Check your OPENAI_API_KEY in the .env file.")
+            return
+        except (APIError, OSError, ValueError) as error:
+            messages.pop()
             print(f"Sorry, something went wrong: {error}")
             return
-
+    # Continue the conversation.
     while True:
         question = input("You: ").strip()
 
-        if question.lower() == "exit" or question.upper() == "EXIT":
+        if question.lower() in ("exit", "quit"):
             print("Chat ended.")
             break
 
@@ -173,16 +195,20 @@ def main():
         messages.append({"role": "user", "content": question})
 
         try:
-            reply = chat_with_model(messages)
+            reply = chat_with_model(client, messages)
             print(f"Assistant: {reply}")
             messages.append({"role": "assistant", "content": reply})
-
             save_history(session_name, messages)
 
-        except Exception as error:
-            # Remove the unsent message so history stays consistent.
+        except AuthenticationError:
+            messages.pop()
+            print("Invalid API key. Check your OPENAI_API_KEY in the .env file.")
+            return
+        except (APIError, OSError, ValueError) as error:
             messages.pop()
             print(f"Sorry, something went wrong: {error}")
+            return
+
 
 if __name__ == "__main__":
     main()

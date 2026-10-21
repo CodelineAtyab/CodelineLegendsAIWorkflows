@@ -1,0 +1,10 @@
+[
+    {
+        "role": "user",
+        "content": "capital of uk"
+    },
+    {
+        "role": "assistant",
+        "content": "The capital of the United Kingdom is London."
+    }
+]
