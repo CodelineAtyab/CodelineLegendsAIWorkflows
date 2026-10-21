@@ -1,4 +1,3 @@
-
 users = [
     {"id": 1, "name": "Salim"},
     {"id": 2, "name": "Sara"},
