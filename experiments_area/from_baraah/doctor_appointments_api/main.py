@@ -1,7 +1,5 @@
-from typing import Annotated
-
 import uvicorn
-from fastapi import Body, FastAPI
+from fastapi import FastAPI, Request
 
 from appointments import (
     appointments,
@@ -38,25 +36,25 @@ async def view_appointments(
 
 # POST - Book a new appointment
 @app.post("/appointments/book")
-async def book_appointment(data: Annotated[dict, Body()]) -> dict:
+async def book_appointment(incoming_request: Request) -> dict:
+    json_body = await incoming_request.json()
 
     # Check missing fields
     for field in ["patient_name", "doctor", "date", "time"]:
-        if data.get(field) is None:
+        if not json_body.get(field):
             return {"error": f"Missing field: {field}"}
 
-    doctor = data["doctor"]
-    date = data["date"]
-    time = data["time"]
+    doctor = json_body["doctor"]
+    date = json_body["date"]
+    time = json_body["time"]
 
-    # Prevent double booking
+    # Check if doctor is already booked
     if doctor_is_booked(doctor, date, time):
         return {"error": f"{doctor} is already booked on {date} at {time}"}
 
-    # Create new appointment
     new_appointment = {
         "id": next_appointment_id(),
-        "patient_name": data["patient_name"],
+        "patient_name": json_body["patient_name"],
         "doctor": doctor,
         "date": date,
         "time": time,
@@ -70,40 +68,32 @@ async def book_appointment(data: Annotated[dict, Body()]) -> dict:
     }
 
 
-# PUT - Update an existing appointment
+# PUT - Update an appointment
 @app.put("/appointments/update")
 async def update_appointment(
     appointment_id: int,
-    data: Annotated[dict, Body()],
+    incoming_request: Request,
 ) -> dict:
-
     appointment = find_appointment(appointment_id)
 
     if appointment is None:
         return {"error": f"Appointment {appointment_id} not found"}
 
-    # Copy appointment so original stays unchanged if error occurs
-    updated = appointment.copy()
+    json_body = await incoming_request.json()
 
-    # Update only allowed fields
-    for field in ["patient_name", "doctor", "date", "time"]:
-        if field in data:
-            updated[field] = data[field]
+    # Keep old values if the user did not send new ones
+    doctor = json_body.get("doctor", appointment["doctor"])
+    date = json_body.get("date", appointment["date"])
+    time = json_body.get("time", appointment["time"])
 
-    doctor = updated["doctor"]
-    date = updated["date"]
-    time = updated["time"]
-
-    # Check double booking 
-    if doctor_is_booked(
-        doctor,
-        date,
-        time,
-        exclude_id=appointment_id,
-    ):
+    # Check booking before changing anything
+    if doctor_is_booked(doctor, date, time, appointment_id):
         return {"error": f"{doctor} is already booked on {date} at {time}"}
 
-    appointment.update(updated)
+    # Change only allowed fields
+    for field in ["patient_name", "doctor", "date", "time"]:
+        if field in json_body:
+            appointment[field] = json_body[field]
 
     return {
         "message": "Appointment updated successfully!",
@@ -111,10 +101,9 @@ async def update_appointment(
     }
 
 
-# DELETE - Remove  appointment
+# DELETE - Remove an appointment
 @app.delete("/appointments/remove")
 async def remove_appointment(appointment_id: int) -> dict:
-
     appointment = find_appointment(appointment_id)
 
     if appointment is None:
@@ -125,6 +114,6 @@ async def remove_appointment(appointment_id: int) -> dict:
     return {"message": f"Appointment {appointment_id} removed successfully!"}
 
 
-# Run 
+# Run the server
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000)

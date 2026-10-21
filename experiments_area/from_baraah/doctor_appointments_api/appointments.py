@@ -23,31 +23,27 @@ appointments: list[dict] = [
     },
 ]
 
-last_id = 3
-
 
 # Find an appointment by ID
 def find_appointment(appointment_id: int) -> dict | None:
     for appointment in appointments:
         if appointment["id"] == appointment_id:
             return appointment
+
     return None
 
 
-# Create a unique appointment ID
 def next_appointment_id() -> int:
-    global last_id
+    highest_id = 0
 
-    highest_id = max(
-        (appointment["id"] for appointment in appointments),
-        default=0,
-    )
-    last_id = max(last_id, highest_id) + 1
+    for appointment in appointments:
+        if appointment["id"] > highest_id:  # noqa: PLR1730
+            highest_id = appointment["id"]
 
-    return last_id
+    return highest_id + 1
 
 
-# Check if the doctor is already booked
+# Check if a doctor is already booked
 def doctor_is_booked(
     doctor: str,
     date: str,
