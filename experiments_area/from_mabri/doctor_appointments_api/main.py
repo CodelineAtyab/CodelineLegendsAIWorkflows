@@ -3,7 +3,6 @@ from fastapi import FastAPI, Request
 
 import appointments
 
-
 app = FastAPI()
 
 
