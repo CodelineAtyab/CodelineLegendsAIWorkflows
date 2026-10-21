@@ -1,12 +1,13 @@
 import json
 import os
-import re
 import sys
 from pathlib import Path
-from typing import Any
 
 from dotenv import load_dotenv
 from openai import APIError, OpenAI
+from openai.types.chat import ChatCompletionMessageParam
+
+from utils.cli_args import clean_session_name, is_exit_word, parse_args
 
 load_dotenv()
 API_KEY = os.getenv("OPENAI_API_KEY")
@@ -15,44 +16,13 @@ BASE_DIR = Path(__file__).resolve().parent
 SESSIONS_DIR = BASE_DIR / "sessions"
 INDEX_FILE = SESSIONS_DIR / "index.json"
 
-History = list[dict[str, str]]
 
+def to_api_message(message: dict[str, str]) -> ChatCompletionMessageParam:
+    """Convert a saved message into the message format the OpenAI API expects."""
+    if message["role"] == "assistant":
+        return {"role": "assistant", "content": message["content"]}
 
-def parse_args(args: list[str]) -> tuple[str | None, str | None]:
-    """Parse and validate command-line arguments."""
-    if len(args) > 2:
-        raise SystemExit(
-            "Error: pass a question, or a session name and a question."
-        )
-
-    if not args:
-        return None, None
-
-    question = args[-1].strip()
-    if not question:
-        raise SystemExit("Error: the question cannot be empty.")
-
-    if len(args) == 1:
-        return None, question
-
-    session_name = args[0].strip()
-    if not session_name:
-        raise SystemExit("Error: the session name cannot be empty.")
-
-    return session_name, question
-
-
-def clean_session_name(name: str) -> str:
-    """Convert an AI suggestion into a two-word session name."""
-    words = re.findall(r"[a-z]+", name.lower())
-    if len(words) < 2:
-        return "new_session"
-    return "_".join(words[:2])
-
-
-def is_exit_word(text: str) -> bool:
-    """Check whether the user wants to end the chat."""
-    return text.strip().lower() in ("exit", "quit")
+    return {"role": "user", "content": message["content"]}
 
 
 def load_index() -> dict[str, str] | None:
@@ -69,12 +39,12 @@ def load_index() -> dict[str, str] | None:
             return None
 
         return data
-    except (OSError, json.JSONDecodeError):
+    except OSError, json.JSONDecodeError:
         print("Could not read session index.")
         return None
 
 
-def save_json(path: Path, data: Any) -> bool:
+def save_json(path: Path, data: object) -> bool:
     """Save data to a JSON file."""
     try:
         with open(path, "w", encoding="utf-8") as file:
@@ -113,7 +83,7 @@ def unique_name(base_name: str, index: dict[str, str]) -> str:
     number = 2
 
     while name in index:
-        name = f"{base_name.split('_')[0]}_{number}"
+        name = f"{base_name}_{number}"
         number += 1
 
     return name
@@ -130,12 +100,16 @@ def resolve_session_id(session_name: str, index: dict[str, str]) -> str:
     return index[session_name]
 
 
-def get_answer(client: OpenAI, messages: History) -> str | None:
+def get_answer(client: OpenAI, messages: list[dict[str, str]]) -> str | None:
     """Request an AI reply using the conversation history."""
+    api_messages: list[ChatCompletionMessageParam] = [
+        to_api_message(message) for message in messages
+    ]
+
     try:
         response = client.chat.completions.create(
             model=MODEL,
-            messages=messages,
+            messages=api_messages,
         )
         return response.choices[0].message.content or ""
     except APIError:
@@ -145,8 +119,8 @@ def get_answer(client: OpenAI, messages: History) -> str | None:
 def exchange(
     client: OpenAI,
     question: str,
-    history: History,
-) -> History | None:
+    history: list[dict[str, str]],
+) -> list[dict[str, str]] | None:
     """Return the history with a successful question and reply added."""
     pending_messages = history + [{"role": "user", "content": question}]
     answer = get_answer(client, pending_messages)
@@ -157,7 +131,7 @@ def exchange(
     return pending_messages + [{"role": "assistant", "content": answer}]
 
 
-def load_history(name: str) -> History | None:
+def load_history(name: str) -> list[dict[str, str]] | None:
     """Load a saved conversation."""
     path = SESSIONS_DIR / f"{name}.json"
 
@@ -170,7 +144,7 @@ def load_history(name: str) -> History | None:
             return None
 
         return history
-    except (OSError, json.JSONDecodeError):
+    except OSError, json.JSONDecodeError:
         print("Could not load session history.")
         return None
 
@@ -178,7 +152,7 @@ def load_history(name: str) -> History | None:
 def chat(
     client: OpenAI,
     name: str,
-    history: History,
+    history: list[dict[str, str]],
     index: dict[str, str],
     new_session: bool,
 ) -> None:
@@ -228,17 +202,20 @@ def run_once(
     session_name: str | None = None,
 ) -> None:
     """Answer one question, save the history, and exit."""
+    history: list[dict[str, str]] = []
+
     if session_name is None:
         name = unique_name(generate_name(client, question), index)
         session_id = f"session-{len(index) + 1}"
-        history = []
     else:
         session_id = resolve_session_id(session_name, index)
         name = session_name
-        history = load_history(name)
+        saved_history = load_history(name)
 
-        if history is None:
+        if saved_history is None:
             raise SystemExit(f"Error: could not load session '{name}'.")
+
+        history = saved_history
 
     updated_history = exchange(client, question, history)
 
@@ -261,7 +238,7 @@ def run_once(
 
 def main() -> None:
     """Start interactive chat or answer a command-line question."""
-    session_name, question = parse_args(sys.argv[1:])
+    session_name, question = parse_args(sys.argv)
 
     if not API_KEY:
         raise SystemExit("Error: API key not found. Check your .env file.")
