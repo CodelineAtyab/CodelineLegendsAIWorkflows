@@ -9,14 +9,17 @@ def parse_args(argv: list[str]) -> tuple[str | None, str | None]:
     if not arguments:
         return None, None
     if len(arguments) == 1:
-        question = arguments[0]
+        question = arguments[0].strip()
         if not question.strip():
             raise SystemExit("Error: question cannot be blank.")
         return None, question
-    question = arguments[1]
-    if not question.strip():
+    session_name = arguments[0].strip()
+    question = arguments[1].strip()
+    if not session_name:
+        raise SystemExit("Error: session name cannot be blank.")
+    if not question:
         raise SystemExit("Error: question cannot be blank.")
-    return arguments[0], question
+    return session_name, question
 
 
 def clean_session_name(raw: str) -> str:

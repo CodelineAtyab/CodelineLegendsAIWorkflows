@@ -37,6 +37,7 @@ def test_parse_args_rejects_invalid_questions_or_argument_counts(argv):
         ("Oman Capital", "oman_capital"),
         ("oman capital city", "oman_capital"),
         ("", "new_session"),
+        ("   ", "new_session"),
     ],
 )
 def test_clean_session_name(raw, expected):
@@ -50,3 +51,8 @@ def test_is_exit_word_accepts_exit_commands(text):
 
 def test_is_exit_word_rejects_other_text():
     assert not is_exit_word("hello")
+
+
+def test_parse_args_rejects_blank_session_name():
+    with pytest.raises(SystemExit, match="session name cannot be blank"):
+        parse_args(["app.py", "   ", "Hello"])
