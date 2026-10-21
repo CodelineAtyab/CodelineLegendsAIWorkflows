@@ -1,4 +1,5 @@
 from random import choice
+
 import uvicorn
 from fastapi import FastAPI, Request
 
