@@ -40,6 +40,22 @@ async def book_appointment(incoming_request: Request) -> dict:
     return {"message": "Appointment booked successfully!", "appointment": new_appointment}
 
 
+@app.put("/appointments/update")
+async def update_appointment(appointment_id: int, incoming_request: Request) -> dict:
+    appointment = appointments.find_appointment(appointment_id)
+    if appointment is None:
+        return {"error": f"Appointment {appointment_id} not found"}
+    new_data = await incoming_request.json()
+    # The slot after the update: sent values win, missing ones keep the current value
+    doctor = new_data.get("doctor", appointment["doctor"])
+    date = new_data.get("date", appointment["date"])
+    time = new_data.get("time", appointment["time"])
+    if appointments.is_doctor_booked(doctor, date, time, ignore_id=appointment_id):
+        return {"error": f"{doctor} is already booked on {date} at {time}"}
+    for field in ["patient_name", "doctor", "date", "time"]:
+        if field in new_data:
+            appointment[field] = new_data[field]
+    return {"message": "Appointment updated successfully!", "appointment": appointment}
 
 
 if __name__ == "__main__":
