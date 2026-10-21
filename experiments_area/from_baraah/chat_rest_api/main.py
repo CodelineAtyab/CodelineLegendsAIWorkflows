@@ -138,6 +138,23 @@ async def start_conversation(incoming_request: Request) -> dict:
     }
 
 
+# 6. Get Conversations
+@app.get("/conversations")
+async def get_conversations(user_id: int | None = None) -> dict:
+    results = []
+
+    for conversation in conversations:
+        if user_id is not None and conversation["user_id"] != user_id:
+            continue
+
+        results.append(conversation)
+
+    return {
+        "conversations": results,
+        "count": len(results),
+    }
+
+
 # 7. Show Conversation
 @app.get("/conversations/show")
 async def show_conversation(conversation_id: int) -> dict:
@@ -170,7 +187,7 @@ async def ask_question(incoming_request: Request) -> dict:
         return {"error": f"Missing field: {missing}"}
 
     conversation_id = json_body.get("conversation_id")
-    text = json_body.get("text")
+    question_text = json_body.get("text")
 
     conversation = find_by_id(conversations, conversation_id)
 
@@ -182,7 +199,7 @@ async def ask_question(incoming_request: Request) -> dict:
         "conversation_id": conversation_id,
         "sender_type": "user",
         "sender_id": conversation["user_id"],
-        "text": text,
+        "text": question_text,
         "reply_to": None,
     }
 
@@ -214,7 +231,7 @@ async def reply_message(incoming_request: Request) -> dict:
     if user_message["sender_type"] != "user":
         return {"error": f"User message {reply_to} not found"}
 
-    # Check if this question already has a reply
+    # A question can have only one bot reply
     for message in messages:
         if message["reply_to"] == reply_to:
             return {"error": f"Message {reply_to} already has a reply"}
@@ -223,6 +240,10 @@ async def reply_message(incoming_request: Request) -> dict:
         conversations,
         user_message["conversation_id"],
     )
+
+    # Check if the conversation exists
+    if conversation is None:
+        return {"error": f"Conversation {user_message['conversation_id']} not found"}
 
     new_message = {
         "id": next_id(messages),
@@ -242,8 +263,6 @@ async def reply_message(incoming_request: Request) -> dict:
 
 
 # 10. Get Messages
-
-
 @app.get("/messages")
 async def get_messages(
     conversation_id: int | None = None,
