@@ -1,4 +1,3 @@
-
 import json
 import sys
 from pathlib import Path
@@ -21,7 +20,7 @@ def load_json(path, default):
             return json.load(file)
     except FileNotFoundError:
         return default
-    except (OSError, json.JSONDecodeError):
+    except OSError, json.JSONDecodeError:
         print(f"Could not read {path.name}. Starting with empty data.")
         return default
 
@@ -117,9 +116,7 @@ def generate_session_name(client, first_question):
         f"Question: {first_question}"
     )
 
-    naming_messages = [
-        {"role": "user", "content": naming_prompt}
-    ]
+    naming_messages = [{"role": "user", "content": naming_prompt}]
 
     return clean_session_name(call_model(client, naming_messages))
 
@@ -218,7 +215,6 @@ def main():
 
     # If a question is provided, use non-interactive mode.
     if question is not None:
-
         # Only check existing sessions when a name is provided.
         if session_name is not None and session_name not in index:
             raise SystemExit(f"Error: no session called {session_name}.")
@@ -244,7 +240,7 @@ def main():
 
     try:
         client = OpenAI()
-    except (OpenAIError, ValueError):
+    except OpenAIError, ValueError:
         print("Could not create the OpenAI client. Check your API key in .env.")
         return
 

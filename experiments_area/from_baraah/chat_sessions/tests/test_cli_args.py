@@ -1,4 +1,3 @@
-
 import pytest
 
 from utils.cli_args import clean_session_name, is_exit_word, parse_args

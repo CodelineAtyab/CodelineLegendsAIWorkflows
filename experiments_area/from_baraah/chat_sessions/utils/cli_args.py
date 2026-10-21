@@ -1,7 +1,3 @@
-
-import re
-
-
 def parse_args(argv: list[str]) -> tuple[str | None, str | None]:
     """Return the session name and question from command-line arguments."""
     args = argv[1:]
@@ -30,12 +26,20 @@ def parse_args(argv: list[str]) -> tuple[str | None, str | None]:
 
 def clean_session_name(raw: str) -> str:
     """Convert the first two words into a session name."""
-    words = re.findall(r"[^\W_]+", raw.lower())
+    cleaned = ""
+
+    for char in raw.lower():
+        if char.isalnum():
+            cleaned += char
+        else:
+            cleaned += " "
+
+    words = cleaned.split()[:2]
 
     if not words:
         return "new_session"
 
-    return "_".join(words[:2])
+    return "_".join(words)
 
 
 def is_exit_word(text: str) -> bool:
