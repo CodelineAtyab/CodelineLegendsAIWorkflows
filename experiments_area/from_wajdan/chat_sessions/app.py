@@ -63,7 +63,7 @@ def choose_session(index):
     """Ask for a session name and return its name and history."""
     try:
         name = input("Session name (Enter for a new session): ").strip()
-    except (EOFError, KeyboardInterrupt):
+    except EOFError, KeyboardInterrupt:
         print("\nGoodbye.")
         return None, None, True
     if name == "":
@@ -214,7 +214,7 @@ def main():
         prompt = "First question: " if new_session else "You: "
         try:
             user_message = input(prompt).strip()
-        except (EOFError, KeyboardInterrupt):
+        except EOFError, KeyboardInterrupt:
             print("\nGoodbye.")
             return
         if is_exit_word(user_message):
