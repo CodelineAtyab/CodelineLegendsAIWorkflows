@@ -1,15 +1,22 @@
+"""Interactive and one shot chatbot backed by the OpenAI chat completions API."""
+
 import json
 import os
+import sys
 
 from dotenv import load_dotenv
 from openai import OpenAI, OpenAIError
+from openai.types.chat import ChatCompletionMessageParam
+
+from utils.cli_args import clean_session_name, is_exit_word, parse_args
 
 SESSION_INDEX_FILE = "session_index.json"
 SESSIONS_DIR = "sessions"
 MODEL_NAME = "gpt-4.1-mini"
 
 
-def load_session_index(path=SESSION_INDEX_FILE):
+def load_session_index(path: str = SESSION_INDEX_FILE) -> dict:
+    """Read the session index, or return an empty index when it is missing."""
     try:
         with open(path, "r", encoding="utf-8") as file:
             data = json.load(file)
@@ -24,7 +31,8 @@ def load_session_index(path=SESSION_INDEX_FILE):
     return data
 
 
-def save_session_index(index, path=SESSION_INDEX_FILE):
+def save_session_index(index: dict, path: str = SESSION_INDEX_FILE) -> None:
+    """Write the session index to disk."""
     try:
         with open(path, "w", encoding="utf-8") as file:
             json.dump(index, file, indent=2)
@@ -32,7 +40,8 @@ def save_session_index(index, path=SESSION_INDEX_FILE):
         print(f"Could not save the session index: {error}")
 
 
-def load_session_history(path):
+def load_session_history(path: str) -> list[ChatCompletionMessageParam]:
+    """Read the saved messages of one session."""
     try:
         with open(path, "r", encoding="utf-8") as file:
             data = json.load(file)
@@ -41,14 +50,15 @@ def load_session_history(path):
     except (json.JSONDecodeError, OSError) as error:
         print(f"Could not read session history: {error}")
         return []
-        
+
     if not isinstance(data, list):
         print("Session history is not a list. Starting with an empty history.")
         return []
     return data
 
 
-def save_session_history(history, path):
+def save_session_history(history: list[ChatCompletionMessageParam], path: str) -> None:
+    """Write the messages of one session to disk."""
     try:
         directory = os.path.dirname(path)
         if directory:
@@ -59,7 +69,8 @@ def save_session_history(history, path):
         print(f"Could not save session history: {error}")
 
 
-def get_openai_client():
+def get_openai_client() -> OpenAI | None:
+    """Build an OpenAI client, or return None when no key is available."""
     load_dotenv()
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
@@ -73,7 +84,7 @@ def get_openai_client():
         return None
 
 
-def unique_session_name(base_name, index):
+def unique_session_name(base_name: str, index: dict) -> str:
     """Return a session name that is not already in the index.
 
     If base_name is taken, append _2, _3, and so on until the name is free.
@@ -87,7 +98,8 @@ def unique_session_name(base_name, index):
     return f"{base_name}_{counter}"
 
 
-def generate_two_word_session_name(client, question):
+def generate_two_word_session_name(client: OpenAI, question: str) -> str:
+    """Ask the model for a short two word session name."""
     try:
         response = client.chat.completions.create(
             model=MODEL_NAME,
@@ -103,88 +115,130 @@ def generate_two_word_session_name(client, question):
         print(f"Could not generate a session name: {error}")
         return "new_session"
 
-    content = response.choices[0].message.content or ""
-
-    words = content.strip().lower().split()
-    if len(words) < 2:
-        return "new_session"
-    return "_".join(words[:2])
+    return clean_session_name(response.choices[0].message.content or "")
 
 
-def main():
-    client = get_openai_client()
-    if client is None:
-        return
+def ask_model(client: OpenAI, history: list[ChatCompletionMessageParam], question: str) -> str | None:
+    """Send the history plus one question and return the answer."""
+    history.append({"role": "user", "content": question})
 
-    index = load_session_index()
+    try:
+        response = client.chat.completions.create(
+            model=MODEL_NAME,
+            messages=history,
+        )
+    except OpenAIError as error:
+        print(f"API error: {error}")
+        history.pop()
+        return None
 
-    session_name = input("Enter a session name (or press Enter to start a new session): ").strip()
+    answer = response.choices[0].message.content or ""
+    history.append({"role": "assistant", "content": answer})
+    return answer
 
-    new_session = False
-    history = []
+
+def run_interactive(client: OpenAI, index: dict) -> None:
+    """Ask for a session name and keep chatting until the user types exit or quit."""
+    session_name = input(
+        "Enter a session name (or press Enter to start a new session): "
+    ).strip()
+
+    history: list[ChatCompletionMessageParam] = []
     session_path = None
 
-    if session_name == "":
-        new_session = True
-    elif session_name in index:
+    if session_name in index:
         session_path = os.path.join(SESSIONS_DIR, f"{session_name}.json")
         history = load_session_history(session_path)
-    else:
+    elif session_name:
         print(f"No session called {session_name}. Starting a new one.")
-        new_session = True
 
-    if new_session:
+    if session_path is None:
         first_question = input("You: ").strip()
-        if first_question in ("exit", "EXIT"):
+
+        if is_exit_word(first_question):
             print("Goodbye!")
             return
 
-        generated_name = generate_two_word_session_name(client, first_question)
-        session_name = unique_session_name(generated_name, index)
+        session_name = unique_session_name(
+            generate_two_word_session_name(client, first_question), index
+        )
         session_path = os.path.join(SESSIONS_DIR, f"{session_name}.json")
-        history = [{"role": "user", "content": first_question}]
+        history = []
 
-        try:
-            response = client.chat.completions.create(
-                model=MODEL_NAME,
-                messages=history,
-            )
-            answer = response.choices[0].message.content or ""
-        except OpenAIError as error:
-            print(f"API error: {error}")
+        answer = ask_model(client, history, first_question)
+        if answer is None:
             return
 
         print("Assistant:", answer)
-        history.append({"role": "assistant", "content": answer})
         save_session_history(history, session_path)
         index[session_name] = session_name
         save_session_index(index)
 
     while True:
         user_input = input("You: ").strip()
-        if user_input in ("exit", "EXIT"):
+
+        if is_exit_word(user_input):
             print("Goodbye!")
             break
         if not user_input:
             continue
 
-        history.append({"role": "user", "content": user_input})
-
-        try:
-            response = client.chat.completions.create(
-                model=MODEL_NAME,
-                messages=history,
-            )
-            answer = response.choices[0].message.content or ""
-        except OpenAIError as error:
-            print(f"API error: {error}")
-            history.pop()
+        answer = ask_model(client, history, user_input)
+        if answer is None:
             continue
 
         print("Assistant:", answer)
-        history.append({"role": "assistant", "content": answer})
         save_session_history(history, session_path)
         save_session_index(index)
+
+
+def run_non_interactive(
+    client: OpenAI,
+    index: dict,
+    session_name: str | None,
+    question: str,
+) -> None:
+    """Answer one question, save the session and print the result."""
+    history: list[ChatCompletionMessageParam] = []
+
+    if session_name is None:
+        session_name = unique_session_name(
+            generate_two_word_session_name(client, question), index
+        )
+    else:
+        session_path = os.path.join(SESSIONS_DIR, f"{session_name}.json")
+        history = load_session_history(session_path)
+
+    answer = ask_model(client, history, question)
+    if answer is None:
+        return
+
+    session_path = os.path.join(SESSIONS_DIR, f"{session_name}.json")
+    save_session_history(history, session_path)
+    index[session_name] = session_name
+    save_session_index(index)
+
+    print(f"Session: {session_name}")
+    print(f"Assistant: {' '.join(answer.splitlines())}")
+
+
+def main() -> None:
+    """Run the interactive chat or the one question command line mode."""
+    session_name, question = parse_args(sys.argv)
+
+    index = load_session_index()
+
+    if question is not None and session_name is not None and session_name not in index:
+        raise SystemExit(f"Error: no session called {session_name}.")
+
+    client = get_openai_client()
+    if client is None:
+        return
+
+    if question is None:
+        run_interactive(client, index)
+    else:
+        run_non_interactive(client, index, session_name, question)
 
 
 if __name__ == "__main__":
