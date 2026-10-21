@@ -4,22 +4,22 @@ appointments: list[dict] = [
         "patient_name": "Salim",
         "doctor": "Dr. Aisha",
         "date": "2026-11-03",
-        "time": "10:30"
+        "time": "10:30",
     },
     {
         "id": 2,
         "patient_name": "Ahmed",
         "doctor": "Dr. Khalifa",
         "date": "2026-11-11",
-        "time": "12:30"
+        "time": "12:30",
     },
     {
         "id": 3,
         "patient_name": "Fatima",
         "doctor": "Dr. Huda",
         "date": "2026-10-31",
-        "time": "08:00"
-    }
+        "time": "08:00",
+    },
 ]
 
 
@@ -36,7 +36,9 @@ def next_id() -> int:
     return max(appointment["id"] for appointment in appointments) + 1
 
 
-def is_doctor_booked(doctor: str, date: str, time: str, ignore_id: int | None = None) -> bool:
+def is_doctor_booked(
+    doctor: str, date: str, time: str, ignore_id: int | None = None
+) -> bool:
     for appointment in appointments:
         # Lets an update keep its own slot without clashing with itself
         if appointment["id"] == ignore_id:
