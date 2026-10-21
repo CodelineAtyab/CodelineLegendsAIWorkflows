@@ -37,9 +37,6 @@ async def get_appointments(
 async def book_appointment(request: Request) -> dict:
     json_body = await request.json()
 
-    if not isinstance(json_body, dict):
-        return {"error": "Request body must be a JSON object"}
-
     required_fields = ["patient_name", "doctor", "date", "time"]
 
     for field in required_fields:
@@ -82,15 +79,9 @@ async def update_appointment(
 
     json_body = await request.json()
 
-    if not isinstance(json_body, dict):
-        return {"error": "Request body must be a JSON object"}
-
     new_doctor = json_body.get("doctor", appointment["doctor"])
     new_date = json_body.get("date", appointment["date"])
     new_time = json_body.get("time", appointment["time"])
-
-    if not new_doctor or not new_date or not new_time:
-        return {"error": "Doctor, date, and time cannot be empty"}
 
     if is_doctor_booked(
         new_doctor,
