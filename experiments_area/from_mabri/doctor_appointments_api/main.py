@@ -1,6 +1,6 @@
 import uvicorn
-from fastapi import FastAPI, Request
 import appointments
+from fastapi import FastAPI, Request
 
 
 app = FastAPI()
