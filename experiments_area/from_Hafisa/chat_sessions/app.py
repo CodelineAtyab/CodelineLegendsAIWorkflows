@@ -92,7 +92,7 @@ def generate_session_name(first_question, client):
         if name is None:
             return "new_session"
 
-        words = name.lower().split()
+        words = [word.strip(".,!?;:\"'") for word in name.lower().split()]
 
         if len(words) == 0:
             return "new_session"

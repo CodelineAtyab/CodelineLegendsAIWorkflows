@@ -38,7 +38,7 @@ jobs:
           BASE_REF: ${{ github.base_ref }}
         run: |
           python3 - <<'PY' >> "$GITHUB_OUTPUT"
-          import json, os, subprocess, tomllib
+          import json, os, subprocess
 
           skip = {
               ".git", ".venv", "venv", "node_modules",
@@ -68,10 +68,6 @@ jobs:
               if "pyproject.toml" not in files:
                   continue
               project = os.path.relpath(root, ".").replace(os.sep, "/")
-              with open(os.path.join(root, "pyproject.toml"), "rb") as config_file:
-                  config = tomllib.load(config_file)
-              if config.get("tool", {}).get("uv", {}).get("workspace"):
-                  continue
               if changed is None or any(
                   f == project or f.startswith(project + "/") for f in changed
               ):
