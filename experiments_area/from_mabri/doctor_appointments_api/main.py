@@ -35,9 +35,18 @@ async def book_appointment(incoming_request: Request) -> dict:
     time = json_body.get("time")
     if appointments.is_doctor_booked(doctor, date, time):
         return {"error": f"{doctor} is already booked on {date} at {time}"}
-    new_appointment = {"id": appointments.next_id(),"patient_name": json_body.get("patient_name"), "doctor": doctor, "date": date, "time": time}
+    new_appointment = {
+        "id": appointments.next_id(),
+        "patient_name": json_body.get("patient_name"),
+        "doctor": doctor,
+        "date": date,
+        "time": time,
+    }
     appointments.appointments.append(new_appointment)
-    return {"message": "Appointment booked successfully!", "appointment": new_appointment}
+    return {
+        "message": "Appointment booked successfully!",
+        "appointment": new_appointment,
+    }
 
 
 @app.put("/appointments/update")
