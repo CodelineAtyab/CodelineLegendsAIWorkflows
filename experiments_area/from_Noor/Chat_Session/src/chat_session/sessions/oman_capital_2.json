@@ -1,0 +1,26 @@
+[
+    {
+        "role": "user",
+        "content": "What is the capital of Oman?"
+    },
+    {
+        "role": "assistant",
+        "content": "The capital of Oman is Muscat."
+    },
+    {
+        "role": "user",
+        "content": "What was my previous question?"
+    },
+    {
+        "role": "assistant",
+        "content": "Your previous question was: \"What is the capital of Oman?\""
+    },
+    {
+        "role": "user",
+        "content": "what is an Ai agent"
+    },
+    {
+        "role": "assistant",
+        "content": "An AI agent is a software entity that perceives its environment through sensors, processes the information, and takes actions to achieve specific goals or tasks. AI agents can range from simple programs performing specific tasks to complex systems capable of learning, reasoning, and making decisions autonomously. Examples include virtual assistants, chatbots, autonomous vehicles, and recommendation systems."
+    }
+]
