@@ -10,10 +10,14 @@ INDEX_FILE = "sessions_index.json"
 
 
 
+
+
 def save_session(file_name, messages):
     os.makedirs(os.path.dirname(file_name), exist_ok=True)
     with open(file_name, "w", encoding="utf-8") as file:
         json.dump(messages, file, indent=4)
+
+
 
 
 
@@ -23,6 +27,11 @@ def load_session(file_name):
             return json.load(file)
     except FileNotFoundError:
         return []
+    except (json.JSONDecodeError, OSError):
+        print(f"Could not read {file_name}, starting with an empty history.")
+        return []
+
+
 
 
 
@@ -32,12 +41,19 @@ def load_index(file_name):
             return json.load(file)
     except FileNotFoundError:
         return {}
+    except (json.JSONDecodeError, OSError):
+        print(f"Could not read {file_name}, starting with an empty index.")
+        return {}
+
+
 
 
 
 def save_index(file_name, index):
     with open(file_name, "w", encoding="utf-8") as file:
         json.dump(index, file, indent=4)
+
+
 
 
 
@@ -48,6 +64,8 @@ def make_unique_name(name, index):
     while f"{name}_{number}" in index:
         number += 1
     return f"{name}_{number}"
+
+
 
 
 
@@ -75,8 +93,14 @@ def generate_session_name(client, first_question):
 
 
 
+
+
 def main():
-    client = OpenAI()
+    try:
+        client = OpenAI()
+    except OpenAIError:
+        print("No API key found. Add OPENAI_API_KEY to your .env file.")
+        return
     index = load_index(INDEX_FILE)
 
     typed_name = input("Session name (press Enter for new): ")
@@ -130,6 +154,8 @@ def main():
                 is_new = False
         except OSError as error:
             print(f"Could not save this session to disk: {error}")
+
+
 
 
 
