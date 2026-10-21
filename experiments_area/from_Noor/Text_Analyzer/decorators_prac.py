@@ -21,9 +21,9 @@ def add_text_stats(func):
         uppercase_chars = num_uppercase_chars(news)
 
         summary = (
-            f"[ No. of Words: {words}, "
+            f"[No. of Words: {words}, "
             f"No. of Spaces: {spaces}, "
-            f"No. of Uppercase Chars: {uppercase_chars} ] "
+            f"No. of Uppercase Chars: {uppercase_chars}] "
         )
 
         return summary + news
