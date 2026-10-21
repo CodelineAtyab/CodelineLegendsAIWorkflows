@@ -1,0 +1,5 @@
+api_key.txt
+.env
+.venv/
+__pycache__/
+*.pyc
