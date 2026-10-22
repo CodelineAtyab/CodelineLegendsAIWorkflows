@@ -98,8 +98,7 @@ async def start_conversation(request: Request) -> dict:
 async def get_conversations(user_id: int | None = None) -> dict:
     """List conversations, optionally filtered by user ID."""
     filtered = [
-        conv for conv in conversations
-        if user_id is None or conv["user_id"] == user_id
+        conv for conv in conversations if user_id is None or conv["user_id"] == user_id
     ]
     return {"conversations": filtered, "count": len(filtered)}
 
