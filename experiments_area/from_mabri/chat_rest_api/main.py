@@ -12,7 +12,7 @@ async def get_users(user_id: int | None = None) -> dict:
         user = find_by_id(users, user_id)
         if user is None:
             return {"error": f"User {user_id} not found"}
-        return {"users": user}
+        return {"user": user}
     return {"users": users}
 
 
