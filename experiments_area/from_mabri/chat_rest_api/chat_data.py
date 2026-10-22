@@ -31,8 +31,7 @@ def find_by_id(items: list[dict], item_id: int) -> dict | None:
 def next_id(items: list[dict]) -> int:
     highest = 0
     for item in items:
-        if item["id"] > highest:
-            highest = item["id"]
+        highest = max(highest, item["id"])
     return highest + 1
 
 
