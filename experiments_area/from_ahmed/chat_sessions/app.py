@@ -1,6 +1,5 @@
 import json
 import os
-import re
 
 from dotenv import load_dotenv
 from openai import OpenAI, OpenAIError
@@ -65,11 +64,9 @@ def generate_two_word_name(client, first_question, existing_index):
     ]
     try:
         reply = ask_model(client, prompt)
-        words = re.findall(r"[a-zA-Z0-9]+", reply.lower())
+        words = reply.replace("_", " ").lower().split()
         if len(words) >= 2:
-            base_name = f"{words[0]}_{words[1]}"
-        elif len(words) == 1:
-            base_name = f"{words[0]}_chat"
+            base_name = "_".join(words[:2])
         else:
             base_name = "new_session"
     except (OpenAIError, RuntimeError):
