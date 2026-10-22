@@ -12,10 +12,12 @@ def is_large(order: dict) -> bool:
 
 
 large_orders = list(filter(is_large, orders))
-formatted_orders = [
-    f"{order['name']} – {order['drink']} ({order['size_oz']}oz)"
-    for order in large_orders
-]
+formatted_orders = list(
+    map(
+        lambda order: f"{order['name']} – {order['drink']} ({order['size_oz']}oz)",
+        large_orders,
+    ),
+)
 total_volume = reduce(lambda total, order: total + order["size_oz"], orders, 0)
 print("Large orders:")
 for order in formatted_orders:
