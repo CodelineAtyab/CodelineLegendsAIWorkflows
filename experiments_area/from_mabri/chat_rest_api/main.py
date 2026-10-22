@@ -1,5 +1,5 @@
-from fastapi import FastAPI
-from chat_data import users, find_by_id
+from fastapi import FastAPI, Request
+from chat_data import users, find_by_id, missing_field, next_id
 
 import uvicorn
 
@@ -14,6 +14,17 @@ async def get_users(user_id: int | None = None) -> dict:
             return {"error": f"User {user_id} not found"}
         return {"user": user}
     return {"users": users}
+
+
+@app.post("/users/add")
+async def add_user(incoming_request: Request) -> dict:
+    body = await incoming_request.json()
+    missing = missing_field(body, ["name"])
+    if missing is None:
+        return {"error": f"Missing field: {missing}"}
+    new_user = {"id": next_id(users), "name": body["name"]}
+    users.append(new_user)
+    return new_user 
 
 
 if __name__ == "__main__":
