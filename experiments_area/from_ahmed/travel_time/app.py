@@ -23,7 +23,8 @@ def fetch_route(source, destination, api_key):
     response = requests.post(URL, headers=headers, json=body, timeout=10)
     data = response.json()
     if not response.ok:
-        raise ValueError(data.get("error").get("message"))
+        error_msg = data.get("error", {}).get("message", "API request failed")
+        raise ValueError(error_msg)
     return data
 
 
