@@ -1,1 +1,5 @@
-.venv, __pycache__, .git, .claude, uv.lock
+.venv
+__pycache__
+.git
+.claude
+uv.lock
