@@ -1,6 +1,3 @@
-import re
-
-
 def parse_args(argv: list[str]) -> tuple[str | None, str | None]:
     """Parse CLI arguments into (session_name, question) or (None, None)."""
     args = argv[1:]
@@ -26,7 +23,7 @@ def parse_args(argv: list[str]) -> tuple[str | None, str | None]:
 
 def clean_session_name(raw: str) -> str:
     """Normalize model output into two lowercase words joined by an underscore."""
-    words = re.findall(r"[^\W_]+", raw.lower())
+    words = raw.replace("_", " ").lower().split()
     if len(words) < 2:
         return "new_session"
     return "_".join(words[:2])
