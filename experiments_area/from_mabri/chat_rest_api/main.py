@@ -6,10 +6,10 @@ from fastapi import FastAPI, Request
 from chat_data import (
     bot_replies,
     bots,
+    check_fields,
     conversations,
     find_by_id,
     messages,
-    missing_field,
     next_id,
     users,
 )
@@ -42,9 +42,9 @@ async def get_users(user_id: int | None = None) -> dict:
 @app.post("/users/add")
 async def add_user(incoming_request: Request) -> dict:
     body = await read_body(incoming_request)
-    missing = missing_field(body, ["name"])
-    if missing is not None:
-        return {"error": f"Missing field: {missing}"}
+    error = check_fields(body, {"name": str})
+    if error is not None:
+        return {"error": error}
     new_user = {"id": next_id(users), "name": body["name"]}
     users.append(new_user)
     return {"message": "User added successfully!", "user": new_user}
@@ -53,9 +53,9 @@ async def add_user(incoming_request: Request) -> dict:
 @app.post("/bots/add")
 async def add_bot(incoming_request: Request) -> dict:
     body = await read_body(incoming_request)
-    missing = missing_field(body, ["name"])
-    if missing is not None:
-        return {"error": f"Missing field: {missing}"}
+    error = check_fields(body, {"name": str})
+    if error is not None:
+        return {"error": error}
     new_bot = {"id": next_id(bots), "name": body["name"]}
     bots.append(new_bot)
     return {"message": "Bot added successfully!", "bot": new_bot}
@@ -74,9 +74,9 @@ async def get_bots(bot_id: int | None = None) -> dict:
 @app.post("/conversations/start")
 async def start_conversation(incoming_request: Request) -> dict:
     body = await read_body(incoming_request)
-    missing = missing_field(body, ["user_id", "bot_id"])
-    if missing is not None:
-        return {"error": f"Missing field: {missing}"}
+    error = check_fields(body, {"user_id": int, "bot_id": int})
+    if error is not None:
+        return {"error": error}
     user_id = body["user_id"]
     bot_id = body["bot_id"]
     if find_by_id(users, user_id) is None:
@@ -122,9 +122,9 @@ async def show_conversation(conversation_id: int) -> dict:
 @app.post("/messages/ask")
 async def ask(incoming_request: Request) -> dict:
     body = await read_body(incoming_request)
-    missing = missing_field(body, ["conversation_id", "text"])
-    if missing is not None:
-        return {"error": f"Missing field: {missing}"}
+    error = check_fields(body, {"conversation_id": int, "text": str})
+    if error is not None:
+        return {"error": error}
     conversation_id = body["conversation_id"]
     conversation = find_by_id(conversations, conversation_id)
     if conversation is None:
@@ -144,9 +144,9 @@ async def ask(incoming_request: Request) -> dict:
 @app.post("/messages/reply")
 async def reply(incoming_request: Request) -> dict:
     body = await read_body(incoming_request)
-    missing = missing_field(body, ["reply_to"])
-    if missing is not None:
-        return {"error": f"Missing field: {missing}"}
+    error = check_fields(body, {"reply_to": int})
+    if error is not None:
+        return {"error": error}
     reply_to = body["reply_to"]
     query = find_by_id(messages, reply_to)
     if query is None or query["sender_type"] != "user":

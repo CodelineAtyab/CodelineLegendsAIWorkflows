@@ -35,8 +35,14 @@ def next_id(items: list[dict]) -> int:
     return highest + 1
 
 
-def missing_field(body: dict, fields: list[str]) -> str | None:
-    for field in fields:
-        if body.get(field) is None:
-            return field
+def check_fields(body: dict, fields: dict[str, type]) -> str | None:
+    # Returns an error message for the first bad field, or None if all are fine.
+    # type(...) is used instead of isinstance so that true/false don't count
+    # as ints (in Python, True == 1).
+    for field, expected_type in fields.items():
+        value = body.get(field)
+        if value is None or value == "":
+            return f"Missing field: {field}"
+        if type(value) is not expected_type:
+            return f"Invalid field: {field} must be {expected_type.__name__}"
     return None
