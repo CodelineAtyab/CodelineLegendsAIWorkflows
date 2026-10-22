@@ -34,7 +34,7 @@ async def add_bot(incoming_request: Request) -> dict:
     if missing is not None:
         return {"error": f"Missing field: {missing}"}
     new_bot = {"id": next_id(bots), "name": body["name"]}
-    users.append(new_bot)
+    bots.append(new_bot)
     return {"message": "Bot added successfully!", "bot": new_bot}
 
 
