@@ -1,15 +1,18 @@
-from fastapi import FastAPI, Request
-from chat_data import (
-    users,
-    bots,
-    conversations,
-    messages,
-    find_by_id,
-    missing_field,
-    next_id,
-)
+from random import choice
 
 import uvicorn
+from fastapi import FastAPI, Request
+
+from chat_data import (
+    bot_replies,
+    bots,
+    conversations,
+    find_by_id,
+    messages,
+    missing_field,
+    next_id,
+    users,
+)
 
 app = FastAPI()
 
@@ -114,6 +117,70 @@ async def show_conversation(conversation_id: int) -> dict:
         "messages": conversation_messages,
         "count": len(conversation_messages),
     }
+
+
+@app.post("/messages/ask")
+async def ask(incoming_request: Request) -> dict:
+    body = await read_body(incoming_request)
+    missing = missing_field(body, ["conversation_id", "text"])
+    if missing is not None:
+        return {"error": f"Missing field: {missing}"}
+    conversation_id = body["conversation_id"]
+    conversation = find_by_id(conversations, conversation_id)
+    if conversation is None:
+        return {"error": f"Conversation {conversation_id} not found"}
+    new_message = {
+        "id": next_id(messages),
+        "conversation_id": conversation_id,
+        "sender_type": "user",
+        "sender_id": conversation["user_id"],
+        "text": body["text"],
+        "reply_to": None,
+    }
+    messages.append(new_message)
+    return {"message": "Query saved!", "chat_message": new_message}
+
+
+@app.post("/messages/reply")
+async def reply(incoming_request: Request) -> dict:
+    body = await read_body(incoming_request)
+    missing = missing_field(body, ["reply_to"])
+    if missing is not None:
+        return {"error": f"Missing field: {missing}"}
+    reply_to = body["reply_to"]
+    query = find_by_id(messages, reply_to)
+    if query is None or query["sender_type"] != "user":
+        return {"error": f"User message {reply_to} not found"}
+    for message in messages:
+        if message["reply_to"] == reply_to:
+            return {"error": f"Message {reply_to} already has a reply"}
+    conversation = find_by_id(conversations, query["conversation_id"])
+    if conversation is None:
+        return {"error": f"Conversation {query['conversation_id']} not found"}
+    new_message = {
+        "id": next_id(messages),
+        "conversation_id": query["conversation_id"],
+        "sender_type": "bot",
+        "sender_id": conversation["bot_id"],
+        "text": choice(bot_replies),
+        "reply_to": reply_to,
+    }
+    messages.append(new_message)
+    return {"message": "Reply saved!", "chat_message": new_message}
+
+
+@app.get("/messages")
+async def get_messages(
+    conversation_id: int | None = None, sender_type: str | None = None
+) -> dict:
+    result = []
+    for message in messages:
+        if conversation_id is not None and message["conversation_id"] != conversation_id:
+            continue
+        if sender_type is not None and message["sender_type"] != sender_type:
+            continue
+        result.append(message)
+    return {"messages": result, "count": len(result)}
 
 
 if __name__ == "__main__":
