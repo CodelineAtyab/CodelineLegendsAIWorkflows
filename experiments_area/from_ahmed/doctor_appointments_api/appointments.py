@@ -22,8 +22,6 @@ appointments: list[dict] = [
     },
 ]
 
-last_id = max((item["id"] for item in appointments), default=0)
-
 
 def find_appointment(appointment_id: int) -> dict | None:
     """Find an appointment by its unique identifier."""
@@ -34,10 +32,8 @@ def find_appointment(appointment_id: int) -> dict | None:
 
 
 def get_next_id() -> int:
-    """Generate a monotonically increasing appointment ID."""
-    global last_id
-    last_id += 1
-    return last_id
+    """Generate the next appointment ID as highest id + 1."""
+    return max((appt["id"] for appt in appointments), default=0) + 1
 
 
 def is_doctor_booked(
