@@ -20,7 +20,7 @@ async def get_users(user_id: int | None = None) -> dict:
 async def add_user(incoming_request: Request) -> dict:
     body = await incoming_request.json()
     missing = missing_field(body, ["name"])
-    if missing is None:
+    if missing is not None:
         return {"error": f"Missing field: {missing}"}
     new_user = {"id": next_id(users), "name": body["name"]}
     users.append(new_user)
