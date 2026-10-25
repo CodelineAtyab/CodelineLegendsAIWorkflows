@@ -1,0 +1,3 @@
+CREATE TABLE visits (
+    id SERIAL PRIMARY KEY
+);
