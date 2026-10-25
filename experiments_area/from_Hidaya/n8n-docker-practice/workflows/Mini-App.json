@@ -1,0 +1,179 @@
+{
+  "name": "Mini App",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "home",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        -144,
+        -224
+      ],
+      "id": "050d0136-084f-4539-b5c9-20e4caa0ff0b",
+      "name": "Webhook",
+      "webhookId": "abb22c0d-b122-416a-82d2-9dd6071fae7d"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n \"message\": \"Welcome to the mini app\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        80,
+        -224
+      ],
+      "id": "07bd5cf1-3322-4336-8b08-aa9f5cf69334",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "path": "health",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        -144,
+        16
+      ],
+      "id": "81f11ef5-ee32-4478-b30f-67e61dc40805",
+      "name": "Webhook1",
+      "webhookId": "5e503eac-c676-4b28-a93e-a9aa0154b456"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"status\": \"ok\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        80,
+        16
+      ],
+      "id": "275cd9ef-e7e9-4ced-928b-385c70600290",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "path": "visits",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        -160,
+        208
+      ],
+      "id": "a852ee04-599b-47c3-9082-a318618e4a4a",
+      "name": "Webhook2",
+      "webhookId": "621f43a0-a7c1-4d25-83bf-13e30c9ce7b5"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH new_visit AS (\n    INSERT INTO visits DEFAULT VALUES RETURNING id\n)\nSELECT COUNT(*)::int + 1 AS visits FROM visits;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        64,
+        208
+      ],
+      "id": "f0334855-d0ed-422b-aaa2-807ef375e6e6",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "postgres": {
+          "id": "K1pJ6MXMowrHPRaO",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ visits: $json.visits }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        288,
+        208
+      ],
+      "id": "905b8495-00f5-405b-bfc8-47f1befab527",
+      "name": "Respond to Webhook2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook2": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "708cce8d-78cb-44ab-b822-36642361c776",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "12880712cc255097d075080481151ceb91bca4dc2ea73fb5d579b7e9fad04dc4"
+  },
+  "nodeGroups": [],
+  "id": "O4uwcA6uIcSgpDPm",
+  "tags": []
+}
