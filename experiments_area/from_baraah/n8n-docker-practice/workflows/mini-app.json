@@ -1,5 +1,5 @@
 {
-  "name": "My workflow",
+  "name": "Docker Mini App (API)",
   "nodes": [
     {
       "parameters": {
