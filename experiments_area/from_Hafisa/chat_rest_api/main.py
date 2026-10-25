@@ -1,3 +1,4 @@
+
 from random import choice
 from typing import Any
 
@@ -114,7 +115,9 @@ async def show_conversation(conversation_id: int) -> dict[str, Any]:
         return {"error": f"Conversation {conversation_id} not found"}
 
     conversation_messages = [
-        message for message in messages if message["conversation_id"] == conversation_id
+        message
+        for message in messages
+        if message["conversation_id"] == conversation_id
     ]
     return {
         "conversation": conversation,
@@ -159,7 +162,8 @@ async def reply_to_message(request: Request) -> dict[str, Any]:
         (
             message
             for message in messages
-            if message["id"] == body["reply_to"] and message["sender_type"] == "user"
+            if message["id"] == body["reply_to"]
+            and message["sender_type"] == "user"
         ),
         None,
     )
@@ -169,7 +173,15 @@ async def reply_to_message(request: Request) -> dict[str, Any]:
     if any(message["reply_to"] == user_message["id"] for message in messages):
         return {"error": f"Message {user_message['id']} already has a reply"}
 
-    conversation = find_by_id(conversations, user_message["conversation_id"])
+    conversation = find_by_id(
+        conversations, user_message["conversation_id"]
+    )
+
+    if conversation is None:
+        return {
+            "error": f"Conversation {user_message['conversation_id']} not found"
+        }
+
     chat_message = {
         "id": next_id(messages),
         "conversation_id": user_message["conversation_id"],
@@ -195,10 +207,14 @@ async def get_messages(
             for message in results
             if message["conversation_id"] == conversation_id
         ]
+
     if sender_type is not None:
         results = [
-            message for message in results if message["sender_type"] == sender_type
+            message
+            for message in results
+            if message["sender_type"] == sender_type
         ]
+
     return {"messages": results, "count": len(results)}
 
 
