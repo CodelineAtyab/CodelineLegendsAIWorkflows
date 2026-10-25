@@ -66,5 +66,15 @@ async def update_appointment(appointment_id: int, incoming_request: Request) -> 
     return {"message": "Appointment updated successfully!", "appointment": appointment}
 
 
+@app.delete("/appointments/remove")
+async def remove_appointment(appointment_id: int) -> dict:
+    appointment = find_appointment(appointment_id)
+    if appointment is None:
+        return {"error": f"Appointment {appointment_id} not found"}
+
+    appointments.remove(appointment)
+    return {"message": f"Appointment {appointment_id} removed successfully!"}
+
+
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000)
