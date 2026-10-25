@@ -1,0 +1,121 @@
+{
+  "name": "Docker Mini App",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "home",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "home-webhook",
+      "name": "Home Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "webhookId": "docker-home"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"message\": \"Hello from Docker!\" } }}",
+        "options": {}
+      },
+      "id": "home-response",
+      "name": "Home Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [240, 0]
+    },
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "health",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "health-webhook",
+      "name": "Health Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 240],
+      "webhookId": "docker-health"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"status\": \"healthy\" } }}",
+        "options": {}
+      },
+      "id": "health-response",
+      "name": "Health Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [240, 240]
+    },
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "visits",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "visits-webhook",
+      "name": "Visits Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 480],
+      "webhookId": "docker-visits"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH new_visit AS (INSERT INTO visits DEFAULT VALUES RETURNING id) SELECT COUNT(*)::int + 1 AS visits FROM visits;",
+        "options": {}
+      },
+      "id": "visits-postgres",
+      "name": "Record Visit",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [240, 480],
+      "credentials": {
+        "postgres": {
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"visits\": $json.visits } }}",
+        "options": {}
+      },
+      "id": "visits-response",
+      "name": "Visits Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [480, 480]
+    }
+  ],
+  "connections": {
+    "Home Webhook": {
+      "main": [[{"node": "Home Response", "type": "main", "index": 0}]]
+    },
+    "Health Webhook": {
+      "main": [[{"node": "Health Response", "type": "main", "index": 0}]]
+    },
+    "Visits Webhook": {
+      "main": [[{"node": "Record Visit", "type": "main", "index": 0}]]
+    },
+    "Record Visit": {
+      "main": [[{"node": "Visits Response", "type": "main", "index": 0}]]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "docker-mini-app-v1",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": []
+}
