@@ -1,20 +1,42 @@
 {
   "name": "Docker Mini App",
-  "active": false,
   "nodes": [
     {
       "parameters": {
-        "httpMethod": "GET",
-        "path": "/home",
-        "options": {},
-        "responseMode": "responseNode"
+        "operation": "executeQuery",
+        "query": "WITH new_visit AS (\n    INSERT INTO visits DEFAULT VALUES RETURNING id\n)\nSELECT COUNT(*)::int + 1 AS visits FROM visits;",
+        "options": {}
       },
-      "id": "home-webhook-node",
-      "name": "Home Webhook",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        208,
+        448
+      ],
+      "id": "8a29edda-c8a5-4c75-b619-4f9317d8ad37",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "postgres": {
+          "id": "OpCN7F0gYtaU8xzs",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "home",
+        "responseMode": "responseNode",
+        "options": {}
+      },
       "type": "n8n-nodes-base.webhook",
-      "typeVersion": 2,
-      "position": [300, 300],
-      "webhookId": "9f8e7d6c-5b4a-4c3d-8e7f-6a5b4c3d2e1f"
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "04afa25e-1d6d-454b-8b62-a12f36c4d2f6",
+      "name": "Home Webhook",
+      "webhookId": "2170b723-ce45-4f12-b411-da3612ecf5cd"
     },
     {
       "parameters": {
@@ -22,25 +44,30 @@
         "responseBody": "{\n  \"message\": \"Hello from Docker!\"\n}",
         "options": {}
       },
-      "id": "respond-to-webhook-home-node",
-      "name": "Respond Home",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
-      "position": [520, 300]
+      "position": [
+        224,
+        0
+      ],
+      "id": "c36666c5-3fee-4a2d-896c-cf169e3f1c90",
+      "name": "Home Response"
     },
     {
       "parameters": {
-        "httpMethod": "GET",
-        "path": "/health",
-        "options": {},
-        "responseMode": "responseNode"
+        "path": "health",
+        "responseMode": "responseNode",
+        "options": {}
       },
-      "id": "health-webhook-node",
-      "name": "Health Webhook",
       "type": "n8n-nodes-base.webhook",
-      "typeVersion": 2,
-      "position": [300, 520],
-      "webhookId": "8a7b6c5d-4e3f-2a1b-9c8d-7e6f5a4b3c2d"
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        224
+      ],
+      "id": "69705ace-1cff-450c-9ba5-9d0971732af0",
+      "name": "Health Webhook",
+      "webhookId": "9c1f4ddf-299a-42c2-a47b-4af9ba5f25d2"
     },
     {
       "parameters": {
@@ -48,65 +75,65 @@
         "responseBody": "{\n  \"status\": \"healthy\"\n}",
         "options": {}
       },
-      "id": "respond-to-webhook-health-node",
-      "name": "Respond Health",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
-      "position": [520, 520]
+      "position": [
+        224,
+        224
+      ],
+      "id": "b43e343c-e614-4e85-bb4c-d12d46957fcf",
+      "name": "Health Response"
     },
     {
       "parameters": {
-        "httpMethod": "GET",
-        "path": "/visits",
-        "options": {},
-        "responseMode": "responseNode"
-      },
-      "id": "visits-webhook-node",
-      "name": "Visits Webhook",
-      "type": "n8n-nodes-base.webhook",
-      "typeVersion": 2,
-      "position": [60, 700],
-      "webhookId": "7b6c5d4e-3f2a-1b0c-9d8e-7f6a5b4c3d2e1"
-    },
-    {
-      "parameters": {
-        "resource": "database",
-        "operation": "executeQuery",
-        "query": "WITH new_visit AS (INSERT INTO visits DEFAULT VALUES RETURNING id) SELECT COUNT(*)::int + 1 AS visits FROM visits;",
+        "path": "visits",
+        "responseMode": "responseNode",
         "options": {}
       },
-      "id": "postgres-visits-node",
-      "name": "Postgres",
-      "type": "n8n-nodes-base.postgres",
+      "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.2,
-      "position": [300, 700],
-      "credentials": {
-        "postgres": {
-          "id": "postgres-credential-id",
-          "name": "postgres",
-          "type": "postgres"
-        }
-      }
+      "position": [
+        -16,
+        448
+      ],
+      "id": "366074a0-faef-477f-9c5d-1ade5050011d",
+      "name": "Visits Webhook",
+      "webhookId": "b67e852b-0a0b-4beb-933f-79ac3dabf4fb"
     },
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "{{ { \"visits\": $json.visits } }}",
+        "responseBody": "={{ { \"visits\": $json.visits } }}",
         "options": {}
       },
-      "id": "respond-to-webhook-visits-node",
-      "name": "Respond Visits",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
-      "position": [520, 700]
+      "position": [
+        432,
+        448
+      ],
+      "id": "077623cf-1fa4-444d-a21b-d0dbcecdcd33",
+      "name": "Visits Response"
     }
   ],
+  "pinData": {},
   "connections": {
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Visits Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
     "Home Webhook": {
       "main": [
         [
           {
-            "node": "Respond Home",
+            "node": "Home Response",
             "type": "main",
             "index": 0
           }
@@ -117,7 +144,7 @@
       "main": [
         [
           {
-            "node": "Respond Health",
+            "node": "Health Response",
             "type": "main",
             "index": 0
           }
@@ -128,18 +155,7 @@
       "main": [
         [
           {
-            "node": "Postgres",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Postgres": {
-      "main": [
-        [
-          {
-            "node": "Respond Visits",
+            "node": "Execute a SQL query",
             "type": "main",
             "index": 0
           }
@@ -147,13 +163,17 @@
       ]
     }
   },
+  "active": true,
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "binaryMode": "separate"
   },
-  "staticData": null,
-  "meta": null,
-  "pinData": {},
-  "versionId": null,
-  "triggerCount": 0,
+  "versionId": "3c4d89ec-de75-4e32-9ae5-5aa198a60187",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9467740254cbc67daf0f310d4922de91e79dc8f2782f1d0563cea85ca535d735"
+  },
+  "nodeGroups": [],
+  "id": "n5kn7KNxN2OYiLMW",
   "tags": []
 }
