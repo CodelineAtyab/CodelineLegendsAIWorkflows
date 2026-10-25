@@ -1,5 +1,6 @@
 import uvicorn
 from fastapi import FastAPI, Request
+
 from appointments import appointments, find_appointment, get_next_id, is_doctor_booked
 
 app = FastAPI()

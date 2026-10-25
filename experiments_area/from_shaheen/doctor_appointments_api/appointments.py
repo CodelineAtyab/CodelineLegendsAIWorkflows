@@ -15,8 +15,7 @@ def find_appointment(appointment_id: int) -> dict | None:
 def get_next_id() -> int:
     highest_id = 0
     for appointment in appointments:
-        if appointment["id"] > highest_id:
-            highest_id = appointment["id"]
+        highest_id = max(highest_id, appointment["id"])
     return highest_id + 1
 
 
