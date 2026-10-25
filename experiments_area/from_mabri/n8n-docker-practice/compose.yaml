@@ -30,3 +30,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+
+volumes:
+  n8n_data:
+  db_data:
