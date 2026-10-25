@@ -3,83 +3,99 @@
   "nodes": [
     {
       "parameters": {
-        "httpMethod": "GET",
         "path": "home",
         "responseMode": "responseNode",
         "options": {}
       },
-      "id": "home-webhook",
-      "name": "Home Webhook",
       "type": "n8n-nodes-base.webhook",
-      "typeVersion": 2,
-      "position": [0, 0],
-      "webhookId": "docker-home"
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "211c3d94-f8af-4f19-8f22-5ba55e8aa604",
+      "name": "Webhook",
+      "webhookId": "76e44fe7-bcce-4377-bfa4-fada8f29223c"
     },
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "={{ { \"message\": \"Hello from Docker!\" } }}",
+        "responseBody": "{\n  \"message\": \"Hello from Docker!\"\n}",
         "options": {}
       },
-      "id": "home-response",
-      "name": "Home Response",
       "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.1,
-      "position": [240, 0]
+      "typeVersion": 1.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "32689ea2-a64d-41de-8968-67fed00edd43",
+      "name": "Respond to Webhook"
     },
     {
       "parameters": {
-        "httpMethod": "GET",
         "path": "health",
         "responseMode": "responseNode",
         "options": {}
       },
-      "id": "health-webhook",
-      "name": "Health Webhook",
       "type": "n8n-nodes-base.webhook",
-      "typeVersion": 2,
-      "position": [0, 240],
-      "webhookId": "docker-health"
+      "typeVersion": 2.2,
+      "position": [
+        -16,
+        208
+      ],
+      "id": "c2c28cf1-7fdb-4f0f-a8d9-5db14dd1f248",
+      "name": "Webhook1",
+      "webhookId": "633c0fba-79ff-4b5b-be03-4778f41fd605"
     },
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "={{ { \"status\": \"healthy\" } }}",
+        "responseBody": "{\n  \"status\": \"healthy\"\n}",
         "options": {}
       },
-      "id": "health-response",
-      "name": "Health Response",
       "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.1,
-      "position": [240, 240]
+      "typeVersion": 1.5,
+      "position": [
+        208,
+        208
+      ],
+      "id": "1c0eef47-0130-406e-88f6-e549e4437080",
+      "name": "Respond to Webhook1"
     },
     {
       "parameters": {
-        "httpMethod": "GET",
         "path": "visits",
         "responseMode": "responseNode",
         "options": {}
       },
-      "id": "visits-webhook",
-      "name": "Visits Webhook",
       "type": "n8n-nodes-base.webhook",
-      "typeVersion": 2,
-      "position": [0, 480],
-      "webhookId": "docker-visits"
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        432
+      ],
+      "id": "61562bfe-8684-4996-8b10-c39ea1f5197a",
+      "name": "Webhook2",
+      "webhookId": "fc465e88-8f05-4022-81e9-5b86810e339a"
     },
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "WITH new_visit AS (INSERT INTO visits DEFAULT VALUES RETURNING id) SELECT COUNT(*)::int + 1 AS visits FROM visits;",
+        "query": "WITH new_visit AS (\n    INSERT INTO visits DEFAULT VALUES\n    RETURNING id\n)\nSELECT (\n    (SELECT COUNT(*) FROM visits)\n    + (SELECT COUNT(*) FROM new_visit)\n)::int AS visits;",
         "options": {}
       },
-      "id": "visits-postgres",
-      "name": "Record Visit",
       "type": "n8n-nodes-base.postgres",
-      "typeVersion": 2.6,
-      "position": [240, 480],
+      "typeVersion": 2.7,
+      "position": [
+        224,
+        432
+      ],
+      "id": "f706a673-e520-43d3-8f3b-22ba9009c500",
+      "name": "Execute a SQL query",
       "credentials": {
         "postgres": {
+          "id": "LygcwuAFlHI5At6O",
           "name": "Postgres account"
         }
       }
@@ -90,32 +106,74 @@
         "responseBody": "={{ { \"visits\": $json.visits } }}",
         "options": {}
       },
-      "id": "visits-response",
-      "name": "Visits Response",
       "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.1,
-      "position": [480, 480]
+      "typeVersion": 1.5,
+      "position": [
+        448,
+        432
+      ],
+      "id": "6ebd35c4-e8c9-4eec-84be-43ef38cca313",
+      "name": "Respond to Webhook2"
     }
   ],
+  "pinData": {},
   "connections": {
-    "Home Webhook": {
-      "main": [[{"node": "Home Response", "type": "main", "index": 0}]]
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
-    "Health Webhook": {
-      "main": [[{"node": "Health Response", "type": "main", "index": 0}]]
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
-    "Visits Webhook": {
-      "main": [[{"node": "Record Visit", "type": "main", "index": 0}]]
+    "Webhook2": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
-    "Record Visit": {
-      "main": [[{"node": "Visits Response", "type": "main", "index": 0}]]
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
-  "active": false,
-  "settings": {},
-  "versionId": "docker-mini-app-v1",
-  "meta": {
-    "templateCredsSetupCompleted": true
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
   },
+  "versionId": "7fb25cde-802c-4479-87f1-750d79e3ba9e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "197a1750ebd9d30a96ad30e0e3c7beb81865d298c65f2e2703cdec8411a4ace5"
+  },
+  "nodeGroups": [],
+  "id": "eRyOL9qR2yZrcOVS",
   "tags": []
 }
