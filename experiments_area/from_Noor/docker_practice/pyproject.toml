@@ -1,0 +1,12 @@
+[project]
+name = "docker-practice"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "fastapi>=0.162.0",
+    "psycopg[binary]>=3.3.6",
+    "requests>=2.34.2",
+    "uvicorn[standard]>=0.54.0",
+]
