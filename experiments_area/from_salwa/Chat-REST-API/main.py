@@ -1,11 +1,7 @@
-def main():
-    print("Hello from chat-rest-api!")
-
-
 import random
 
 import uvicorn
-from fastapi import Body, FastAPI, Request
+from fastapi import FastAPI, Request
 
 from chat_data import (
     bot_replies,
@@ -72,8 +68,8 @@ async def get_bots(bot_id: int | None = None) -> dict:
 
 
 @app.post("/conversations/start")
-async def start_conversation(user_id: int = Body(...), bot_id: int = Body(...)) -> dict:
-    data = {"user_id": user_id, "bot_id": bot_id}
+async def start_conversation(request: Request) -> dict:
+    data = await request.json()
     missing = missing_field(data, ["user_id", "bot_id"])
 
     if missing:
@@ -129,9 +125,8 @@ async def show_conversation(conversation_id: int) -> dict:
 
 
 @app.post("/messages/ask")
-async def ask_question(conversation_id: int = Body(...), text: str = Body(...)) -> dict:
-    data = {"conversation_id": conversation_id, "text": text}
-
+async def ask_question(request: Request) -> dict:
+    data = await request.json()
     missing = missing_field(data, ["conversation_id", "text"])
 
     if missing:
@@ -176,6 +171,9 @@ async def reply_to_question(request: Request) -> dict:
             return {"error": f"Message {original['id']} already has a reply"}
 
     conversation = find_by_id(conversations, original["conversation_id"])
+
+    if conversation is None:
+        return {"error": f"Conversation {original['conversation_id']} not found"}
 
     chat_message = {
         "id": next_id(messages),

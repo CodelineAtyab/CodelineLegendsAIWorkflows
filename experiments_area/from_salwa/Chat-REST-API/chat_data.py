@@ -1,15 +1,15 @@
-users = [
+users: list[dict] = [
     {"id": 1, "name": "Salim"},
     {"id": 2, "name": "Sara"},
 ]
 
-bots = [
+bots: list[dict] = [
     {"id": 1, "name": "HelperBot"},
     {"id": 2, "name": "StudyBot"},
 ]
 
-messages = []
-conversations = []
+messages: list[dict] = []
+conversations: list[dict] = []
 
 bot_replies: list[str] = [
     "Hello! How can I help you?",
@@ -20,7 +20,7 @@ bot_replies: list[str] = [
 ]
 
 
-def find_by_id(items: list[dict], item_id: int):
+def find_by_id(items: list[dict], item_id: int) -> dict | None:
     for item in items:
         if item["id"] == item_id:
             return item
@@ -33,7 +33,7 @@ def next_id(items: list[dict]) -> int:
     return max(item["id"] for item in items) + 1
 
 
-def missing_field(data: dict, fields: list[str]):
+def missing_field(data: dict, fields: list[str]) -> str | None:
     for field in fields:
         if field not in data or data[field] is None:
             return field
