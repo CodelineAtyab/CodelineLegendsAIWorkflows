@@ -1,7 +1,7 @@
 
 services:
   n8n:
-    image: n8nio/n8n:latest
+    image: n8nio/n8n:2.44.6
     restart: unless-stopped
     ports:
       - "5678:5678"
@@ -13,8 +13,7 @@ services:
       DB_POSTGRESDB_USER: n8n_user
       DB_POSTGRESDB_PASSWORD: local_demo_password
       GENERIC_TIMEZONE: Asia/Muscat
-      TZ: Asia/Muscat
-      N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS: "true"
+    
     depends_on:
       db:
         condition: service_healthy

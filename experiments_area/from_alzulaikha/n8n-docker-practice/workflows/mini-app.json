@@ -82,7 +82,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "WITH new_visit AS (\n    INSERT INTO visits DEFAULT VALUES\n    RETURNING id\n)\nSELECT COUNT(*)::int AS visits\nFROM visits;",
+        "query": "WITH new_visit AS (\n    INSERT INTO visits DEFAULT VALUES\n    RETURNING id\n)\nSELECT COUNT(*)::int + 1 AS visits\nFROM visits;",
         "options": {}
       },
       "type": "n8n-nodes-base.postgres",
@@ -168,7 +168,7 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "2ee8534b-8663-485b-883a-81c2b23c50f6",
+  "versionId": "525a49cb-f5aa-43b6-84aa-fa580a8b003b",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "8748174eaad42cdad78de2bbf828e5408bd2f265856b9b993c84967d5d366f52"
