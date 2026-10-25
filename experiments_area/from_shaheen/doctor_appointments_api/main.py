@@ -1,6 +1,6 @@
 import uvicorn
-from fastapi import FastAPI
-from appointments import appointments
+from fastapi import FastAPI, Request
+from appointments import appointments, get_next_id, is_doctor_booked
 
 app = FastAPI()
 
@@ -16,6 +16,32 @@ async def view_appointments(doctor: str | None = None, date: str | None = None) 
         matching_appointments.append(appointment)
 
     return {"appointments": matching_appointments, "count": len(matching_appointments)}
+
+
+@app.post("/appointments/book")
+async def book_appointment(incoming_request: Request) -> dict:
+    json_body = await incoming_request.json()
+
+    required_fields = ["patient_name", "doctor", "date", "time"]
+    for field in required_fields:
+        if json_body.get(field) is None:
+            return {"error": f"Missing field: {field}"}
+
+    doctor = json_body.get("doctor")
+    date = json_body.get("date")
+    time = json_body.get("time")
+    if is_doctor_booked(doctor, date, time):
+        return {"error": f"{doctor} is already booked on {date} at {time}"}
+
+    new_appointment = {
+        "id": get_next_id(),
+        "patient_name": json_body.get("patient_name"),
+        "doctor": doctor,
+        "date": date,
+        "time": time
+    }
+    appointments.append(new_appointment)
+    return {"message": "Appointment booked successfully!", "appointment": new_appointment}
 
 
 if __name__ == "__main__":
