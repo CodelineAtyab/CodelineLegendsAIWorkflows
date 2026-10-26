@@ -10,3 +10,13 @@ class ChatState(TypedDict):
 def store_message_node(state: ChatState) -> ChatState:
     state["history"].append(state["incoming_message"].strip())
     return state
+
+#Node 2: process_message_node
+def process_message_node(state: ChatState) -> ChatState:
+    current_msg = state["history"][-1] # Get the latest message from history (or clean incoming_message)
+    
+    upper_msg = current_msg.upper()
+    word_count = len(current_msg.split())
+    
+    state["processed_message"] = f"{upper_msg} ({word_count} words)"
+    return state
