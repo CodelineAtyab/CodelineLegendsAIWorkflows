@@ -1,12 +1,13 @@
 import json
 import os
+import sys
 
 from dotenv import load_dotenv
 from openai import OpenAI, OpenAIError
 
+from utils.cli_args import clean_session_name, is_exit_word, parse_args
+
 MODEL = "gpt-4.1-mini"
-FALLBACK_SESSION_NAME = "new_session"
-EXIT_COMMANDS = ("exit", "EXIT")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 SESSIONS_DIR = os.path.join(BASE_DIR, "sessions")
@@ -80,19 +81,6 @@ def ask_session_name(index):
     return None
 
 
-def clean_session_name(raw_name):
-    """Turn the model's reply into exactly two lower-case words joined by '_'."""
-    without_apostrophes = raw_name.lower().replace("'", "").replace("’", "")
-    letters_only = "".join(
-        char if char.isascii() and char.isalnum() else " "
-        for char in without_apostrophes
-    )
-    words = letters_only.split()[:2]
-    if not words:
-        return FALLBACK_SESSION_NAME
-    return "_".join(words)
-
-
 def make_unique(name, index):
     """Add a number to the last word if the name is taken, so old sessions are never reused."""
     unique_name = name
@@ -136,7 +124,7 @@ def chat_loop(client, session_name, history, index):
     """Ask, answer and save until the user types exit. session_name is None for a new session."""
     while True:
         question = input("\nYou: ").strip()
-        if question in EXIT_COMMANDS:
+        if is_exit_word(question):
             print("Goodbye!")
             return
         if not question:
@@ -183,7 +171,37 @@ def start_session(client):
     chat_loop(client, session_name, history, index)
 
 
+def run_once(client, session_name: str | None, question: str) -> None:
+    """Answer one question in a new or named session, save it, and print two lines."""
+    index = load_index()
+
+    if session_name is None:
+        history = []
+        session_name = generate_session_name(client, question, index)
+    else:
+        if session_name not in index:
+            raise SystemExit(f"Error: no session called '{session_name}'.")
+        history = load_history(session_name)
+        if history is None:
+            raise SystemExit(f"Error: could not load session '{session_name}'.")
+
+    history.append({"role": "user", "content": question})
+    answer = ask_model(client, history)
+    if answer is None:
+        raise SystemExit("Error: No answer from the model.")
+
+    history.append({"role": "assistant", "content": answer})
+    if session_name not in index:
+        index[session_name] = next_session_id(index)
+        save_index(index)
+    save_history(session_name, history)
+
+    print(f"Session: {session_name}")
+    print(f"Assistant: {answer}")
+
+
 def main():
+    session_name, question = parse_args(sys.argv)
     load_dotenv()
     try:
         client = OpenAI()
@@ -192,7 +210,10 @@ def main():
         return
 
     try:
-        start_session(client)
+        if question is None:
+            start_session(client)
+        else:
+            run_once(client, session_name, question)
     except KeyboardInterrupt, EOFError:
         print("\nGoodbye!")
 
