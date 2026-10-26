@@ -20,7 +20,7 @@
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "{\n \"message\": \"Welcome to the mini app\"\n}",
+        "responseBody": "{\n \"message\": \"Hello from Docker!\"\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.respondToWebhook",
@@ -51,7 +51,7 @@
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "{\n  \"status\": \"ok\"\n}",
+        "responseBody": "{\n  \"status\": \"healthy\"\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.respondToWebhook",
