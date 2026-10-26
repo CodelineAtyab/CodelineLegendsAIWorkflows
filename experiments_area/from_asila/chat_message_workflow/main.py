@@ -1,5 +1,5 @@
 from typing import TypedDict
-
+from langgraph.graph import StateGraph, START, END
 
 class ChatState(TypedDict):
     incoming_message: str
@@ -20,3 +20,20 @@ def process_message_node(state: ChatState) -> ChatState:
     
     state["processed_message"] = f"{upper_msg} ({word_count} words)"
     return state
+
+def main():
+#Graph
+    graph = StateGraph(ChatState)
+
+    graph.add_node("store_message_node", store_message_node)
+    graph.add_node("process_message_node", process_message_node)
+
+    graph.add_edge(START, "store_message_node")
+    graph.add_edge("store_message_node", "process_message_node")
+    graph.add_edge("process_message_node", END)
+
+    workflow = graph.compile()
+
+
+if __name__ == "__main__":
+    main()
