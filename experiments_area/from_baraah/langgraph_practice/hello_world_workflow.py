@@ -1,12 +1,9 @@
-
 from typing import TypedDict
 from langgraph.graph import StateGraph, START, END
 
 
 class SharedState(TypedDict):
     message: str
-
-
 
 
 def update_greeting_message_node(state: SharedState) -> SharedState:
