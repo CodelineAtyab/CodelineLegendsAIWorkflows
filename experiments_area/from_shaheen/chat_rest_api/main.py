@@ -1,15 +1,17 @@
-import uvicorn
 from random import randint
+
+import uvicorn
 from fastapi import FastAPI, Request
+
 from chat_data import (
-    users,
-    bots,
-    messages,
-    conversations,
     bot_replies,
+    bots,
+    conversations,
     find_by_id,
-    next_id,
     find_missing_field,
+    messages,
+    next_id,
+    users,
 )
 
 app = FastAPI()
