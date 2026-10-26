@@ -1,0 +1,10 @@
+[project]
+name = "chat-message-workflow"
+version = "0.1.0"
+description = "Two-node LangGraph workflow that stores and processes chat messages (issue #249)"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "grandalf>=0.8",
+    "langgraph>=1.2.17",
+]
