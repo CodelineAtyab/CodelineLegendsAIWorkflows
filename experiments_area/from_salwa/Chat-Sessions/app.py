@@ -1,7 +1,6 @@
 
 import json
 import os
-import re
 
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -107,20 +106,27 @@ def generate_session_name(client, question, index):
             )
 
             text = response.choices[0].message.content or ""
-            words = re.findall(r"[a-zA-Z]+", text.lower())
 
-            if len(words) >= 2:
-                name = "_".join(words[:2])
+            # Split the text into words and join the first two with an underscore.
+            words = text.lower().split()
+            name = "_".join(words[:2])
 
-                if name not in index:
-                    return name
+            if len(words) >= 2 and name not in index:
+                return name
 
         except Exception:
             print("Could not generate a session name.")
             raise
 
-    print("Could not create a unique session name. Please try again.")
-    raise ValueError("Session name generation failed.")
+    # Use a fallback name if the model cannot create a unique name.
+    name = "new_session"
+    number = 2
+
+    while name in index:
+        name = f"new_session_{number}"
+        number += 1
+
+    return name
 
 
 def get_answer(client, history):
@@ -201,9 +207,7 @@ def main():
 
         if session_name:
             history = load_history(session_name)
-            chat_loop(
-                client, session_name, history, index
-            )
+            chat_loop(client, session_name, history, index)
         else:
             os.makedirs(SESSIONS_DIR, exist_ok=True)
             chat_loop(
