@@ -1,4 +1,4 @@
-from chat_workflow import workflow
+from chat_workflow import ChatState, workflow
 
 messages = [
     "  hello team codeline  ",
@@ -6,10 +6,10 @@ messages = [
     "good",
 ]
 
-history = []
+history: list[str] = []
 
 for message in messages:
-    initial_state = {
+    initial_state: ChatState = {
         "incoming_message": message,
         "history": history,
         "processed_message": "",
