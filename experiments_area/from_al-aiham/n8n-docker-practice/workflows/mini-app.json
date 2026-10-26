@@ -1,0 +1,177 @@
+{
+  "name": "Docker Mini App (API)",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "home",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "5ae08896-e344-4a52-8efc-fb3556b6d4cb",
+      "name": "Home Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        32,
+        -208
+      ],
+      "webhookId": "6565d053-d72d-4d2e-b475-b291d8be35df"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"message\": \"Hello from Docker!\"\n}",
+        "options": {}
+      },
+      "id": "f28da6ac-3d0b-4279-8505-cc1b1b304b89",
+      "name": "Home Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        352,
+        -208
+      ]
+    },
+    {
+      "parameters": {
+        "path": "health",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "1670125e-a74d-40ce-9dbe-9046e5a9d66b",
+      "name": "Health Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        32,
+        32
+      ],
+      "webhookId": "f74c3ee2-008a-4e66-aeff-1a81643506d8"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"status\": \"healthy\"\n}",
+        "options": {}
+      },
+      "id": "c2a01dd9-b7ae-4da9-b2df-efaef713cd76",
+      "name": "Health Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        352,
+        32
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "84408da1-7191-4524-96c8-cab3e575782c",
+      "name": "Visits Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        672,
+        272
+      ]
+    },
+    {
+      "parameters": {
+        "path": "visits",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "5996dd8b-f178-4a58-941f-173b18161926",
+      "name": "Visits Webhook1",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        32,
+        272
+      ],
+      "webhookId": "0a440482-9079-4f24-a612-da1a509ef4e9"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH new_visit AS (\n    INSERT INTO visits DEFAULT VALUES RETURNING id\n)\nSELECT COUNT(*)::int + 1 AS visits\nFROM visits;",
+        "options": {}
+      },
+      "id": "369f7bd5-5cc8-489a-b3f0-35e167634d84",
+      "name": "Execute a SQL query1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        352,
+        272
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "NqncPBZ04sBKdVXV",
+          "name": "Postgres account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Home Webhook": {
+      "main": [
+        [
+          {
+            "node": "Home Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Health Webhook": {
+      "main": [
+        [
+          {
+            "node": "Health Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Visits Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query1": {
+      "main": [
+        [
+          {
+            "node": "Visits Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "95b1fda0-e2b2-48a9-a1e0-3f5c6a9bb80d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3e2f0841551873932036a06ae96ab2cdfb282a79b3b6a13296651ca3683f54a9"
+  },
+  "nodeGroups": [],
+  "id": "5YfTYshXEbvQcCYX",
+  "tags": []
+}
