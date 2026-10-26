@@ -9,13 +9,13 @@ class ChatState(TypedDict):
     processed_message: str
 
 
-# remove extra spaces and save the message in history
+# Save the cleaned message in history.
 def store_message_node(state: ChatState) -> ChatState:
     state["history"].append(state["incoming_message"].strip())
     return state
 
 
-# convert the message to uppercase and count its words
+# Convert the message to uppercase and count words.
 def process_message_node(state: ChatState) -> ChatState:
     message = state["incoming_message"].strip()
     state["processed_message"] = f"{message.upper()} ({len(message.split())} words)"
@@ -39,9 +39,10 @@ messages = [
     "good",
 ]
 
-history = []
+history: list[str] = []
+
 for message in messages:
-    state = {
+    state: ChatState = {
         "incoming_message": message,
         "history": history.copy(),
         "processed_message": "",
