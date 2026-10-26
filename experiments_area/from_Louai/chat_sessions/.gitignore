@@ -1,0 +1,7 @@
+.env
+sessions/
+.venv/
+sessions_index.json
+chat_history.json
+test.json
+__pycache__/
