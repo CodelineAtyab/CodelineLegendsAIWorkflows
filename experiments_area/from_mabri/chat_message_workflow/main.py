@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import TypedDict
 
 from langgraph.graph import END, START, StateGraph
@@ -48,3 +49,7 @@ for message in messages:
     print(history)
 
 print(workflow.get_graph().draw_mermaid())
+
+png_path = Path(__file__).with_name("chat_message_workflow.png")
+png_path.write_bytes(workflow.get_graph().draw_mermaid_png())
+print(f"Graph saved to {png_path}")
