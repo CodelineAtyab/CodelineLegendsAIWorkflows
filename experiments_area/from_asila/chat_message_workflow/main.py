@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import TypedDict
 from langgraph.graph import StateGraph, START, END
 
@@ -34,6 +35,24 @@ def main():
 
     workflow = graph.compile()
 
+# Execution & Printing
+    initial_state: ChatState = { "incoming_message": "", "history": [],"processed_message": ""}
+
+    messages_to_send = ["  hello team codeline  ","how are you","good"]
+
+    current_state = initial_state
+
+    for msg in messages_to_send:
+        current_state["incoming_message"] = msg
+        current_state = workflow.invoke(current_state) 
+        
+        print(current_state["processed_message"])
+        print(current_state["history"])
+
+# Save Mermaid graph as a PNG file
+    png_path = Path(__file__).with_suffix(".png")
+    png_path.write_bytes(workflow.get_graph().draw_mermaid_png())
+    print(f"Graph saved to {png_path}")
 
 if __name__ == "__main__":
     main()
