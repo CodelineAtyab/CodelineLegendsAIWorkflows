@@ -1,5 +1,5 @@
 from typing import TypedDict
-
+from pathlib import Path
 from langgraph.graph import END, START, StateGraph
 
 
@@ -34,3 +34,11 @@ result = workflow.invoke({"message": ""})
 print(result)
 
 print(workflow.get_graph().draw_ascii())
+
+image_path = Path(__file__).with_suffix(".png")
+
+image_path.write_bytes(
+    workflow.get_graph().draw_mermaid_png()
+)
+
+print(f"Graph saved to: {image_path}")
