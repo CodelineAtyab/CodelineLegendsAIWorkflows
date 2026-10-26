@@ -1,8 +1,11 @@
 import json
 import os
+import sys
 
 from dotenv import load_dotenv
 from openai import APIError, OpenAI, OpenAIError
+
+from utils.cli_args import clean_session_name, is_exit_word, parse_args
 
 load_dotenv()
 
@@ -92,15 +95,7 @@ def generate_session_name(first_question, client):
         if name is None:
             return "new_session"
 
-        words = [word.strip(".,!?;:\"'") for word in name.lower().split()]
-
-        if len(words) == 0:
-            return "new_session"
-
-        if len(words) == 1:
-            words.append("session")
-
-        return "_".join(words[:2])
+        return clean_session_name(name)
 
     except APIError as error:
         print("Could not create session name:", error)
@@ -143,6 +138,16 @@ def chat_with_model(messages, client):
 
 
 def main():
+    requested_session, question = parse_args(sys.argv)
+    index = load_index()
+
+    if (
+        question is not None
+        and requested_session is not None
+        and requested_session not in index
+    ):
+        raise SystemExit(f"Error: no session called {requested_session}.")
+
     api_key = os.getenv("OPENAI_API_KEY")
 
     if api_key is None:
@@ -156,7 +161,31 @@ def main():
         print("Could not start chat:", error)
         return
 
-    index = load_index()
+    if question is not None:
+        if requested_session is not None:
+            session_name = requested_session
+            messages = load_session(session_name)
+
+        else:
+            session_name = make_unique_name(
+                generate_session_name(question, client),
+                index,
+            )
+            index[session_name] = get_next_session_id(index)
+            save_index(index)
+            messages = []
+
+        messages.append({"role": "user", "content": question})
+        assistant_reply = chat_with_model(messages, client)
+
+        if assistant_reply is None:
+            return
+
+        messages.append({"role": "assistant", "content": assistant_reply})
+        save_session(session_name, messages)
+        print(f"Session: {session_name}")
+        print(f"Assistant: {assistant_reply}")
+        return
 
     session_name = input(
         "Enter a session name to continue, or press Enter for a new session: "
@@ -176,7 +205,7 @@ def main():
     while True:
         user_message = input("You: ")
 
-        if user_message.strip().lower() == "exit":
+        if is_exit_word(user_message):
             print("Chat ended.")
             break
 
