@@ -33,3 +33,4 @@ result = workflow.invoke({"message": ""})
 # Print the final state
 print(result)
 
+print(workflow.get_graph().draw_ascii())
