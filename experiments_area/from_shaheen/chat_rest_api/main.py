@@ -1,7 +1,16 @@
 import uvicorn
 from random import randint
 from fastapi import FastAPI, Request
-from chat_data import users, bots, messages, conversations, bot_replies, find_by_id, next_id, find_missing_field
+from chat_data import (
+    users,
+    bots,
+    messages,
+    conversations,
+    bot_replies,
+    find_by_id,
+    next_id,
+    find_missing_field,
+)
 
 app = FastAPI()
 
@@ -66,7 +75,11 @@ async def start_conversation(incoming_request: Request) -> dict:
     if find_by_id(bots, bot_id) is None:
         return {"error": f"Bot {bot_id} not found"}
 
-    new_conversation = {"id": next_id(conversations), "user_id": user_id, "bot_id": bot_id}
+    new_conversation = {
+        "id": next_id(conversations),
+        "user_id": user_id,
+        "bot_id": bot_id,
+    }
     conversations.append(new_conversation)
     return {"message": "Conversation started!", "conversation": new_conversation}
 
@@ -155,10 +168,14 @@ async def reply_to_question(incoming_request: Request) -> dict:
 
 
 @app.get("/messages")
-async def get_messages(conversation_id: int | None = None, sender_type: str | None = None) -> dict:
+async def get_messages(
+    conversation_id: int | None = None, sender_type: str | None = None
+) -> dict:
     filtered_messages = []
     for message in messages:
-        matches_conversation = conversation_id is None or message["conversation_id"] == conversation_id
+        matches_conversation = (
+            conversation_id is None or message["conversation_id"] == conversation_id
+        )
         matches_sender = sender_type is None or message["sender_type"] == sender_type
         if matches_conversation and matches_sender:
             filtered_messages.append(message)
