@@ -78,20 +78,21 @@ def save_history(session_name, messages):
         json.dump(messages, file, indent=4)
 
 
+
 def choose_session(index):
-    while True:
-        session_name = input(
-            "Enter a session name to resume, or press Enter for a new chat: "
-        ).strip()
+    session_name = input(
+        "Enter a session name to resume, or press Enter for a new chat: "
+    ).strip()
 
-        if not session_name:
-            return None
+    if not session_name:
+        return None
 
-        if session_name in index:
-            print(f"Resuming session: {session_name}")
-            return session_name
+    if session_name in index:
+        print(f"Resuming session: {session_name}")
+        return session_name
 
-        print(f"No session called '{session_name}'. Please try again.")
+    print(f"No session called '{session_name}'. Starting a new one.")
+    return None
 
 
 def generate_session_name(client, question):
