@@ -44,7 +44,7 @@ def load_index():
     try:
         with open(INDEX_FILE, "r", encoding="utf-8") as file:
             return json.load(file)
-    except (json.JSONDecodeError, OSError):
+    except json.JSONDecodeError, OSError:
         print("Could not read the session index. Starting with an empty index.")
         return {}
 
@@ -65,7 +65,7 @@ def load_history(session_name):
     try:
         with open(history_file, "r", encoding="utf-8") as file:
             return json.load(file)
-    except (json.JSONDecodeError, OSError):
+    except json.JSONDecodeError, OSError:
         print("Could not read the conversation history.")
         return []
 
@@ -76,7 +76,6 @@ def save_history(session_name, messages):
 
     with open(history_file, "w", encoding="utf-8") as file:
         json.dump(messages, file, indent=4)
-
 
 
 def choose_session(index):
