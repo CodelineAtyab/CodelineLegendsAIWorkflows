@@ -1,0 +1,179 @@
+{
+  "name": "Docker Mini App",
+  "nodes": [
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"message\": \"Hello from Docker!\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        224,
+        176
+      ],
+      "id": "4c05f818-9069-464a-bd34-3e187a40ad2c",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"status\":\"healthy\"}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "f1c08d1e-47ea-41a8-b1d2-50f3900a6078",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH new_visit AS (\n    INSERT INTO visits DEFAULT VALUES RETURNING id\n)\nSELECT COUNT(*)::int + 1 AS visits FROM visits;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        208,
+        384
+      ],
+      "id": "bb7cefb5-7c54-4835-9241-b0a3f84fb2c4",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "postgres": {
+          "id": "Or5m3MmpOVwPnE0C",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"visits\": $json.visits } }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        432,
+        384
+      ],
+      "id": "ee0da17b-003c-4f2d-b07a-45699681486b",
+      "name": "Respond to Webhook2"
+    },
+    {
+      "parameters": {
+        "path": "health",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "05fe61b9-f4e4-4b0b-b167-f81aa2293e6b",
+      "name": "health",
+      "webhookId": "de1d8cb8-bb8f-48d3-8607-e76aa126b6f7"
+    },
+    {
+      "parameters": {
+        "path": "home",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        176
+      ],
+      "id": "ab23659a-523a-40f9-b9ba-33fda7fa6d16",
+      "name": "home",
+      "webhookId": "e9cebed7-b279-4efb-9192-5c6d0d798017"
+    },
+    {
+      "parameters": {
+        "path": "visits",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        384
+      ],
+      "id": "8fe3bf4c-9948-4d3a-b521-a1fc87ebbf9d",
+      "name": "visits",
+      "webhookId": "b2503da9-1bd5-4fc0-b9b3-117982d49c01"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "health": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "home": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "visits": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "e7b14700-bc70-4b85-a4ec-16f184696611",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6be20956ed717bfe637ab1c3b416141ddbbe6e011dcafc5bfad215814a770eee"
+  },
+  "nodeGroups": [],
+  "id": "mgVgTrA9m4Sov9L3",
+  "tags": []
+}
