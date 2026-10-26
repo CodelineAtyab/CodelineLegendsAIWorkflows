@@ -1,0 +1,179 @@
+{
+  "name": "Docker Mini App (API)",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "home",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        -416,
+        -16
+      ],
+      "id": "379a2407-e291-40f0-aeb7-306ea0508d67",
+      "name": "Webhook",
+      "webhookId": "d1c373dd-f8c6-47f1-a654-a3b9e84748e1"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "\n{\n  \"message\": \"Hello from Docker!\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -192,
+        -16
+      ],
+      "id": "9aa699d0-7577-4ad2-92d4-3e5097fd2874",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "path": "health",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        -400,
+        208
+      ],
+      "id": "5533818a-d32e-43f5-a776-77a0f4e9a8f0",
+      "name": "Webhook1",
+      "webhookId": "d73d637e-4e76-4785-9e2c-29d3fa4aa0e2"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "\n{\n  \"status\": \"healthy\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -176,
+        208
+      ],
+      "id": "ec06c574-d5a7-4d67-9a22-0358115a12f1",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "path": "visits",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        -448,
+        512
+      ],
+      "id": "bd6bbf3a-7e76-4249-acd5-1f84e045d060",
+      "name": "Webhook2",
+      "webhookId": "a9786e97-503f-4912-91c6-e3fb66f1d78b"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "\nWITH new_visit AS (\n    INSERT INTO visits DEFAULT VALUES\n    RETURNING id\n)\nSELECT\n    (\n        SELECT COUNT(*) FROM visits\n    )::int\n    +\n    (\n        SELECT COUNT(*) FROM new_visit\n    )::int AS visits;\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        -224,
+        512
+      ],
+      "id": "c384e9ac-96fe-463a-8abc-77d0bbf79fcf",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "postgres": {
+          "id": "WVtO6pPd3yOuEGou",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ visits: $json.visits }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        0,
+        512
+      ],
+      "id": "8c380424-6f48-40c2-8ef7-c1d6a6df92b1",
+      "name": "Respond to Webhook2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook2": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "d82218eb-ba33-4596-bb3b-f88cbd7fdddd",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fff06df59d397e4589845e5a293eedc79d169458decf3fa04e4a81ad6e86ccd6"
+  },
+  "nodeGroups": [],
+  "id": "P72VXYEzgZGTZ66i",
+  "tags": []
+}
