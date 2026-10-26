@@ -156,7 +156,11 @@ async def reply_to_question(incoming_request: Request) -> dict:
         if message["reply_to"] == reply_to:
             return {"error": f"Message {reply_to} already has a reply"}
 
-    conversation = find_by_id(conversations, user_message["conversation_id"])
+    conversation_id = user_message["conversation_id"]
+    conversation = find_by_id(conversations, conversation_id)
+    if conversation is None:
+        return {"error": f"Conversation {conversation_id} not found"}
+
     new_message = {
         "id": next_id(messages),
         "conversation_id": conversation["id"],
