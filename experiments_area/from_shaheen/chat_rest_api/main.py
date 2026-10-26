@@ -1,6 +1,6 @@
 import uvicorn
 from fastapi import FastAPI, Request
-from chat_data import users, find_by_id, next_id, find_missing_field
+from chat_data import users, bots, find_by_id, next_id, find_missing_field
 
 app = FastAPI()
 
@@ -26,6 +26,29 @@ async def get_users(user_id: int | None = None) -> dict:
         return {"user": user}
 
     return {"users": users, "count": len(users)}
+
+
+@app.post("/bots/add")
+async def add_bot(incoming_request: Request) -> dict:
+    json_body = await incoming_request.json()
+    missing_field = find_missing_field(json_body, ["name"])
+    if missing_field is not None:
+        return {"error": f"Missing field: {missing_field}"}
+
+    new_bot = {"id": next_id(bots), "name": json_body.get("name")}
+    bots.append(new_bot)
+    return {"message": "Bot added successfully!", "bot": new_bot}
+
+
+@app.get("/bots")
+async def get_bots(bot_id: int | None = None) -> dict:
+    if bot_id is not None:
+        bot = find_by_id(bots, bot_id)
+        if bot is None:
+            return {"error": f"Bot {bot_id} not found"}
+        return {"bot": bot}
+
+    return {"bots": bots, "count": len(bots)}
 
 
 if __name__ == "__main__":
