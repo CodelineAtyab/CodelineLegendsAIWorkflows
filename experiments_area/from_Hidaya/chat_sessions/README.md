@@ -1,0 +1,1 @@
+ This chatbot saves conversations so you can continue them later using the session name. Run uv run app.py to chat, or pass a question directly, and use uv run pytest to run the tests.
