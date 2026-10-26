@@ -1,6 +1,7 @@
-def main():
-    print("Hello from chat-message-workflow!")
+from typing import TypedDict
 
 
-if __name__ == "__main__":
-    main()
+class ChatState(TypedDict):
+    incoming_message: str
+    history: list[str]
+    processed_message: str
