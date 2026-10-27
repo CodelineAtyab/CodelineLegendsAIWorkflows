@@ -55,7 +55,7 @@ builder.add_edge("process_question", END)
 
 workflow = builder.compile()
 
-test_inputs = [
+test_inputs: list[MessageState] = [
     {
         "question": "Who are you?",
         "is_processed": False,
@@ -67,7 +67,8 @@ test_inputs = [
 ]
 
 for test_input in test_inputs:
-    print(workflow.invoke(test_input))
+    initial_state: MessageState = test_input
+    print(workflow.invoke(initial_state))
 
 diagram = workflow.get_graph().draw_mermaid_png()
 diagram_path = Path(__file__).with_suffix(".png")
