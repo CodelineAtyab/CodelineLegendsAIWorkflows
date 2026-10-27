@@ -1,0 +1,4 @@
+.env
+session_index.json
+sessions/
+.vscode/
