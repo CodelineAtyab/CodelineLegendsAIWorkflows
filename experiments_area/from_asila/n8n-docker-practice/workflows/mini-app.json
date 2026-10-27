@@ -1,0 +1,179 @@
+{
+  "name": "Docker Mini App",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH new_visit AS (\n    INSERT INTO visits DEFAULT VALUES RETURNING id\n)\nSELECT COUNT(*)::int + 1 AS visits FROM visits;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        208,
+        448
+      ],
+      "id": "8a29edda-c8a5-4c75-b619-4f9317d8ad37",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "postgres": {
+          "id": "OpCN7F0gYtaU8xzs",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "home",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "04afa25e-1d6d-454b-8b62-a12f36c4d2f6",
+      "name": "Home Webhook",
+      "webhookId": "2170b723-ce45-4f12-b411-da3612ecf5cd"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"message\": \"Hello from Docker!\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "c36666c5-3fee-4a2d-896c-cf169e3f1c90",
+      "name": "Home Response"
+    },
+    {
+      "parameters": {
+        "path": "health",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        224
+      ],
+      "id": "69705ace-1cff-450c-9ba5-9d0971732af0",
+      "name": "Health Webhook",
+      "webhookId": "9c1f4ddf-299a-42c2-a47b-4af9ba5f25d2"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"status\": \"healthy\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        224,
+        224
+      ],
+      "id": "b43e343c-e614-4e85-bb4c-d12d46957fcf",
+      "name": "Health Response"
+    },
+    {
+      "parameters": {
+        "path": "visits",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        -16,
+        448
+      ],
+      "id": "366074a0-faef-477f-9c5d-1ade5050011d",
+      "name": "Visits Webhook",
+      "webhookId": "b67e852b-0a0b-4beb-933f-79ac3dabf4fb"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"visits\": $json.visits } }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        432,
+        448
+      ],
+      "id": "077623cf-1fa4-444d-a21b-d0dbcecdcd33",
+      "name": "Visits Response"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Visits Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Home Webhook": {
+      "main": [
+        [
+          {
+            "node": "Home Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Health Webhook": {
+      "main": [
+        [
+          {
+            "node": "Health Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Visits Webhook": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "3c4d89ec-de75-4e32-9ae5-5aa198a60187",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9467740254cbc67daf0f310d4922de91e79dc8f2782f1d0563cea85ca535d735"
+  },
+  "nodeGroups": [],
+  "id": "n5kn7KNxN2OYiLMW",
+  "tags": []
+}
