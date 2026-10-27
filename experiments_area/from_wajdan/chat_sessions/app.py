@@ -1,8 +1,11 @@
 import json
 import os
+import sys
 
 from dotenv import load_dotenv
 from openai import OpenAI, OpenAIError
+
+from utils.cli_args import clean_session_name, is_exit_word, parse_args
 
 INDEX_FILE = "session_index.json"
 SESSIONS_FOLDER = "sessions"
@@ -13,16 +16,13 @@ def load_index():
     """Read the saved session index."""
     if not os.path.exists(INDEX_FILE):
         return {}
-
     try:
         with open(INDEX_FILE, "r", encoding="utf-8") as file:
-            index = json.load(file)
+            return json.load(file)
     except json.JSONDecodeError as error:
         raise ValueError("The session index contains malformed JSON.") from error
     except OSError as error:
         raise OSError("The session index could not be read.") from error
-
-    return index
 
 
 def load_history(session_name):
@@ -30,7 +30,7 @@ def load_history(session_name):
     file_name = os.path.join(SESSIONS_FOLDER, session_name + ".json")
     try:
         with open(file_name, "r", encoding="utf-8") as file:
-            history = json.load(file)
+            return json.load(file)
     except json.JSONDecodeError as error:
         raise ValueError(
             f"The history for {session_name} contains malformed JSON."
@@ -38,23 +38,25 @@ def load_history(session_name):
     except OSError as error:
         raise OSError(f"The history for {session_name} could not be read.") from error
 
-    return history
-
 
 def save_data(index, session_name, history):
     """Save the conversation and the session index after an answer."""
     try:
         os.makedirs(SESSIONS_FOLDER, exist_ok=True)
-        history_file_name = os.path.join(SESSIONS_FOLDER, session_name + ".json")
-        with open(history_file_name, "w", encoding="utf-8") as file:
+        with open(
+            os.path.join(SESSIONS_FOLDER, session_name + ".json"),
+            "w",
+            encoding="utf-8",
+        ) as file:
             json.dump(history, file, indent=2, ensure_ascii=False)
             file.write("\n")
-
         with open(INDEX_FILE, "w", encoding="utf-8") as file:
             json.dump(index, file, indent=2, ensure_ascii=False)
             file.write("\n")
-    except OSError:
-        raise OSError("Saving did not complete. The program will stop safely.")
+    except OSError as error:
+        raise OSError(
+            "Saving did not complete. The program will stop safely."
+        ) from error
 
 
 def choose_session(index):
@@ -64,14 +66,12 @@ def choose_session(index):
     except EOFError, KeyboardInterrupt:
         print("\nGoodbye.")
         return None, None, True
-
     if name == "":
         return None, [], False
-
+    name = clean_session_name(name)
     if name not in index:
         print(f"No session called {name}. Starting a new one.")
         return None, [], False
-
     try:
         history = load_history(name)
     except (OSError, ValueError) as error:
@@ -90,34 +90,13 @@ def make_session_name(client, first_question, index):
         {"role": "user", "content": first_question},
     ]
     answer = ask_openai(client, messages, "naming")
-
-    # Keep letters and numbers, and use spaces as word separators.
-    words = []
-    current_word = ""
-    for character in answer.lower():
-        if ("a" <= character <= "z") or ("0" <= character <= "9"):
-            current_word += character
-        elif current_word:
-            words.append(current_word)
-            current_word = ""
-    if current_word:
-        words.append(current_word)
-
-    if len(words) >= 2:
-        base_name = words[0] + "_" + words[1]
-    elif len(words) == 1:
-        base_name = words[0] + "_session"
-    else:
-        base_name = "new_session"
-
-    # Add a number instead of overwriting an old session.
+    base_name = clean_session_name(answer)
     name = base_name
     number = 2
     while name in index or os.path.exists(
         os.path.join(SESSIONS_FOLDER, name + ".json")
     ):
-        first_word, second_word = base_name.split("_", 1)
-        name = first_word + "_" + second_word + str(number)
+        name = f"{base_name}{number}"
         number += 1
     return name
 
@@ -131,54 +110,105 @@ def ask_openai(client, messages, purpose):
             error_code = getattr(error, "code", None) or "unknown"
             raise RuntimeError(
                 f"RateLimitError code: {error_code}. Check your usage limits."
-            )
+            ) from error
         raise RuntimeError(
             f"The OpenAI {purpose} request failed. Check your key, billing, or connection."
-        )
-
+        ) from error
     try:
         text = response.choices[0].message.content
-    except AttributeError, IndexError, TypeError:
-        raise RuntimeError(f"The OpenAI {purpose} response was malformed.")
+    except (AttributeError, IndexError, TypeError) as error:
+        raise RuntimeError(f"The OpenAI {purpose} response was malformed.") from error
     if not isinstance(text, str) or text.strip() == "":
         raise RuntimeError(f"The OpenAI {purpose} response was empty.")
     return text.strip()
 
 
-def main():
-    # Load the key before creating the OpenAI client.
+def create_session_id(index):
+    """Return the next available session identifier."""
+    session_number = len(index) + 1
+    session_id = f"session-{session_number}"
+    while session_id in index.values():
+        session_number += 1
+        session_id = f"session-{session_number}"
+    return session_id
+
+
+def get_client():
+    """Load credentials and create the OpenAI client."""
     load_dotenv()
     api_key = os.getenv("OPENAI_API_KEY", "").strip()
-    placeholder_keys = (
+    placeholder_keys = {
         "your-key",
         "your_api_key_here",
         "your-api-key",
         "replace-me",
         "changeme",
-    )
+    }
     if not api_key:
-        print("OPENAI_API_KEY is missing. Add your real key to .env.")
-        return
+        raise SystemExit("Error: OPENAI_API_KEY is missing.")
     if api_key.lower() in placeholder_keys:
-        print("OPENAI_API_KEY is still a placeholder. Add your real key to .env.")
-        return
+        raise SystemExit("Error: OPENAI_API_KEY is still a placeholder.")
+    try:
+        return OpenAI(api_key=api_key)
+    except OpenAIError as error:
+        raise SystemExit("Error: the OpenAI client could not start.") from error
 
+
+def answer_once(client, index, session_name, history, question):
+    """Answer one question, save the session, and return its name and reply."""
+    if session_name is None:
+        session_name = make_session_name(client, question, index)
+        index[session_name] = create_session_id(index)
+    history.append({"role": "user", "content": question})
+    try:
+        reply = ask_openai(client, history, "chat")
+    except RuntimeError:
+        history.pop()
+        raise
+    history.append({"role": "assistant", "content": reply})
+    save_data(index, session_name, history)
+    return session_name, reply
+
+
+def run_non_interactive(session_name, question, index):
+    """Run one non-interactive question and print exactly two result lines."""
+    if session_name is not None:
+        session_name = clean_session_name(session_name)
+        if session_name not in index:
+            raise SystemExit(f"Error: unknown session '{session_name}'.")
+        history = load_history(session_name)
+    else:
+        history = []
+    client = get_client()
+    try:
+        session_name, reply = answer_once(
+            client, index, session_name, history, question
+        )
+    except (OSError, RuntimeError, ValueError) as error:
+        raise SystemExit(f"Error: {error}") from error
+    print(f"Session: {session_name}")
+    print(f"Assistant: {reply.replace(chr(13), ' ').replace(chr(10), ' ')}")
+
+
+def main():
+    """Run interactive or one-question chat mode."""
+    session_name, question = parse_args(sys.argv)
     try:
         index = load_index()
     except (OSError, ValueError) as error:
-        print(f"Could not load sessions: {error}")
+        raise SystemExit(f"Error: {error}") from error
+    if question is not None:
+        run_non_interactive(session_name, question, index)
         return
 
     session_name, history, stopped = choose_session(index)
     if stopped:
         return
-
     try:
-        client = OpenAI(api_key=api_key)
-    except OpenAIError:
-        print("The OpenAI client could not start. Check your API key.")
+        client = get_client()
+    except SystemExit as error:
+        print(error)
         return
-
     new_session = session_name is None
     while True:
         prompt = "First question: " if new_session else "You: "
@@ -187,43 +217,21 @@ def main():
         except EOFError, KeyboardInterrupt:
             print("\nGoodbye.")
             return
-
-        if user_message.lower() == "exit":
+        if is_exit_word(user_message):
             return
         if user_message == "":
             continue
-
-        if new_session:
-            try:
-                session_name = make_session_name(client, user_message, index)
-            except RuntimeError as error:
-                print(error)
-                return
-            print(f"Session name: {session_name}")
-
-            session_number = len(index) + 1
-            session_id = "session-" + str(session_number)
-            while session_id in index.values():
-                session_number += 1
-                session_id = "session-" + str(session_number)
-            index[session_name] = session_id
-            new_session = False
-
-        history.append({"role": "user", "content": user_message})
         try:
-            assistant_message = ask_openai(client, history, "chat")
+            session_name, reply = answer_once(
+                client, index, session_name, history, user_message
+            )
         except RuntimeError as error:
-            history.pop()
             print(error)
             continue
-
-        history.append({"role": "assistant", "content": assistant_message})
-        print(f"Assistant: {assistant_message}")
-        try:
-            save_data(index, session_name, history)
-        except OSError as error:
-            print(error)
-            return
+        if new_session:
+            print(f"Session name: {session_name}")
+            new_session = False
+        print(f"Assistant: {reply}")
 
 
 if __name__ == "__main__":

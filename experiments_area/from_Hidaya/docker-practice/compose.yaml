@@ -1,0 +1,28 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: "postgresql://practice_user:practice_password@db:5432/practice_db"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: practice_db
+      POSTGRES_USER: practice_user
+      POSTGRES_PASSWORD: practice_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U practice_user -d practice_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+volumes:
+  postgres_data:
