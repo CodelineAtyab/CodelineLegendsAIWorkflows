@@ -63,7 +63,7 @@ def main():
 
         history = result["history"]
 
-    print(workflow.get_graph().draw_mermaid())
+   # print(workflow.get_graph().draw_mermaid())
 
     png_path = Path(__file__).with_suffix(".png")
     png_path.write_bytes(workflow.get_graph().draw_mermaid_png())
