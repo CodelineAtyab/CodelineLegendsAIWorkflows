@@ -7,8 +7,7 @@ def get_api_key(file_path="key.txt"):
         with open(file_path, "r") as file:
             return file.read().strip()
     except FileNotFoundError:
-        print(f"Error: The API key file '{file_path}' was not found.")
-        print("Please set the MAPS_API_KEY environment variable or create the key file.")
+        print("Could not get the travel time: key file not found")
         raise SystemExit(1)
 
 
@@ -33,15 +32,17 @@ def fetch_travel_time(source, destination, api_key):
         response = requests.post(url, json=payload, headers=headers, timeout=30)
         response.raise_for_status()
         return response.json()
+    except requests.exceptions.HTTPError as error:
+        print(f"Could not get the travel time: HTTP {error.response.status_code}")
+        return None
     except requests.exceptions.RequestException:
-
-        print("Could not get the travel time due to a network or API error.")
+        print("Could not get the travel time: network error")
         return None
 
 
 def format_and_print_time(source, destination, data):
-    if not data:
-        return
+    if data is None:
+        return  # fetch_travel_time already printed the reason
 
     try:
         routes = data.get("routes")
@@ -50,7 +51,10 @@ def format_and_print_time(source, destination, data):
             return
 
 
-        duration_str = routes[0].get("duration", "0s")
+        duration_str = routes[0].get("duration")
+        if not duration_str:
+            print("Could not get the travel time: no duration in the answer")
+            return
         total_seconds = int(duration_str.rstrip("s"))
 
 
@@ -86,7 +90,7 @@ def main():
         dest_place = input("Enter destination: ").strip()
 
         if not source_place or not dest_place:
-            print("Source and destination cannot be empty.")
+            print("Could not get the travel time: source and destination cannot be empty")
             return
 
         api_key = get_api_key()
