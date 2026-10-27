@@ -51,7 +51,6 @@ for message in ["  hello team codeline  ", "how are you", "good"]:
     print(result["processed_message"])
     print(history)
 
-print(workflow.get_graph().draw_mermaid())
 png_path = Path(__file__).with_suffix(".png")
 png_path.write_bytes(workflow.get_graph().draw_mermaid_png())
 print(f"Graph saved to {png_path}")
