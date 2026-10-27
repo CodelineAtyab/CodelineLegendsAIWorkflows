@@ -1,33 +1,33 @@
-
 # LangGraph Video Scenarios
 
 ## Video
 
 - Tutorial: https://www.youtube.com/watch?v=jGg_1h0qzaM
 - Required start time: 1:30:00
-- Required end time: end of video
+- Required end time: End of video
 - Approach: Rebuild each distinct scenario using plain Python and LangGraph.
 - Scope: State, nodes, chaining, edges, and conditional routing.
-- Simplifications: Replace LLM calls, tools, async code, decorators,
-  generators, FastAPI, Temporal, and Qdrant with plain Python where needed.
 
 ## Scenario Log
 
-| # | Timestamp | Scenario name | File | State keys | Nodes | Edges (plain / conditional) | Result matches video? |
+| # | Timestamp | Scenario name | File | State keys | Nodes | Edges | Result verified |
 |---|---|---|---|---|---:|---|---|
-| 1 | 1:30:xx | Replace with actual scenario | `scenario_01_two_nodes.py` | `message`, `processed_message` | 2 | plain | Pending verification |
-| 2 | Actual timestamp | Replace with actual scenario | `scenario_02_conditional_message.py` | `question`, `is_processed` | 2 | conditional + plain | Pending verification |
+| 1 | TODO | Two-node message workflow | `scenario_01_two_nodes.py` | `message`, `processed_message` | 2 | Plain | Code runs; comparison pending |
+| 2 | TODO | Conditional message workflow | `scenario_02_conditional_message.py` | `question`, `is_processed` | Verify | Conditional + plain | Both branches tested; comparison pending |
+| 3 | TODO | Three-node message workflow | `scenario_03_three_nodes.py` | `message` | 3 | Plain | Code runs; comparison pending |
 
 ## Testing
 
-- [ ] Each scenario runs with `uv run`.
-- [ ] Each scenario prints the final state as a plain dictionary.
-- [ ] Each scenario saves its own PNG graph diagram.
-- [ ] Every conditional branch has been tested.
+- [x] All three current scripts run with `uv run`.
+- [x] All three current scripts print the final state as a plain dictionary.
+- [x] All three current scripts generate PNG graph diagrams.
+- [x] Both branches of the current conditional workflow have been tested.
+- [ ] Every scenario from the video has been identified and implemented.
 - [ ] Results have been compared with the video.
 - [ ] Simplifications from the original video have been documented.
 
 ## Notes and Simplifications
 
-Document the actual simplifications made for each scenario here.
-Do not mark a scenario complete until it has been run and checked.
+The current scripts use simple Python string operations to practise LangGraph state, nodes, chaining, and conditional routing. Confirm which examples correspond to the tutorial and document any differences. Add a separate Python file and PNG for each additional distinct scenario found in the required video section.
+
+Do not mark full video coverage as complete until it has been verified.
