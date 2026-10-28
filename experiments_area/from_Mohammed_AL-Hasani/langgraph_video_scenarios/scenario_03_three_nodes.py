@@ -10,18 +10,14 @@ class ScenarioState(TypedDict):
 
 def first_node(state: ScenarioState) -> ScenarioState:
     """Perform the first step."""
-    return {
-        **state,
-        "message": state["message"].strip(),
-    }
+    state["message"] = state["message"].strip()
+    return state
 
 
 def second_node(state: ScenarioState) -> ScenarioState:
     """Perform the next step."""
-    return {
-        **state,
-        "message": state["message"].upper(),
-    }
+    state["message"] = state["message"].upper()
+    return state
 
 
 builder = StateGraph(ScenarioState)

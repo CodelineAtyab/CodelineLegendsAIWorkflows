@@ -11,18 +11,14 @@ class MessageState(TypedDict):
 
 def prepare_message(state: MessageState) -> MessageState:
     """Prepare the message for processing."""
-    return {
-        **state,
-        "processed_message": state["message"].strip(),
-    }
+    state["processed_message"] = state["message"].strip()
+    return state
 
 
 def add_greeting(state: MessageState) -> MessageState:
     """Add a greeting to the processed message."""
-    return {
-        **state,
-        "processed_message": f"Hello, {state['processed_message']}!",
-    }
+    state["processed_message"] = f"Hello, {state['processed_message']}!"
+    return state
 
 
 builder = StateGraph(MessageState)
