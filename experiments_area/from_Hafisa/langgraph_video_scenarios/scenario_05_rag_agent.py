@@ -1,4 +1,3 @@
-from pathlib import Path
 from typing import TypedDict
 
 from langgraph.graph import END, START, StateGraph
@@ -43,10 +42,13 @@ graph.add_conditional_edges("answer", choose_next_step, {"retrieve": "retrieve",
 graph.add_edge("retrieve", "answer")
 workflow = graph.compile()
 
-result = workflow.invoke(
-    {"question": "How does a StateGraph share state?", "context": "", "answer": "", "searched": False}
-)
-print(result)
+inputs = [
+    {"question": "How does a StateGraph share state?", "context": "", "answer": "", "searched": False},
+    {"question": "What does a retriever do?", "context": "", "answer": "", "searched": False},
+]
+for input_state in inputs:
+    print(workflow.invoke(input_state))
 
-diagram_path = Path(__file__).with_suffix(".png")
-diagram_path.write_bytes(workflow.get_graph().draw_mermaid_png())
+diagram_path = __file__.replace(".py", ".png")
+with open(diagram_path, "wb") as diagram_file:
+    diagram_file.write(workflow.get_graph().draw_mermaid_png())

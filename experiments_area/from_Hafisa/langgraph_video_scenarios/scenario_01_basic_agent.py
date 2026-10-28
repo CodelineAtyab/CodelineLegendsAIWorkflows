@@ -1,4 +1,3 @@
-from pathlib import Path
 from typing import TypedDict
 
 from langgraph.graph import END, START, StateGraph
@@ -23,5 +22,6 @@ workflow = graph.compile()
 result = workflow.invoke({"messages": ["What is LangGraph?"]})
 print(result)
 
-diagram_path = Path(__file__).with_suffix(".png")
-diagram_path.write_bytes(workflow.get_graph().draw_mermaid_png())
+diagram_path = __file__.replace(".py", ".png")
+with open(diagram_path, "wb") as diagram_file:
+    diagram_file.write(workflow.get_graph().draw_mermaid_png())

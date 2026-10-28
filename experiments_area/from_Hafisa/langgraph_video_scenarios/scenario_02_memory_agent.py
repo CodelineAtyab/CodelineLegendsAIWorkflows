@@ -1,4 +1,3 @@
-from pathlib import Path
 from typing import TypedDict
 
 from langgraph.graph import END, START, StateGraph
@@ -12,11 +11,11 @@ def respond_with_memory(state: AgentState) -> AgentState:
     user_message = state["messages"][-1]
     turn_number = sum(message.startswith("User:") for message in state["messages"])
     if user_message.lower().endswith("what is my name?"):
-        remembered_name = next(
-            message.removeprefix("User: My name is ").rstrip(".")
-            for message in state["messages"]
-            if message.startswith("User: My name is ")
-        )
+        remembered_name = ""
+        for message in state["messages"]:
+            if message.startswith("User: My name is "):
+                remembered_name = message[len("User: My name is "):].rstrip(".")
+                break
         response = f"Assistant: Your name is {remembered_name}."
     else:
         response = f"Assistant: Turn {turn_number}; I remember that you said '{user_message[6:]}'."
@@ -34,5 +33,6 @@ conversation = ["User: My name is Hafisa.", "Assistant: Nice to meet you, Hafisa
 result = workflow.invoke({"messages": conversation})
 print(result)
 
-diagram_path = Path(__file__).with_suffix(".png")
-diagram_path.write_bytes(workflow.get_graph().draw_mermaid_png())
+diagram_path = __file__.replace(".py", ".png")
+with open(diagram_path, "wb") as diagram_file:
+    diagram_file.write(workflow.get_graph().draw_mermaid_png())
