@@ -3,14 +3,17 @@ from pathlib import Path
 from langgraph.graph import StateGraph, START, END
 
 
-
 class SharedState(TypedDict):
     message: str
 
+
 def print_greeting_message(state: SharedState):
-    state['message'] = f"{state['message']}, you're doing an amazing job learning LangGraph!"
+    state["message"] = (
+        f"{state['message']}, you're doing an amazing job learning LangGraph!"
+    )
 
     return state
+
 
 graph = StateGraph(SharedState)
 
