@@ -25,9 +25,10 @@ Video: https://www.youtube.com/watch?v=jGg_1h0qzaM (watched from 1:30:00)
 ## Checks
 
 ```powershell
-uvx mypy .                  # type check (uses .venv via [tool.mypy] in pyproject.toml)
-uvx ruff@0.16.10 check .    # lint, same version as CI
+uv run --frozen --with 'mypy==2.4.0' mypy --ignore-missing-imports .   # type check, same as CI
+uvx ruff@0.16.10 check .                                               # lint, same as CI
 ```
 
-- `uvx` runs mypy in an isolated env, so without `python_executable` it can't see langgraph etc. (`import-not-found`). The path must use backslashes on Windows. On Mac/Linux, use `uv run --with mypy mypy .` instead.
+- Use `uv run --with mypy`, not `uvx mypy`. `uvx` runs mypy in an isolated env that can't see langgraph etc. (`import-not-found`), while `uv run` uses the project's env.
+- Don't set `python_executable` in `pyproject.toml`. A Windows path like `.venv\Scripts\python.exe` broke CI on Linux (`Invalid python executable`).
 - CI failures fixed: `F401` (unused `ToolMessage`), `UP035` (`Sequence` from `collections.abc`), `I001` (import order), `SIM114` (merged `if` branches in `decider`).

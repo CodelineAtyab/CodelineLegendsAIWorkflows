@@ -10,6 +10,3 @@ dependencies = [
     "langchain-openai>=1.7.3",
     "langgraph[standard]>=1.2.18",
 ]
-
-[tool.mypy]
-python_executable = '.venv\Scripts\python.exe'
