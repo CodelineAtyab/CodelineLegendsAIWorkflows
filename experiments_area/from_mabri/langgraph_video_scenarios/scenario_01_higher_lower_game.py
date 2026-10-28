@@ -10,7 +10,7 @@ START -> setup -> guess -> hint -> (continue: back to guess | end: END)
 """
 import random
 from pathlib import Path
-from typing import TypedDict
+from typing import NotRequired, TypedDict
 
 from langgraph.graph import StateGraph, START, END
 
@@ -21,7 +21,7 @@ class GameState(TypedDict):
     attempts: int
     lower_bound: int
     upper_bound: int
-    target: int
+    target: NotRequired[int]  # set by the setup node, not passed in
 
 
 def setup(state: GameState) -> GameState:
