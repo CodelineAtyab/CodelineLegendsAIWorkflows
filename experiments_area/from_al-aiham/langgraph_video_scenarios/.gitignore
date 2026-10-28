@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+*.pyc
+logging.txt
+draft_one.txt
+draft_two.txt
