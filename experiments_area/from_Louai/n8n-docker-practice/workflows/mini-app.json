@@ -1,0 +1,177 @@
+{
+  "name": "Docker Mini App (API)",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "home",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "7c95da95-4524-4b4d-b1cb-0370d249f90a",
+      "name": "GET/home",
+      "webhookId": "c5fccb67-837e-421d-a8ac-31206dc52e93"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"message\": \"Hello from Docker!\"}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "638c6f61-f201-4619-9888-f46f13021ebe",
+      "name": "Respond home"
+    },
+    {
+      "parameters": {
+        "path": "health",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        352,
+        144
+      ],
+      "id": "3b976b09-fbc6-4d30-bbd4-7ef21a12ce94",
+      "name": "Get/health",
+      "webhookId": "95a2bbc5-f56e-431e-b57d-d9a81065aa11"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"status\": \"healthy\"}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        576,
+        144
+      ],
+      "id": "be7ed911-6fe1-4f5d-b1d3-1af51d9eff12",
+      "name": "Respond health"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH new_visit AS (INSERT INTO visits DEFAULT VALUES RETURNING id)\nSELECT COUNT(*)::int + 1 AS visits FROM visits;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        672,
+        -240
+      ],
+      "id": "49cf0497-0b5c-464e-acc5-1fe5f442ef83",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "postgres": {
+          "id": "GXN2oKBwY9wG3aiH",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "visits",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        448,
+        -240
+      ],
+      "id": "2ea91c0d-074e-43bd-8296-24000861c366",
+      "name": "Count visits",
+      "webhookId": "efa2e6a3-b603-449d-a4f3-ff47577456d0"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        896,
+        -240
+      ],
+      "id": "a3e99e5b-3981-48d8-8dde-aa38eafa0014",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "GET/home": {
+      "main": [
+        [
+          {
+            "node": "Respond home",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get/health": {
+      "main": [
+        [
+          {
+            "node": "Respond health",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Count visits": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "7836ec11-faa3-4b7b-a264-b37b85789a01",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e521351994ce610b1ccedf54aa0b92fa9de542f95b0ad921e4157134b69cb0d0"
+  },
+  "nodeGroups": [],
+  "id": "GkXxundo8bJ1oRiQ",
+  "tags": []
+}
