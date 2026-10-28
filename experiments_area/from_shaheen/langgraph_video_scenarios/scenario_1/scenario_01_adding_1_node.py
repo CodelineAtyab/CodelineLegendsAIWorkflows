@@ -7,7 +7,7 @@ class SharedState(TypedDict):
     message: str
 
 
-def print_greeting_message(state: SharedState):
+def print_greeting_message(state: SharedState) -> SharedState:
     state["message"] = (
         f"{state['message']}, you're doing an amazing job learning LangGraph!"
     )
