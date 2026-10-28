@@ -42,7 +42,8 @@ graph.add_node("save_document", save_document)
 
 graph.add_edge(START, "decide_action")
 graph.add_conditional_edges(
-    "decide_action", choose_next,
+    "decide_action",
+    choose_next,
     {"update": "update_document", "save": "save_document"},
 )
 graph.add_edge("update_document", "decide_action")
@@ -50,24 +51,32 @@ graph.add_edge("save_document", END)
 
 workflow = graph.compile()
 
-print(workflow.invoke({
-    "drafts": [
-        "I cannot attend the meeting today.",
-        "I cannot attend today. Please share the meeting notes.",
-    ],
-    "draft_index": 0,
-    "document": "",
-    "filename": str(Path(__file__).with_name("draft_one.txt")),
-    "saved": False,
-}))
+print(
+    workflow.invoke(
+        {
+            "drafts": [
+                "I cannot attend the meeting today.",
+                "I cannot attend today. Please share the meeting notes.",
+            ],
+            "draft_index": 0,
+            "document": "",
+            "filename": str(Path(__file__).with_name("draft_one.txt")),
+            "saved": False,
+        }
+    )
+)
 
-print(workflow.invoke({
-    "drafts": [],
-    "draft_index": 0,
-    "document": "This document is ready to save.",
-    "filename": str(Path(__file__).with_name("draft_two.txt")),
-    "saved": False,
-}))
+print(
+    workflow.invoke(
+        {
+            "drafts": [],
+            "draft_index": 0,
+            "document": "This document is ready to save.",
+            "filename": str(Path(__file__).with_name("draft_two.txt")),
+            "saved": False,
+        }
+    )
+)
 
 png_path = Path(__file__).with_suffix(".png")
 png_path.write_bytes(workflow.get_graph().draw_mermaid_png())

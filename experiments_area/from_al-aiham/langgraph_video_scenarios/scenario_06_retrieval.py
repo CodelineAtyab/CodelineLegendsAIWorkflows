@@ -43,7 +43,8 @@ graph.add_node("search_documents", search_documents)
 
 graph.add_edge(START, "answer_question")
 graph.add_conditional_edges(
-    "answer_question", choose_next,
+    "answer_question",
+    choose_next,
     {"search": "search_documents", "finish": END},
 )
 graph.add_edge("search_documents", "answer_question")
@@ -56,13 +57,17 @@ documents = [
 ]
 
 for question in ["LangGraph", "unknown"]:
-    print(workflow.invoke({
-        "question": question,
-        "documents": documents,
-        "context": "",
-        "searched": False,
-        "answer": "",
-    }))
+    print(
+        workflow.invoke(
+            {
+                "question": question,
+                "documents": documents,
+                "context": "",
+                "searched": False,
+                "answer": "",
+            }
+        )
+    )
 
 png_path = Path(__file__).with_suffix(".png")
 png_path.write_bytes(workflow.get_graph().draw_mermaid_png())
