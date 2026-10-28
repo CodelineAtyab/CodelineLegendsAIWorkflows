@@ -4,5 +4,6 @@
 .venv_new/
 __pycache__/
 *.pyc
+.pytest_cache/
 sessions/
 session_index.json
