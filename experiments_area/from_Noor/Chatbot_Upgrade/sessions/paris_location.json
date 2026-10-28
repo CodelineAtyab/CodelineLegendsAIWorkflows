@@ -1,0 +1,10 @@
+[
+    {
+        "role": "user",
+        "content": "capital of france"
+    },
+    {
+        "role": "assistant",
+        "content": "The capital of France is Paris."
+    }
+]
