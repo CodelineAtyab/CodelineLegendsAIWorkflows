@@ -12,7 +12,7 @@ import random
 from pathlib import Path
 from typing import NotRequired, TypedDict
 
-from langgraph.graph import StateGraph, START, END
+from langgraph.graph import END, START, StateGraph
 
 
 class GameState(TypedDict):
@@ -44,9 +44,7 @@ def hint(state: GameState) -> GameState:
     return state
 
 def decider(state: GameState) -> str:
-    if state["guesses"][-1] == state["target"]:
-        return "end"
-    elif state["attempts"] >= 7:
+    if state["guesses"][-1] == state["target"] or state["attempts"] >= 7:
         return "end"
     else:
         return "continue"
