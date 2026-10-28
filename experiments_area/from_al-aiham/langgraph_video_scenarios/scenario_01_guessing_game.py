@@ -65,15 +65,19 @@ graph.add_conditional_edges(
 workflow = graph.compile()
 
 for player_name in ["Aiham", "Sara"]:
-    print(workflow.invoke({
-        "player_name": player_name,
-        "target_number": 0,
-        "guesses": [],
-        "attempts": 0,
-        "hint": "",
-        "lower_bound": 1,
-        "upper_bound": 20,
-    }))
+    print(
+        workflow.invoke(
+            {
+                "player_name": player_name,
+                "target_number": 0,
+                "guesses": [],
+                "attempts": 0,
+                "hint": "",
+                "lower_bound": 1,
+                "upper_bound": 20,
+            }
+        )
+    )
 
 png_path = Path(__file__).with_suffix(".png")
 png_path.write_bytes(workflow.get_graph().draw_mermaid_png())

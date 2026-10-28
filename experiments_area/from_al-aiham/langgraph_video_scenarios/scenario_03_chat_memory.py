@@ -30,8 +30,7 @@ for question in ["My name is Aiham.", "What was my first message?"]:
     print(result)
 
 with open(Path(__file__).with_name("logging.txt"), "w", encoding="utf-8") as file:
-    for message in history:
-        file.write(message + "\n")
+    file.writelines(message + "\n" for message in history)
 
 png_path = Path(__file__).with_suffix(".png")
 png_path.write_bytes(workflow.get_graph().draw_mermaid_png())

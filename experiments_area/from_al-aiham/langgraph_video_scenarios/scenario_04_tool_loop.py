@@ -52,35 +52,75 @@ graph.add_edge("calculate", "decide_action")
 
 workflow = graph.compile()
 
-print(workflow.invoke({
-    "number1": 10, "number2": 4, "operation": "add",
-    "next_operation": "finish", "next_number": 0,
-    "result": 0, "reply": "",
-}))
+print(
+    workflow.invoke(
+        {
+            "number1": 10,
+            "number2": 4,
+            "operation": "add",
+            "next_operation": "finish",
+            "next_number": 0,
+            "result": 0,
+            "reply": "",
+        }
+    )
+)
 
-print(workflow.invoke({
-    "number1": 10, "number2": 5, "operation": "add",
-    "next_operation": "add", "next_number": 3,
-    "result": 0, "reply": "",
-}))
+print(
+    workflow.invoke(
+        {
+            "number1": 10,
+            "number2": 5,
+            "operation": "add",
+            "next_operation": "add",
+            "next_number": 3,
+            "result": 0,
+            "reply": "",
+        }
+    )
+)
 
-print(workflow.invoke({
-    "number1": 40, "number2": 12, "operation": "add",
-    "next_operation": "multiply", "next_number": 6,
-    "result": 0, "reply": "",
-}))
+print(
+    workflow.invoke(
+        {
+            "number1": 40,
+            "number2": 12,
+            "operation": "add",
+            "next_operation": "multiply",
+            "next_number": 6,
+            "result": 0,
+            "reply": "",
+        }
+    )
+)
 
-print(workflow.invoke({
-    "number1": 10, "number2": 3, "operation": "subtract",
-    "next_operation": "finish", "next_number": 0,
-    "result": 0, "reply": "",
-}))
+print(
+    workflow.invoke(
+        {
+            "number1": 10,
+            "number2": 3,
+            "operation": "subtract",
+            "next_operation": "finish",
+            "next_number": 0,
+            "result": 0,
+            "reply": "",
+        }
+    )
+)
 
-print(workflow.invoke({
-    "number1": 0, "number2": 0, "operation": "finish",
-    "next_operation": "finish", "next_number": 0,
-    "result": 0, "reply": "Hello! No calculation was requested.",
-}))
+print(
+    workflow.invoke(
+        {
+            "number1": 0,
+            "number2": 0,
+            "operation": "finish",
+            "next_operation": "finish",
+            "next_number": 0,
+            "result": 0,
+            "reply": "Hello! No calculation was requested.",
+        }
+    )
+)
 
 png_path = Path(__file__).with_suffix(".png")
 png_path.write_bytes(workflow.get_graph().draw_mermaid_png())
