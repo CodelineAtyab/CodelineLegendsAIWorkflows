@@ -11,5 +11,8 @@ dependencies = [
 [tool.uv.workspace]
 members = [
     "api_explorer",
-    "chat-message-workflow",
+    "travel_time",
 ]
+
+[tool.mypy]
+explicit_package_bases = true
