@@ -11,6 +11,10 @@ dependencies = [
 [tool.uv.workspace]
 members = [
     "api_explorer",
+<<<<<<< HEAD
+=======
+    "chat-message-workflow",
+>>>>>>> 9151ef76e86ac9a090c6ef788f664e775bb870ae
     "travel_time",
 ]
 
