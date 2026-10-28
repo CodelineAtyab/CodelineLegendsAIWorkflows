@@ -33,3 +33,7 @@ app = graph.compile()
 result = app.invoke({"name": "Jack Sparrow","values":[1,2,3,4],"operation": "*", "final_output" : "" })
 
 print(result["final_output"])
+
+png_path = Path(__file__).with_suffix(".png")
+png_path.write_bytes(app.get_graph().draw_mermaid_png())
+print(f"Graph saved to {png_path}")
