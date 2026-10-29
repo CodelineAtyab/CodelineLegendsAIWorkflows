@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
     "dependencies>=7.7.1",
+    "grandalf>=0.8",
     "langchain-core>=1.7.1",
     "langchain-openai>=1.7.3",
     "langgraph>=1.2.18",
