@@ -8,7 +8,6 @@ class DraftState(TypedDict):
     drafts: list[str]
     draft_index: int
     document: str
-    filename: str
     saved: bool
 
 
@@ -29,8 +28,6 @@ def update_document(state: DraftState) -> DraftState:
 
 
 def save_document(state: DraftState) -> DraftState:
-    with open(state["filename"], "w", encoding="utf-8") as file:
-        file.write(state["document"])
     state["saved"] = True
     return state
 
@@ -60,7 +57,6 @@ print(
             ],
             "draft_index": 0,
             "document": "",
-            "filename": str(Path(__file__).with_name("draft_one.txt")),
             "saved": False,
         }
     )
@@ -72,7 +68,6 @@ print(
             "drafts": [],
             "draft_index": 0,
             "document": "This document is ready to save.",
-            "filename": str(Path(__file__).with_name("draft_two.txt")),
             "saved": False,
         }
     )
