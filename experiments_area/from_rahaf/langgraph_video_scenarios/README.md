@@ -14,3 +14,7 @@ uv run scenario_01_number_guessing_loop.py
 Each scenario prints the final state and writes its graph diagram beside the
 script. See [`SCENARIOS.md`](SCENARIOS.md) for timestamps, graph shapes, and
 adaptations.
+
+For a detailed explanation of all six workflows, see the
+[`SCENARIO_GUIDE.pdf`](SCENARIO_GUIDE.pdf) (editable source:
+[`SCENARIO_GUIDE.md`](SCENARIO_GUIDE.md)).
