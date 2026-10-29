@@ -1,0 +1,10 @@
+[project]
+name = "langgraph-video-scenarios"
+version = "0.1.0"
+description = "Plain Python LangGraph video scenario exercises"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "grandalf>=0.8",
+    "langgraph>=1.2.18",
+]
