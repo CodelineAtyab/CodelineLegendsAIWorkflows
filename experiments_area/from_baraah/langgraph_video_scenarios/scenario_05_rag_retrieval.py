@@ -1,9 +1,7 @@
-
 from pathlib import Path
 from typing import TypedDict
 
 from langgraph.graph import END, START, StateGraph
-
 
 DOCUMENTS = {
     "python": "Python is a programming language.",
@@ -66,19 +64,23 @@ workflow = builder.compile()
 
 
 if __name__ == "__main__":
-    result1 = workflow.invoke({
-        "question": "What is Python?",
-        "passage": "",
-        "answer": "",
-    })
+    result1 = workflow.invoke(
+        {
+            "question": "What is Python?",
+            "passage": "",
+            "answer": "",
+        }
+    )
 
     print(result1)
 
-    result2 = workflow.invoke({
-        "question": "What is Java?",
-        "passage": "",
-        "answer": "",
-    })
+    result2 = workflow.invoke(
+        {
+            "question": "What is Java?",
+            "passage": "",
+            "answer": "",
+        }
+    )
 
     print(result2)
 

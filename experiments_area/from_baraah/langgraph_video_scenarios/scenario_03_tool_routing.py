@@ -1,84 +1,98 @@
-
 from pathlib import Path
 from typing import TypedDict
 
 from langgraph.graph import END, START, StateGraph
 
 
+# Store the question, tool result, and final answer.
 class State(TypedDict):
     question: str
+    tool_result: str
     answer: str
-    needs_calculator: bool
 
 
-def classify_question(state: State) -> dict:
-    needs_calculator = state["question"].startswith("add ")
-    return {"needs_calculator": needs_calculator}
+# Decide whether to use the calculator or finish.
+def agent(state: State) -> dict:
+    if state["tool_result"]:
+        return {"answer": f"The answer is {state['tool_result']}"}
+
+    if state["question"].startswith("add "):
+        return {"answer": ""}
+
+    return {"answer": "No calculator needed."}
 
 
-def choose_path(state: State) -> str:
-    if state["needs_calculator"]:
-        return "calculator"
+# Choose the next node based on the state.
+def choose_next(state: State) -> str:
+    if state["answer"]:
+        return "finish"
 
-    return "plain_reply"
+    return "use_tool"
 
 
+# Calculate the sum of the numbers in the question.
 def calculator(state: State) -> dict:
     parts = state["question"].split()[1:]
 
     try:
         numbers = [int(number) for number in parts]
-        result = sum(numbers)
-        return {"answer": str(result)}
+
+        if not numbers:
+            return {"tool_result": "No numbers provided"}
+
+        return {"tool_result": str(sum(numbers))}
     except ValueError:
-        return {"answer": "Please enter valid numbers."}
+        return {"tool_result": "Invalid numbers"}
 
 
-def plain_reply(state: State) -> dict:
-    return {
-        "answer": "This question does not need a calculator."
-    }
-
-
+# Create the graph.
 builder = StateGraph(State)
 
-builder.add_node("classify_question", classify_question)
+# Add the agent and calculator nodes.
+builder.add_node("agent", agent)
 builder.add_node("calculator", calculator)
-builder.add_node("plain_reply", plain_reply)
 
-builder.add_edge(START, "classify_question")
+# Start with the agent.
+builder.add_edge(START, "agent")
 
+# The agent chooses whether to use the tool or finish.
 builder.add_conditional_edges(
-    "classify_question",
-    choose_path,
+    "agent",
+    choose_next,
     {
-        "calculator": "calculator",
-        "plain_reply": "plain_reply",
+        "use_tool": "calculator",
+        "finish": END,
     },
 )
 
-builder.add_edge("calculator", END)
-builder.add_edge("plain_reply", END)
+# Return the tool result to the agent.
+builder.add_edge("calculator", "agent")
 
+# Compile the workflow.
 workflow = builder.compile()
 
 
 if __name__ == "__main__":
-    result1 = workflow.invoke({
-        "question": "add 25 15",
-        "answer": "",
-        "needs_calculator": False,
-    })
-
+    # Test a question that needs the calculator.
+    result1 = workflow.invoke(
+        {
+            "question": "add 25 15",
+            "tool_result": "",
+            "answer": "",
+        }
+    )
     print(result1)
 
-    result2 = workflow.invoke({
-        "question": "Say hello",
-        "answer": "",
-        "needs_calculator": False,
-    })
-
+    # Test a question that does not need the calculator.
+    result2 = workflow.invoke(
+        {
+            "question": "Hello",
+            "tool_result": "",
+            "answer": "",
+        }
+    )
     print(result2)
 
+    # Save the graph diagram.
     image = workflow.get_graph().draw_mermaid_png()
     Path(__file__).with_suffix(".png").write_bytes(image)

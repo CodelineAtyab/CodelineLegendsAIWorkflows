@@ -1,4 +1,3 @@
-
 from pathlib import Path
 from typing import TypedDict
 
@@ -13,9 +12,7 @@ class State(TypedDict):
 
 
 def create_draft(state: State) -> dict:
-    return {
-        "draft": f"Document about {state['topic']}."
-    }
+    return {"draft": f"Document about {state['topic']}."}
 
 
 def choose_revision(state: State) -> str:
@@ -60,20 +57,24 @@ workflow = builder.compile()
 
 
 if __name__ == "__main__":
-    result1 = workflow.invoke({
-        "topic": "Python",
-        "feedback": "",
-        "draft": "",
-        "status": "",
-    })
+    result1 = workflow.invoke(
+        {
+            "topic": "Python",
+            "feedback": "",
+            "draft": "",
+            "status": "",
+        }
+    )
     print(result1)
 
-    result2 = workflow.invoke({
-        "topic": "Python",
-        "feedback": "Add an example.",
-        "draft": "",
-        "status": "",
-    })
+    result2 = workflow.invoke(
+        {
+            "topic": "Python",
+            "feedback": "Add an example.",
+            "draft": "",
+            "status": "",
+        }
+    )
     print(result2)
 
     image = workflow.get_graph().draw_mermaid_png()
