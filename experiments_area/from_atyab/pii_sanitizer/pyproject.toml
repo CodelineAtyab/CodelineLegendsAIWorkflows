@@ -1,0 +1,10 @@
+[project]
+name = "pii-sanitizer"
+version = "0.1.0"
+description = "CLI that masks emails, phones, and card numbers while streaming a file"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = []
+
+[dependency-groups]
+dev = ["pytest>=8.0"]
