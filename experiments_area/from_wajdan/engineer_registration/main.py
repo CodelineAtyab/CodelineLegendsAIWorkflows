@@ -1,6 +1,14 @@
-def main():
-    print("Hello from engineer-registration!")
+from fastapi import FastAPI
+
+from models.engineer import SoftwareEngineerRegistration
+
+app = FastAPI()
 
 
-if __name__ == "__main__":
-    main()
+@app.post("/engineers/software")
+def register_software_engineer(engineer: SoftwareEngineerRegistration):
+    return {
+        "name": engineer.name,
+        "email": engineer.email,
+        "activity_percent": engineer.activity_percent(),
+    }
