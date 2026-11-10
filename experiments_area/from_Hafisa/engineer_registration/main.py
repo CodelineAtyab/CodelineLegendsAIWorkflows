@@ -23,3 +23,4 @@ def register_civil(engineer: CivilEngineerRegistration) -> dict[str, str | int]:
         "activity_percent": engineer.activity_percent(),
     }
 
+
