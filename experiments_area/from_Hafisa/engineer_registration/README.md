@@ -18,3 +18,4 @@ Rules for all seven fields live in the parent model, and FastAPI validates the t
 ## Verification (2026-11-10)
 
 All 36 HTTP checks passed using FastAPI TestClient against the actual app.
+Both routes returned 200 with exactly the three expected fields for the valid example.
