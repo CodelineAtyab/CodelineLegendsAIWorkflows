@@ -27,3 +27,4 @@ Ruff 0.16.10 and mypy 2.4.0 were used for lint and type checks.
 Validation requests were executed programmatically; Swagger was available, but manual Swagger submissions were not performed.
 
 ## Strictness exploration
+
