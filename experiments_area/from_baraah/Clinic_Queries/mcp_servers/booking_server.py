@@ -14,10 +14,10 @@ def register_patient(name: str, phone: str) -> dict:
     patient_id = len(patients) + 1
 
     patient: dict[str, int | str] = {
-    "patient_id": patient_id,
-    "name": name,
-    "phone": phone,
-  }
+        "patient_id": patient_id,
+        "name": name,
+        "phone": phone,
+    }
 
     patients[patient_id] = patient
     return patient
@@ -38,12 +38,12 @@ def book_appointment(
 
     # Check if the doctor is already booked
     for existing_appointment in appointments.values():
-      if (
-        existing_appointment["doctor"] == doctor
-        and existing_appointment["date"] == date
-        and existing_appointment["time"] == time
+        if (
+            existing_appointment["doctor"] == doctor
+            and existing_appointment["date"] == date
+            and existing_appointment["time"] == time
         ):
-        return {"error": "Doctor is already booked"}
+            return {"error": "Doctor is already booked"}
 
     # Create a new appointment
     appointment_id = len(appointments) + 1
