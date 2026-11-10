@@ -20,3 +20,4 @@ def register_civil(engineer: CivilEngineerRegistration) -> dict[str, str | int]:
     return {
         "name": engineer.name,
         "email": engineer.email,
+        "activity_percent": engineer.activity_percent(),
