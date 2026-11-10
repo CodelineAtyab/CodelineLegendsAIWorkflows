@@ -18,3 +18,4 @@ def register_software(engineer: SoftwareEngineerRegistration) -> dict[str, str |
 @app.post("/engineers/civil")
 def register_civil(engineer: CivilEngineerRegistration) -> dict[str, str | int]:
     return {
+        "name": engineer.name,
