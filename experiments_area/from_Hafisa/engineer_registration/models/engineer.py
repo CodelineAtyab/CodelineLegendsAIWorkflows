@@ -21,3 +21,4 @@ class SoftwareEngineerRegistration(EngineerRegistration):
 
 class CivilEngineerRegistration(EngineerRegistration):
     def activity_percent(self) -> int:
+        return 80
