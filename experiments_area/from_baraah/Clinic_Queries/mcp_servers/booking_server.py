@@ -4,8 +4,8 @@ from fastmcp import FastMCP
 mcp = FastMCP("Booking MCP Server")
 
 # Store data in memory
-patients = {}
-appointments = {}
+patients: dict[int, dict[str, int | str]] = {}
+appointments: dict[int, dict[str, int | str]] = {}
 
 
 @mcp.tool
@@ -13,11 +13,11 @@ def register_patient(name: str, phone: str) -> dict:
     """Register a new patient."""
     patient_id = len(patients) + 1
 
-    patient = {
-        "patient_id": patient_id,
-        "name": name,
-        "phone": phone,
-    }
+    patient: dict[str, int | str] = {
+    "patient_id": patient_id,
+    "name": name,
+    "phone": phone,
+  }
 
     patients[patient_id] = patient
     return patient
@@ -37,18 +37,18 @@ def book_appointment(
         return {"error": "Patient not found"}
 
     # Check if the doctor is already booked
-    for appointment in appointments.values():
-        if (
-            appointment["doctor"] == doctor
-            and appointment["date"] == date
-            and appointment["time"] == time
+    for existing_appointment in appointments.values():
+      if (
+        existing_appointment["doctor"] == doctor
+        and existing_appointment["date"] == date
+        and existing_appointment["time"] == time
         ):
-            return {"error": "Doctor is already booked"}
+        return {"error": "Doctor is already booked"}
 
     # Create a new appointment
     appointment_id = len(appointments) + 1
 
-    appointment = {
+    appointment: dict[str, int | str] = {
         "appointment_id": appointment_id,
         "patient_id": patient_id,
         "doctor": doctor,
