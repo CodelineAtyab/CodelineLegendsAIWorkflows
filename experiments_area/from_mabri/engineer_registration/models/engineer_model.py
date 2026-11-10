@@ -10,7 +10,6 @@ class EngineerRegistration(BaseModel):
     bio: str | None = Field(default=None, max_length=200)
     website: HttpUrl | None = None
 
-
     def activity_percent(self):
         return 50
 
