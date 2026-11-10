@@ -6,3 +6,4 @@ from models.engineer import CivilEngineerRegistration, SoftwareEngineerRegistrat
 app = FastAPI()
 
 
+@app.post("/engineers/software")
