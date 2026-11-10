@@ -14,3 +14,4 @@ class EngineerRegistration(BaseModel):
         return 50
 
 
+class SoftwareEngineerRegistration(EngineerRegistration):
