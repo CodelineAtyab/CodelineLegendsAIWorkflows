@@ -13,3 +13,4 @@ def register_software(engineer: SoftwareEngineerRegistration) -> dict[str, str |
         "email": engineer.email,
         "activity_percent": engineer.activity_percent(),
     }
+
