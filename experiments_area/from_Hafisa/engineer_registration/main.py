@@ -15,3 +15,4 @@ def register_software(engineer: SoftwareEngineerRegistration) -> dict[str, str |
     }
 
 
+@app.post("/engineers/civil")
