@@ -24,3 +24,4 @@ def register_civil(engineer: CivilEngineerRegistration) -> dict[str, str | int]:
     }
 
 
+if __name__ == "__main__":
