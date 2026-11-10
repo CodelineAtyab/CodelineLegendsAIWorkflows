@@ -1,4 +1,3 @@
-
 from fastmcp import FastMCP
 
 mcp = FastMCP("Hello MCP Server")

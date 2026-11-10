@@ -1,4 +1,3 @@
-
 from fastmcp import FastMCP
 
 # Create the MCP server

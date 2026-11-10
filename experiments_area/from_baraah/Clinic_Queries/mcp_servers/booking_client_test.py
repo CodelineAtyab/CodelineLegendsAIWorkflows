@@ -1,4 +1,3 @@
-
 import asyncio
 
 from fastmcp import Client
@@ -6,7 +5,6 @@ from fastmcp import Client
 
 async def main():
     async with Client("http://127.0.0.1:8001/mcp") as client:
-
         # 1. List available MCP tools
         tools = await client.list_tools()
         print("Tools:", [tool.name for tool in tools])
