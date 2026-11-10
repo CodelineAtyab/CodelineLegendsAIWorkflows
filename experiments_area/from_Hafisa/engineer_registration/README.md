@@ -10,3 +10,4 @@ This is a no-package uv project in the parent workspace; dependencies are locked
 
 ## Example
 
+Send `{"name":"Mona Al Said","email":"mona@example.com","age":27,"employee_id":"ENG-0042","skills":["python","fastapi"]}` to either route.
