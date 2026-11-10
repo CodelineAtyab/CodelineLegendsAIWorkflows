@@ -1,0 +1,3 @@
+# The root .gitignore ignores every "models/" folder (meant for ML model files).
+# Here models/ is our Pydantic models package, so re-include it for this project only.
+!models/
