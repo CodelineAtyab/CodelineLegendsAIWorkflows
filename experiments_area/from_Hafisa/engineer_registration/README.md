@@ -32,3 +32,4 @@ Pydantic's default lax mode converts an age supplied as `"27"` into the integer 
 Calling `EngineerRegistration.model_validate(payload, strict=True)` rejects that text age; both behaviors were checked.
 The API keeps the default lax behavior required by this exercise.
 Reference: https://docs.pydantic.dev/latest/concepts/strict_mode/
+
