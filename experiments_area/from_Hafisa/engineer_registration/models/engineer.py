@@ -9,3 +9,4 @@ class EngineerRegistration(BaseModel):
     skills: list[str] = Field(min_length=1, max_length=5)
     bio: str | None = Field(default=None, max_length=200)
     website: HttpUrl | None = None
+
