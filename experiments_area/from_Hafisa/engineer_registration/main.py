@@ -8,3 +8,4 @@ app = FastAPI()
 
 @app.post("/engineers/software")
 def register_software(engineer: SoftwareEngineerRegistration) -> dict[str, str | int]:
+    return {
