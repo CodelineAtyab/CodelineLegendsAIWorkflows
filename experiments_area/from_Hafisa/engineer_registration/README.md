@@ -17,3 +17,4 @@ Rules for all seven fields live in the parent model, and FastAPI validates the t
 
 ## Verification (2026-11-10)
 
+All 36 HTTP checks passed using FastAPI TestClient against the actual app.
