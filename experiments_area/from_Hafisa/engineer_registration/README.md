@@ -34,3 +34,4 @@ The API keeps the default lax behavior required by this exercise.
 Reference: https://docs.pydantic.dev/latest/concepts/strict_mode/
 
 ## Assistance disclosure
+
