@@ -28,3 +28,4 @@ Validation requests were executed programmatically; Swagger was available, but m
 
 ## Strictness exploration
 
+Pydantic's default lax mode converts an age supplied as `"27"` into the integer 27.
