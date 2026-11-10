@@ -11,5 +11,5 @@ class EngineerRegistration(BaseModel):
     website: HttpUrl | None = None
 
 
-def activity_percent():
-    return 50
+    def activity_percent(self):
+        return 50
