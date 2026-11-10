@@ -7,3 +7,4 @@ class EngineerRegistration(BaseModel):
     age: int = Field(ge=18, le=65)
     employee_id: str = Field(pattern=r"^ENG-[0-9]{4}$")
     skills: list[str] = Field(min_length=1, max_length=5)
+    bio: str | None = Field(default=None, max_length=200)
