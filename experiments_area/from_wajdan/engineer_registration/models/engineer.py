@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, HttpUrl
 
 
 class EngineerRegistration(BaseModel):
@@ -7,3 +7,5 @@ class EngineerRegistration(BaseModel):
     age: int = Field(ge=18, le=65)
     employee_id: str = Field(pattern=r"^ENG-\d{4}$")
     skills: list[str] = Field(min_length=1, max_length=5)
+    bio: str | None = Field(default=None, max_length=200)
+    website: HttpUrl | None = None
