@@ -1,9 +1,10 @@
-from fastapi import FastAPI
-from models.engineer_model import (
-    SoftwareEngineerRegistration,
-    CivilEngineerRegistration,
-)
 import uvicorn
+from fastapi import FastAPI
+
+from models.engineer_model import (
+    CivilEngineerRegistration,
+    SoftwareEngineerRegistration,
+)
 
 app = FastAPI()
 
