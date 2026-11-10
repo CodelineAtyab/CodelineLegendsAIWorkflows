@@ -1,3 +1,16 @@
+import uvicorn
+from fastapi import FastAPI
+
+from models.engineer_registration import SoftwareEngineerRegistration
+
+
+
+
+
+
+
+
+
 def main():
     print("Hello from engineer-registration!")
 
