@@ -16,3 +16,4 @@ The civil route returns the same fields with `activity_percent` equal to 80; the
 Rules for all seven fields live in the parent model, and FastAPI validates the typed request body.
 
 ## Verification (2026-11-10)
+
