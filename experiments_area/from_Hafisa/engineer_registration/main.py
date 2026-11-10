@@ -19,3 +19,4 @@ def register_software(engineer: SoftwareEngineerRegistration) -> dict[str, str |
 def register_civil(engineer: CivilEngineerRegistration) -> dict[str, str | int]:
     return {
         "name": engineer.name,
+        "email": engineer.email,
