@@ -13,3 +13,4 @@ class EngineerRegistration(BaseModel):
     def activity_percent(self) -> int:
         return 50
 
+
