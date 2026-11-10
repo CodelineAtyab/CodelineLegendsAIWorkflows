@@ -19,3 +19,4 @@ class SoftwareEngineerRegistration(EngineerRegistration):
         return 10
 
 
+class CivilEngineerRegistration(EngineerRegistration):
