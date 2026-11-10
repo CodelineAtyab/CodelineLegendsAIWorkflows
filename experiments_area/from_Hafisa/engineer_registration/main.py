@@ -4,3 +4,4 @@ from fastapi import FastAPI
 from models.engineer import CivilEngineerRegistration, SoftwareEngineerRegistration
 
 app = FastAPI()
+
