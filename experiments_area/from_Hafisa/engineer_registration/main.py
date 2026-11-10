@@ -10,3 +10,4 @@ app = FastAPI()
 def register_software(engineer: SoftwareEngineerRegistration) -> dict[str, str | int]:
     return {
         "name": engineer.name,
+        "email": engineer.email,
