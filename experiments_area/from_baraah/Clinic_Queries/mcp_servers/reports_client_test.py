@@ -1,5 +1,5 @@
-
 import asyncio
+
 from fastmcp import Client
 
 
