@@ -35,3 +35,4 @@ Reference: https://docs.pydantic.dev/latest/concepts/strict_mode/
 
 ## Assistance disclosure
 
+This implementation was completed with AI assistance at the author's request, so it does not satisfy the issue's no-AI-generated-syntax checklist item.
