@@ -20,3 +20,4 @@ Rules for all seven fields live in the parent model, and FastAPI validates the t
 All 36 HTTP checks passed using FastAPI TestClient against the actual app.
 Both routes returned 200 with exactly the three expected fields for the valid example.
 Both returned 422 naming the failing field for all 11 issue examples: invalid email, short/long name, age 17, nonnumeric age, malformed ID, empty/oversized skills, long bio, invalid website, and missing email.
+Both accepted inclusive name/age/list/bio boundaries and optional nulls; both rejected age 66 and IDs with a prefix, suffix, or trailing newline.
