@@ -1,0 +1,17 @@
+
+[project]
+name = "chat-session"
+version = "0.1.0"
+description = "A CLI chatbot with persistent conversation sessions"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "openai>=3.35.1",
+    "python-dotenv>=1.2.4",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.17.1",
+    "pytest",
+]
