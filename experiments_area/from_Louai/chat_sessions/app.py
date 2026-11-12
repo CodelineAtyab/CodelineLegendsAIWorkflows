@@ -28,7 +28,7 @@ def load_json(path, default):
             return json.load(f)
     except FileNotFoundError:
         return default
-    except OSError, json.JSONDecodeError:
+    except (OSError, json.JSONDecodeError):
         print("Could not read the file.")
         return default
 
@@ -164,7 +164,7 @@ def main():
 
     try:
         chat_loop(client, index, session_name, chat_messages)
-    except KeyboardInterrupt, EOFError:
+    except (KeyboardInterrupt, EOFError):
         print("\nBye.")
 
 

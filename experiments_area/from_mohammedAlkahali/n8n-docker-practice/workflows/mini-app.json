@@ -1,0 +1,174 @@
+{
+  "name": "Docker Mini App (API)",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "home",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "a1f0c6d2-0001-4c3e-9a10-000000000001",
+      "name": "Webhook GET /home",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "7c1e2f30-1111-4a5b-8c9d-0000000000a1"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"message\": \"Hello from Docker!\"\n}",
+        "options": {}
+      },
+      "id": "a1f0c6d2-0002-4c3e-9a10-000000000002",
+      "name": "Respond /home",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "path": "health",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "a1f0c6d2-0003-4c3e-9a10-000000000003",
+      "name": "Webhook GET /health",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        200
+      ],
+      "webhookId": "7c1e2f30-2222-4a5b-8c9d-0000000000b2"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"status\": \"healthy\"\n}",
+        "options": {}
+      },
+      "id": "a1f0c6d2-0004-4c3e-9a10-000000000004",
+      "name": "Respond /health",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        260,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "path": "visits",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "a1f0c6d2-0005-4c3e-9a10-000000000005",
+      "name": "Webhook GET /visits",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        400
+      ],
+      "webhookId": "7c1e2f30-3333-4a5b-8c9d-0000000000c3"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH new_visit AS (INSERT INTO visits DEFAULT VALUES RETURNING id)\nSELECT COUNT(*)::int + 1 AS visits FROM visits;",
+        "options": {}
+      },
+      "id": "a1f0c6d2-0006-4c3e-9a10-000000000006",
+      "name": "Insert visit + count",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        260,
+        400
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "pgMiniAppCred01",
+          "name": "Postgres (db)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"visits\": $json.visits } }}",
+        "options": {}
+      },
+      "id": "a1f0c6d2-0007-4c3e-9a10-000000000007",
+      "name": "Respond /visits",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        520,
+        400
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook GET /home": {
+      "main": [
+        [
+          {
+            "node": "Respond /home",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook GET /health": {
+      "main": [
+        [
+          {
+            "node": "Respond /health",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook GET /visits": {
+      "main": [
+        [
+          {
+            "node": "Insert visit + count",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert visit + count": {
+      "main": [
+        [
+          {
+            "node": "Respond /visits",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "83d72a7e-4086-4a82-b5ba-c5730bcc88c3",
+  "meta": null,
+  "id": "XRakDgsfnzUHv6Qg",
+  "tags": []
+}

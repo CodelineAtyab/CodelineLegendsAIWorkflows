@@ -1,5 +1,5 @@
 def main():
-    print("Hello from simple-langgraph-workflows!")
+    print("Hello from travel-time!")
 
 
 if __name__ == "__main__":
