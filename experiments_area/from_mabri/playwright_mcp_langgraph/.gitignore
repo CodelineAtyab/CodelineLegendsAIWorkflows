@@ -1,2 +1,3 @@
 outputs/
 .env
+.playwright-mcp/

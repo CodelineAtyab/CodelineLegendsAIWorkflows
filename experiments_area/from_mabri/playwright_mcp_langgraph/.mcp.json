@@ -2,14 +2,14 @@
   "mcpServers": {
     "playwright": {
       "type": "stdio",
-      "command": "npx",
+      "command": "cmd",
       "args": [
+        "/c",
+        "npx",
         "-y",
         "@playwright/mcp@0.0.85",
-        "--browser",
-        "chromium",
         "--viewport-size",
-        "1280,800",
+        "1280x800",
         "--output-dir",
         "outputs"
       ]
