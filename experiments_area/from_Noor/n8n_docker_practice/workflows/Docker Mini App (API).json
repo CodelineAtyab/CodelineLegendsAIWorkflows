@@ -1,0 +1,183 @@
+{
+  "name": "Docker Mini App (API)",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "home",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        -256,
+        -192
+      ],
+      "id": "c4f1a57a-7654-4672-b278-ca22c75692f7",
+      "name": "Webhook",
+      "webhookId": "bcba6518-5452-4aa1-977d-16db87416ecd"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"message\": \"Hello from Docker!\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -32,
+        -192
+      ],
+      "id": "ff19e213-6ef4-48d1-927d-2667e340f2cd",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "path": "health",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        -256,
+        0
+      ],
+      "id": "c618f5a9-9d2b-4115-8218-6a520779be63",
+      "name": "Webhook1",
+      "webhookId": "387b568e-8ff6-430e-bd58-e537136808ec"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"status\": \"healthy\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -32,
+        0
+      ],
+      "id": "93a948b0-e624-4a8c-bc8f-a7ce4ff27666",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "path": "visits",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        -256,
+        176
+      ],
+      "id": "7b748486-015f-41fd-a253-9a4560678823",
+      "name": "Webhook2",
+      "webhookId": "2d5703b9-b1ed-4ee2-a4a4-eb87b4fc0097"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH new_visit AS (\n    INSERT INTO visits DEFAULT VALUES\n    RETURNING id\n)\nSELECT COUNT(*)::int AS visits\nFROM visits;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        -32,
+        176
+      ],
+      "id": "ebc41b8b-e66f-4c12-ab5e-7016d287021c",
+      "name": "Execute a SQL query",
+      "alwaysOutputData": false,
+      "credentials": {
+        "postgres": {
+          "id": "LpL7lOgp1nnwzsBi",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"visits\": $json.visits } }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        192,
+        176
+      ],
+      "id": "0d71ffa8-7ed8-4ba0-9944-f1ff2ca7916d",
+      "name": "Respond to Webhook2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook2": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "5e2869e3-739a-47ec-8a61-7202bcd06295",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b02e914fef4f73cd8422e7e36d20e01e557004d10d13806bef2b8ae4378b09a6"
+  },
+  "nodeGroups": [],
+  "id": "6GehIRYOSOXBRMCs",
+  "tags": []
+}
