@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Engineer Registration</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 420px; margin: 40px auto; padding: 0 16px; }
+    label { display: block; margin-top: 12px; font-weight: 600; }
+    input, select { width: 100%; padding: 8px; margin-top: 4px; box-sizing: border-box; }
+    button { margin-top: 20px; padding: 10px 18px; }
+    .error { color: #b00020; margin-top: 12px; }
+    .success { color: #0a7d32; margin-top: 12px; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <h1>Engineer Registration</h1>
+  <form id="registration" novalidate>
+    <label for="full-name">Full name</label>
+    <input id="full-name" name="full_name" autocomplete="off">
+
+    <label for="email">Email</label>
+    <input id="email" name="email" type="email" autocomplete="off">
+
+    <label for="discipline">Discipline</label>
+    <select id="discipline" name="discipline">
+      <option value="">-- choose --</option>
+      <option value="software">Software</option>
+      <option value="civil">Civil</option>
+    </select>
+
+    <label for="years">Years of experience</label>
+    <input id="years" name="years" type="number" min="0" max="60">
+
+    <label><input id="terms" name="terms" type="checkbox" style="width:auto"> I accept the terms</label>
+
+    <button type="submit">Register</button>
+  </form>
+  <div id="result" role="status" aria-live="polite"></div>
+
+  <script>
+    document.getElementById("registration").addEventListener("submit", (event) => {
+      event.preventDefault();
+      const name = document.getElementById("full-name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const discipline = document.getElementById("discipline").value;
+      const years = Number(document.getElementById("years").value);
+      const terms = document.getElementById("terms").checked;
+
+      const errors = [];
+      if (name.length < 3) errors.push("Full name must be at least 3 characters.");
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) errors.push("Email is invalid.");
+      if (!discipline) errors.push("Choose a discipline.");
+      if (!Number.isInteger(years) || years < 0 || years > 60) errors.push("Years must be 0-60.");
+      if (!terms) errors.push("You must accept the terms.");
+
+      const result = document.getElementById("result");
+      if (errors.length) {
+        result.className = "error";
+        result.textContent = errors.join(" ");
+      } else {
+        result.className = "success";
+        result.textContent = `Registered ${name} as a ${discipline} engineer.`;
+      }
+    });
+  </script>
+</body>
+</html>
