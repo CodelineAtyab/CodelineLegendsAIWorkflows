@@ -1,0 +1,19 @@
+---
+config:
+  flowchart:
+    curve: linear
+---
+graph TD;
+	__start__([<p>__start__</p>]):::first
+	agent(agent)
+	tools(tools<hr/><small><em>__tools = browser_handle_dialog, browser_find, browser_fill_form, browser_press_key, browser_type, browser_navigate, browser_navigate_back, browser_take_screenshot, browser_snapshot, browser_click, browser_select_option, browser_wait_for</em></small>)
+	report(report)
+	__end__([<p>__end__</p>]):::last
+	__start__ --> agent;
+	agent -. &nbsp;__end__&nbsp; .-> report;
+	agent -.-> tools;
+	tools --> agent;
+	report --> __end__;
+	classDef default fill:#f2f0ff,line-height:1.2
+	classDef first fill-opacity:0
+	classDef last fill:#bfb6fc

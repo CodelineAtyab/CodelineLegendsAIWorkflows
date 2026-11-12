@@ -35,6 +35,9 @@ def server_config(headless: bool = False) -> dict[str, Any]:
         "--isolated",
         "--viewport-size",
         "1280x800",
+        # Screenshots taken without an explicit file name land here.
+        "--output-dir",
+        "outputs",
     ]
     if headless:
         args.append("--headless")
