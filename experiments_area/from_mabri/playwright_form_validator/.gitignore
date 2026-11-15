@@ -1,0 +1,6 @@
+.env
+*.db
+.venv/
+__pycache__/
+.playwright-mcp/
+outputs/
