@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Clinic Chat</title>
+</head>
+<body>
+  <h1>Clinic Chat</h1>
+  <ul id="chat-log"></ul>
+  <form id="chat-form">
+    <label for="chat-message">Message</label>
+    <textarea id="chat-message" name="message" rows="3" cols="50"></textarea>
+    <button id="send-button" type="submit">Send</button>
+  </form>
+  <p id="chat-error" role="alert"></p>
+
+  <script>
+    document.getElementById("chat-form").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const messageInput = document.getElementById("chat-message");
+      const chatError = document.getElementById("chat-error");
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: messageInput.value }),
+      });
+      const body = await response.json();
+      if (response.ok) {
+        const entry = document.createElement("li");
+        entry.textContent = body.message;
+        document.getElementById("chat-log").appendChild(entry);
+        chatError.textContent = "";
+        messageInput.value = "";
+      } else {
+        chatError.textContent = body.error;
+      }
+    });
+  </script>
+</body>
+</html>
