@@ -1,6 +1,15 @@
+import datetime
+from pathlib import Path
 from typing import Any, TypedDict
 
 from langgraph.graph import END, START, StateGraph
+from playwright.sync_api import Error as PlaywrightError
+from playwright.sync_api import sync_playwright
+
+FORM_URL = Path("booking_form.html").resolve().as_uri()
+TODAY = datetime.datetime.now().astimezone().date()
+TOMORROW = (TODAY + datetime.timedelta(days=1)).isoformat()
+YESTERDAY = (TODAY - datetime.timedelta(days=1)).isoformat()
 
 
 class BookingState(TypedDict):
@@ -83,3 +92,50 @@ graph.add_conditional_edges("read_outcome", check_result, {"pass": "record_pass"
 graph.add_edge("record_pass", END)
 graph.add_edge("record_fail", END)
 workflow = graph.compile()
+
+TEST_CASES = [
+    {"case_name": "valid_booking", "name": "Sara", "email": "sara@mail.com", "date": TOMORROW, "expected": "valid"},
+    {"case_name": "empty_name", "name": "", "email": "sara@mail.com", "date": TOMORROW, "expected": "invalid"},
+    {"case_name": "one_character_name", "name": "S", "email": "sara@mail.com", "date": TOMORROW, "expected": "invalid"},
+    {"case_name": "bad_email", "name": "Sara", "email": "sara.mail", "date": TOMORROW, "expected": "invalid"},
+    {"case_name": "past_date", "name": "Sara", "email": "sara@mail.com", "date": YESTERDAY, "expected": "invalid"},
+    {"case_name": "empty_date", "name": "Sara", "email": "sara@mail.com", "date": "", "expected": "invalid"},
+    {"case_name": "deliberate_fail_demo", "name": "Sara", "email": "sara@mail.com", "date": TOMORROW, "expected": "invalid"},
+]
+
+
+def main() -> None:
+    """Run every test case through the workflow and print one line per case."""
+    passed_count = 0
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page()
+        for case in TEST_CASES:
+            try:
+                result = workflow.invoke({
+                    "page": page,
+                    "url": FORM_URL,
+                    "case_name": case["case_name"],
+                    "name": case["name"],
+                    "email": case["email"],
+                    "date": case["date"],
+                    "expected": case["expected"],
+                    "actual": "",
+                    "message": "",
+                    "passed": False,
+                })
+            except PlaywrightError as error:
+                print(f"ERROR | {case['case_name']} | {error.message.splitlines()[0]}")
+                continue
+            if result["passed"]:
+                passed_count += 1
+                status = "PASS"
+            else:
+                status = "FAIL"
+            print(f"{status} | {result['case_name']} | expected={result['expected']} | actual={result['actual']} | {result['message']}")
+        browser.close()
+    print(f"{passed_count}/{len(TEST_CASES)} passed")
+
+
+if __name__ == "__main__":
+    main()
