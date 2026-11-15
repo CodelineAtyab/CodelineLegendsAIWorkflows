@@ -1,0 +1,56 @@
+{
+  "base_url": "http://localhost:8000",
+  "system_prompt": "You are a QA tester for a small clinic web app. You control a real browser only through the tools you are given. Rules: 1) Before typing or clicking, take a snapshot and use the exact ref values from the latest snapshot; refs change after every navigation. 2) When the instruction says a field must stay empty, do not type into it at all. 3) For chat tests, log in first and then follow the 'Go to chat' link in the same tab. 4) After submitting, take one more snapshot and read the message the page shows (the login result, the chat error, or the new chat log entry). 5) Use as few steps as possible and never retry with different input. 6) A result is 'valid' when the app accepted the input (login succeeded or the message appeared in the chat log) and 'invalid' when the page showed an error. Finish with exactly one line and nothing after it: VERDICT: valid|invalid | <exact message shown on the page>",
+  "cases": [
+    {
+      "name": "valid_login",
+      "instruction": "Open the login page and log in as demo_user with the password {DEMO_USER_PASSWORD}. Report whether the login succeeded.",
+      "expected": "valid"
+    },
+    {
+      "name": "wrong_password",
+      "instruction": "Open the login page and log in as demo_user with the password wrong-pass-123. Report whether the login succeeded.",
+      "expected": "invalid"
+    },
+    {
+      "name": "unknown_username",
+      "instruction": "Open the login page and log in as ghost_user with the password wrong-pass-123. Report whether the login succeeded.",
+      "expected": "invalid"
+    },
+    {
+      "name": "empty_username",
+      "instruction": "Open the login page, leave the username field empty, enter the password {DEMO_USER_PASSWORD} and press the login button. Report whether the login succeeded.",
+      "expected": "invalid"
+    },
+    {
+      "name": "empty_password",
+      "instruction": "Open the login page, enter the username demo_user, leave the password field empty and press the login button. Report whether the login succeeded.",
+      "expected": "invalid"
+    },
+    {
+      "name": "injection_username",
+      "instruction": "Open the login page and try to log in with the username ' OR '1'='1 and the password anything. Report whether the app let you in.",
+      "expected": "invalid"
+    },
+    {
+      "name": "chat_valid_message",
+      "instruction": "Log in as demo_user with the password {DEMO_USER_PASSWORD}, go to the chat page and send the message: Is Dr. Salim available tomorrow? Report whether the message was accepted.",
+      "expected": "valid"
+    },
+    {
+      "name": "chat_empty_message",
+      "instruction": "Log in as demo_user with the password {DEMO_USER_PASSWORD}, go to the chat page, leave the message box empty and press send. Report whether the message was accepted.",
+      "expected": "invalid"
+    },
+    {
+      "name": "chat_201_characters",
+      "instruction": "Log in as demo_user with the password {DEMO_USER_PASSWORD}, go to the chat page and send exactly this 201-character message: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa Report whether the message was accepted.",
+      "expected": "invalid"
+    },
+    {
+      "name": "deliberate_fail_demo",
+      "instruction": "Open the login page and log in as demo_user with the password wrong-pass-123. Report whether the login succeeded.",
+      "expected": "valid"
+    }
+  ]
+}
