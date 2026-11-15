@@ -1,0 +1,16 @@
+[project]
+name = "playwright-form-validator"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "bcrypt>=5.0.0",
+    "fastapi>=0.163.1",
+    "grandalf>=0.8",
+    "langchain-google-genai>=4.5.0",
+    "langchain-mcp-adapters>=0.3.2",
+    "langgraph>=1.2.22",
+    "python-dotenv>=1.2.4",
+    "uvicorn>=0.54.0",
+]
