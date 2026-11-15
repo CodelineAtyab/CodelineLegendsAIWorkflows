@@ -16,7 +16,7 @@ Run the sequential LangGraph browser test suite in a second terminal:
 uv run --env-file .env python main.py
 ```
 
-The workflow starts Playwright MCP with the Windows-safe `npx.cmd` command. It creates one explicit MCP session per test, runs cases sequentially, requires the exact expected visible message, and reports browser failures as `actual=error`.
+The workflow starts Playwright MCP with the Windows-safe `npx.cmd` command. It creates one explicit MCP session and agent for the sequential test suite, requires the exact observed visible message, and reports browser failures with a specific error as `actual=error`.
 
 Run quality checks with:
 

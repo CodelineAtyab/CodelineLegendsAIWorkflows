@@ -66,7 +66,10 @@ def page(name: str) -> HTMLResponse:
 
 
 def current_user(request: Request) -> str | None:
-    return sessions.get(request.cookies.get("session"))
+    session_id = request.cookies.get("session")
+    if session_id is None:
+        return None
+    return sessions.get(session_id)
 
 
 @app.get("/", response_class=HTMLResponse)
