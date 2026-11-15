@@ -1,0 +1,67 @@
+
+{
+  "base_url": "http://localhost:8000",
+  "system_prompt": "You are a QA testing agent using Playwright MCP. The login page is at http://localhost:8000/ and the chat page is at http://localhost:8000/chat. Do not use /login. For every test, open the correct page, interact with the form, submit it, and inspect the displayed result. Do not guess. Return VERDICT: valid | message only when the form accepts the input. Return VERDICT: invalid | message only when the form rejects the input and you observe the expected validation or rejection message. If the page is empty, returns 404, is inaccessible, or you cannot complete the test, return VERDICT: error | reason. Always finish with exactly one VERDICT line. For chat tests, log in first using the training credentials supplied securely by the test runner. Never expose passwords in your final response.",
+  "cases": [
+    {
+      "name": "valid_login",
+      "instruction": "Open http://localhost:8000/. Enter username demo_user and its configured training password. Submit the form. Verify that the page displays 'Welcome, demo_user' and opens /chat.",
+      "expected": "valid",
+      "expected_message": "Welcome, demo_user"
+    },
+    {
+      "name": "wrong_password",
+      "instruction": "Open http://localhost:8000/. Enter username demo_user and password WrongPassword123. Submit the login form. Verify that the page displays 'Invalid username or password'.",
+      "expected": "invalid",
+      "expected_message": "Invalid username or password"
+    },
+    {
+      "name": "unknown_username",
+      "instruction": "Open http://localhost:8000/. Enter username unknown_user and password WrongPassword123. Submit the form. Verify that the page displays 'Invalid username or password'.",
+      "expected": "invalid",
+      "expected_message": "Invalid username or password"
+    },
+    {
+      "name": "empty_username",
+      "instruction": "Open http://localhost:8000/. Leave the username empty and enter password WrongPassword123. Submit the form. Verify that the page displays 'Username and password are required'.",
+      "expected": "invalid",
+      "expected_message": "Username and password are required"
+    },
+    {
+      "name": "empty_password",
+      "instruction": "Open http://localhost:8000/. Enter username demo_user and leave the password empty. Submit the form. Verify that the page displays 'Username and password are required'.",
+      "expected": "invalid",
+      "expected_message": "Username and password are required"
+    },
+    {
+      "name": "injection_attempt",
+      "instruction": "Open http://localhost:8000/. Enter username ' OR '1'='1 and password WrongPassword123. Submit the form. Verify that the page displays 'Invalid username or password'.",
+      "expected": "invalid",
+      "expected_message": "Invalid username or password"
+    },
+    {
+      "name": "valid_chat",
+      "instruction": "Log in as demo_user using the configured training password. Open http://localhost:8000/chat. Enter 'Hello clinic' into the chat form and submit it. Verify that the message appears in the chat.",
+      "expected": "valid",
+      "expected_message": "Hello clinic"
+    },
+    {
+      "name": "empty_chat",
+      "instruction": "Log in as demo_user using the configured training password. Open http://localhost:8000/chat. Submit an empty chat message. Verify that the page displays 'Message cannot be empty'.",
+      "expected": "invalid",
+      "expected_message": "Message cannot be empty"
+    },
+    {
+      "name": "long_chat",
+      "instruction": "Log in as demo_user using the configured training password. Open http://localhost:8000/chat. Enter a message containing 201 characters and submit it. Verify that the page displays 'Message too long'.",
+      "expected": "invalid",
+      "expected_message": "Message too long"
+    },
+    {
+      "name": "deliberate_fail_demo",
+      "instruction": "Open http://localhost:8000/. Enter username demo_user and password WrongPassword123. Submit the form and report the actual result. Do not change the result to match the expected value.",
+      "expected": "valid",
+      "expected_message": "Welcome, demo_user"
+    }
+  ]
+}

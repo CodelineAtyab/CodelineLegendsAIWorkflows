@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Training Login</title></head>
+<body>
+  <main>
+    <h1>Training Login</h1>
+    <form id="login-form" novalidate>
+      <label>Username <input id="username" name="username" required></label>
+      <label>Password <input id="password" name="password" type="password" required></label>
+      <button id="login-button" type="submit">Log in</button>
+    </form>
+    <p id="login-result" role="status"></p>
+    <a id="chat-link" href="/chat" hidden>Open chat</a>
+  </main>
+  <script>
+    document.querySelector('#login-form').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const username = document.querySelector('#username').value;
+      const password = document.querySelector('#password').value;
+      const result = document.querySelector('#login-result');
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Authorization': 'Basic ' + btoa(username + ':' + password) }
+      });
+      const data = await response.json();
+      result.textContent = data.message;
+      if (response.ok && data.message.startsWith('Welcome, ')) {
+        document.querySelector('#chat-link').hidden = false;
+      }
+    });
+  </script>
+</body>
+</html>
