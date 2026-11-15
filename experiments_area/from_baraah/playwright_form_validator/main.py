@@ -2,8 +2,10 @@ import asyncio
 import json
 import os
 import re
+import time
 from pathlib import Path
 from typing import Any, TypedDict
+from urllib.request import urlopen
 
 from dotenv import load_dotenv
 from langchain.agents import create_agent
@@ -54,6 +56,38 @@ def redact(text: str, secret: str) -> str:
     return text.replace(secret, "[redacted]") if secret else text
 
 
+async def wait_for_server(base_url: str, timeout: float = 15.0) -> None:
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        try:
+            response = await asyncio.to_thread(urlopen, base_url, timeout=2)
+            response.close()
+            return
+        except OSError:
+            await asyncio.sleep(0.25)
+    raise RuntimeError(f"FastAPI server is not accessible at {base_url}")
+
+
+def is_transient_navigation_error(answer: str) -> bool:
+    lowered = answer.lower()
+    return any(
+        phrase in lowered
+        for phrase in (
+            "page is inaccessible",
+            "page inaccessible",
+            "loading aborted",
+            "page load error",
+            "aborted at http://",
+            "err_aborted",
+            "failed to load page",
+            "cannot access",
+            "network error",
+            "could not be loaded",
+            "execution context was destroyed",
+        )
+    )
+
+
 async def main() -> None:
     config = load_config()
     if config is None:
@@ -62,6 +96,12 @@ async def main() -> None:
     training_password = os.getenv("DEMO_USER_PASSWORD")
     if not training_password:
         print("ERROR | configuration | DEMO_USER_PASSWORD is not available")
+        return
+
+    try:
+        await wait_for_server(config["base_url"])
+    except RuntimeError as error:
+        print(f"ERROR | server readiness | {error}")
         return
 
     client = MultiServerMCPClient(
@@ -115,20 +155,25 @@ async def main() -> None:
                 "tools_used": [],
             }
         try:
-            result = await agent.ainvoke(
-                {"messages": [{"role": "user", "content": state["prompt"]}]}
-            )
-            messages = result.get("messages", [])
-            answer = content_text(messages[-1].content) if messages else ""
-            tools_used = [
-                call.get("name", "unknown")
-                for message in messages
-                for call in getattr(message, "tool_calls", [])
-            ]
-            return {
-                "agent_answer": redact(answer, state.get("training_password", "")),
-                "tools_used": tools_used,
-            }
+            for attempt in range(2):
+                result = await agent.ainvoke(
+                    {"messages": [{"role": "user", "content": state["prompt"]}]}
+                )
+                messages = result.get("messages", [])
+                answer = content_text(messages[-1].content) if messages else ""
+                if attempt == 0 and is_transient_navigation_error(answer):
+                    await asyncio.sleep(1)
+                    continue
+                tools_used = [
+                    call.get("name", "unknown")
+                    for message in messages
+                    for call in getattr(message, "tool_calls", [])
+                ]
+                return {
+                    "agent_answer": redact(answer, state.get("training_password", "")),
+                    "tools_used": tools_used,
+                }
+            raise RuntimeError("navigation retry did not produce a result")
         except (
             APIError,
             OSError,
