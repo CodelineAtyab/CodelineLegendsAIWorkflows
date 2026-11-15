@@ -1,0 +1,11 @@
+[project]
+name = "playwright-form-validator"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "grandalf>=0.8",
+    "langgraph>=1.2.22",
+    "playwright>=1.65.2",
+]
