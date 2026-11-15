@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Clinic Booking Form</title>
+</head>
+<body>
+    <h1>Clinic Booking</h1>
+
+    <p>
+        <label for="name">Patient name</label>
+        <input type="text" id="name">
+    </p>
+    <p>
+        <label for="email">Email</label>
+        <input type="email" id="email">
+    </p>
+    <p>
+        <label for="date">Appointment date</label>
+        <input type="date" id="date">
+    </p>
+    <p>
+        <button type="button" id="submit">Book appointment</button>
+    </p>
+
+    <p id="result"></p>
+
+    <script>
+        function todayAsText() {
+            const now = new Date();
+            const month = String(now.getMonth() + 1).padStart(2, "0");
+            const day = String(now.getDate()).padStart(2, "0");
+            return now.getFullYear() + "-" + month + "-" + day;
+        }
+
+        function checkBooking(name, email, date) {
+            if (name === "") {
+                return "Patient name is required";
+            }
+            if (name.length < 2) {
+                return "Patient name must be at least 2 characters";
+            }
+            if (email === "") {
+                return "Email is required";
+            }
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                return "Enter a valid email";
+            }
+            if (date === "") {
+                return "Appointment date is required";
+            }
+            if (date < todayAsText()) {
+                return "Appointment date cannot be in the past";
+            }
+            return "Booking confirmed";
+        }
+
+        document.getElementById("submit").addEventListener("click", function () {
+            const name = document.getElementById("name").value.trim();
+            const email = document.getElementById("email").value.trim();
+            const date = document.getElementById("date").value;
+            document.getElementById("result").textContent = checkBooking(name, email, date);
+        });
+    </script>
+</body>
+</html>
