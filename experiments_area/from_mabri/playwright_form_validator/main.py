@@ -5,6 +5,8 @@ from typing import TypedDict
 from dotenv import load_dotenv
 
 CONFIG_PATH = "test_plan.json"
+VERDICT_PREFIX = "VERDICT:"
+VALID_VERDICTS = ("valid", "invalid")
 
 
 def load_config(path):
@@ -37,6 +39,19 @@ def prepare_prompt(state: TestState) -> dict:
         DEMO_USER_PASSWORD=os.environ["DEMO_USER_PASSWORD"]
     )
     return {"instruction": f"Base URL: {state['base_url']}\n{instruction}"}
+
+
+def parse_verdict(state: TestState) -> dict:
+    for line in state["agent_answer"].splitlines():
+        line = line.strip()
+        if not line.startswith(VERDICT_PREFIX):
+            continue
+        verdict, _, message = line.removeprefix(VERDICT_PREFIX).partition("|")
+        verdict = verdict.strip().lower()
+        if verdict not in VALID_VERDICTS:
+            verdict = "unknown"
+        return {"actual": verdict, "message": message.strip()}
+    return {"actual": "unknown", "message": "no VERDICT line in agent answer"}
 
 
 if __name__ == "__main__":
