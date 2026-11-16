@@ -28,6 +28,10 @@ PLAYWRIGHT_MCP_SERVER: StdioConnection = {
 VERDICT_PREFIX = "VERDICT:"
 VALID_VERDICTS = ("valid", "invalid")
 AGENT_STEP_LIMIT = 50  # each tool call costs two graph steps (model + tool)
+# The Gemini client defaults to 6 retries with growing waits and no timeout,
+# which makes a run look frozen once the free quota is used up.
+MODEL_MAX_RETRIES = 2
+MODEL_TIMEOUT_SECONDS = 60
 
 
 def load_config(path):
@@ -149,7 +153,11 @@ async def main() -> None:
 
 
 async def run_cases(config: dict, tools: list) -> None:
-    model = ChatGoogleGenerativeAI(model=os.getenv("GEMINI_MODEL", DEFAULT_MODEL))
+    model = ChatGoogleGenerativeAI(
+        model=os.getenv("GEMINI_MODEL", DEFAULT_MODEL),
+        max_retries=MODEL_MAX_RETRIES,
+        timeout=MODEL_TIMEOUT_SECONDS,
+    )
     agent = create_react_agent(model, tools, prompt=config["system_prompt"])
     workflow = build_workflow()
     run_config = {"configurable": {"agent": agent}}
