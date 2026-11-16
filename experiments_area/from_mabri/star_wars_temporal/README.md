@@ -124,4 +124,6 @@ with one commit per step and a review after each step.
 
 ## What Temporal saved me from
 
- As a developer Temporal saved me from writing and maintaining complex failure-handling, state-management, and retry boilerplate code in distributed systems.
+- **Retries:** the broken search was retried 5 times automatically, and I didn't write a retry loop.
+- **Progress after the crash:** when I killed the worker, the new one skipped the search, the homeworld and the first 2 films, because Temporal already had their results.
+- **No lost results:** the starter waited through both the outage and the crash and still printed the full dossier.
