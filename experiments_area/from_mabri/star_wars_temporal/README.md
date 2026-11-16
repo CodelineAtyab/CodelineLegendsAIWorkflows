@@ -124,4 +124,4 @@ with one commit per step and a review after each step.
 
 ## What Temporal saved me from
 
-<!-- Write this paragraph in your own words before opening the PR (the issue grades it). -->
+ As a developer Temporal saved me from writing and maintaining complex failure-handling, state-management, and retry boilerplate code in distributed systems.
