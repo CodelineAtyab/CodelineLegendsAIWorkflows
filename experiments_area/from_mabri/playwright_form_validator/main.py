@@ -1,12 +1,29 @@
+import asyncio
 import json
+import logging
 import os
 from typing import TypedDict
 
 from dotenv import load_dotenv
+from langchain_core.exceptions import ModelError
 from langchain_core.runnables import RunnableConfig
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_mcp_adapters.client import MultiServerMCPClient
+from langchain_mcp_adapters.tools import load_mcp_tools
+from langgraph.errors import GraphRecursionError
 from langgraph.graph import END, START, StateGraph
+from langgraph.prebuilt import create_react_agent
+
+# MCP tool schemas carry keys Gemini ignores; hide the one warning per tool.
+logging.getLogger("langchain_google_genai._function_utils").setLevel(logging.ERROR)
 
 CONFIG_PATH = "test_plan.json"
+DEFAULT_MODEL = "gemini-3.8-flash"
+PLAYWRIGHT_MCP_SERVER = {
+    "transport": "stdio",
+    "command": "cmd",
+    "args": ["/c", "npx", "-y", "@playwright/mcp@0.0.85", "--isolated", "--output-dir", "outputs"],
+}
 VERDICT_PREFIX = "VERDICT:"
 VALID_VERDICTS = ("valid", "invalid")
 AGENT_STEP_LIMIT = 50  # each tool call costs two graph steps (model + tool)
@@ -115,18 +132,48 @@ def print_result(state: TestState) -> None:
     print(f"    tools used: {', '.join(state['tools_used'])}")
 
 
-if __name__ == "__main__":
+async def main() -> None:
     load_dotenv()
     config = load_config(CONFIG_PATH)
-    if config is not None:
-        print(f"Configuration loaded successfully: {len(config['cases'])} cases")
-        first_case = config["cases"][0]
-        state = TestState(
-            base_url=config["base_url"],
-            case_name=first_case["name"],
-            instruction=first_case["instruction"],
-            expected=first_case["expected"],
-        )
-        print(state)
-    else:
-        print("Failed to load configuration.")
+    if config is None:
+        return
+
+    client = MultiServerMCPClient({"playwright": PLAYWRIGHT_MCP_SERVER})
+    # One session = one Playwright server = one browser shared by every tool call.
+    # client.get_tools() would start a new session (and browser) per tool call.
+    async with client.session("playwright") as session:
+        tools = await load_mcp_tools(session)
+        print(f"Loaded {len(tools)} Playwright MCP tools: {[tool.name for tool in tools]}\n")
+        await run_cases(config, tools)
+
+
+async def run_cases(config: dict, tools: list) -> None:
+    model = ChatGoogleGenerativeAI(model=os.getenv("GEMINI_MODEL", DEFAULT_MODEL))
+    agent = create_react_agent(model, tools, prompt=config["system_prompt"])
+    workflow = build_workflow()
+    run_config = {"configurable": {"agent": agent}}
+
+    passed_count = 0
+    for case in config["cases"]:
+        try:
+            final_state = await workflow.ainvoke(
+                {
+                    "base_url": config["base_url"],
+                    "case_name": case["name"],
+                    "instruction": case["instruction"],
+                    "expected": case["expected"],
+                },
+                config=run_config,
+            )
+        except (KeyError, GraphRecursionError, ModelError) as error:
+            print(f"ERROR | {case.get('name', '<unnamed>')} | {type(error).__name__}: {error}")
+            continue
+        print_result(final_state)
+        if final_state["passed"]:
+            passed_count += 1
+
+    print(f"\n{passed_count}/{len(config['cases'])} passed")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
