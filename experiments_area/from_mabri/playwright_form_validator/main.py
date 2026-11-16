@@ -5,7 +5,7 @@ import os
 from typing import TypedDict
 
 from dotenv import load_dotenv
-from langchain_core.exceptions import ModelError
+from langchain_core.exceptions import ModelError, ModelRateLimitError
 from langchain_core.runnables import RunnableConfig
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_mcp_adapters.client import MultiServerMCPClient
@@ -174,6 +174,10 @@ async def run_cases(config: dict, tools: list) -> None:
                 },
                 config=run_config,
             )
+        except ModelRateLimitError as error:
+            print(f"ERROR | {case.get('name', '<unnamed>')} | {type(error).__name__}: {error}")
+            print("Model quota is used up, so the remaining cases are skipped.")
+            break
         except (KeyError, GraphRecursionError, ModelError) as error:
             print(f"ERROR | {case.get('name', '<unnamed>')} | {type(error).__name__}: {error}")
             continue
