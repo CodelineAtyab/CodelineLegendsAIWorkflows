@@ -54,6 +54,12 @@ def parse_verdict(state: TestState) -> dict:
     return {"actual": "unknown", "message": "no VERDICT line in agent answer"}
 
 
+def check_result(state: TestState) -> str:
+    if state["actual"] == state["expected"]:
+        return "pass"
+    return "fail"
+
+
 if __name__ == "__main__":
     load_dotenv()
     config = load_config(CONFIG_PATH)
