@@ -1,4 +1,5 @@
 import asyncio
+
 import httpx
 from temporalio import activity
 from temporalio.exceptions import ApplicationError

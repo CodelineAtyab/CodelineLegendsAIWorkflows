@@ -5,6 +5,7 @@ import sys
 from uuid import uuid4
 
 from temporalio.client import Client, WorkflowFailureError
+
 from workflow import StarWarsDossier
 
 
