@@ -106,6 +106,15 @@ def build_workflow():
     return graph.compile()
 
 
+def print_result(state: TestState) -> None:
+    status = "PASS" if state["passed"] else "FAIL"
+    print(
+        f"{status} | {state['case_name']} | expected={state['expected']} "
+        f"| actual={state['actual']} | {state['message']}"
+    )
+    print(f"    tools used: {', '.join(state['tools_used'])}")
+
+
 if __name__ == "__main__":
     load_dotenv()
     config = load_config(CONFIG_PATH)
