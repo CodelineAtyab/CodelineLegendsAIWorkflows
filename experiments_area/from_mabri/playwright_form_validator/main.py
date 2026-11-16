@@ -3,6 +3,7 @@ import os
 from typing import TypedDict
 
 from dotenv import load_dotenv
+from langchain_core.runnables import RunnableConfig
 
 CONFIG_PATH = "test_plan.json"
 VERDICT_PREFIX = "VERDICT:"
@@ -39,6 +40,17 @@ def prepare_prompt(state: TestState) -> dict:
         DEMO_USER_PASSWORD=os.environ["DEMO_USER_PASSWORD"]
     )
     return {"instruction": f"Base URL: {state['base_url']}\n{instruction}"}
+
+
+async def run_agent(state: TestState, config: RunnableConfig) -> dict:
+    agent = config["configurable"]["agent"]
+    result = await agent.ainvoke({"messages": [("user", state["instruction"])]})
+    tools_used = [
+        tool_call["name"]
+        for message in result["messages"]
+        for tool_call in getattr(message, "tool_calls", [])
+    ]
+    return {"agent_answer": result["messages"][-1].text, "tools_used": tools_used}
 
 
 def parse_verdict(state: TestState) -> dict:
