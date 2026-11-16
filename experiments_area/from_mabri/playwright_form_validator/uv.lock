@@ -556,6 +556,20 @@ wheels = [
 ]
 
 [[package]]
+name = "langchain"
+version = "1.5.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "langchain-core" },
+    { name = "langgraph" },
+    { name = "pydantic" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/eb/1f/ada67c46bf9ccbe08ef5db706a33d72284b52f6a0e10817c528dba5547c5/langchain-1.5.0.tar.gz", hash = "sha256:62b8d048847d7063cf769b39d32219c4a8ff8abc75f3ebfde461e65b9ff8ff49", size = 722112, upload-time = "2026-11-11T15:47:09.605Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/33/9d/a59a56e2a7d37937739e54e20649ac351454954483e33a4fe98beeef7cdf/langchain-1.5.0-py3-none-any.whl", hash = "sha256:24e94c496a3e532be1f9541edb475d5d0975aeb1211c3f8fecc042da3ec44cfa", size = 176648, upload-time = "2026-11-11T15:47:07.964Z" },
+]
+
+[[package]]
 name = "langchain-core"
 version = "1.8.0"
 source = { registry = "https://pypi.org/simple" }
@@ -816,6 +830,7 @@ dependencies = [
     { name = "bcrypt" },
     { name = "fastapi" },
     { name = "grandalf" },
+    { name = "langchain" },
     { name = "langchain-google-genai" },
     { name = "langchain-mcp-adapters" },
     { name = "langgraph" },
@@ -828,6 +843,7 @@ requires-dist = [
     { name = "bcrypt", specifier = ">=5.0.0" },
     { name = "fastapi", specifier = ">=0.163.1" },
     { name = "grandalf", specifier = ">=0.8" },
+    { name = "langchain", specifier = ">=1.5.0" },
     { name = "langchain-google-genai", specifier = ">=4.5.0" },
     { name = "langchain-mcp-adapters", specifier = ">=0.3.2" },
     { name = "langgraph", specifier = ">=1.2.22" },

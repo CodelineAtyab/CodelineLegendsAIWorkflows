@@ -5,6 +5,7 @@ import os
 from typing import TypedDict
 
 from dotenv import load_dotenv
+from langchain.agents import create_agent
 from langchain_core.exceptions import ModelError, ModelRateLimitError
 from langchain_core.runnables import RunnableConfig
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -13,7 +14,6 @@ from langchain_mcp_adapters.sessions import StdioConnection
 from langchain_mcp_adapters.tools import load_mcp_tools
 from langgraph.errors import GraphRecursionError
 from langgraph.graph import END, START, StateGraph
-from langgraph.prebuilt import create_react_agent
 
 # MCP tool schemas carry keys Gemini ignores; hide the one warning per tool.
 logging.getLogger("langchain_google_genai._function_utils").setLevel(logging.ERROR)
@@ -162,7 +162,7 @@ async def run_cases(config: dict, tools: list) -> None:
         max_retries=MODEL_MAX_RETRIES,
         timeout=MODEL_TIMEOUT_SECONDS,
     )
-    agent = create_react_agent(model, tools, prompt=config["system_prompt"])
+    agent = create_agent(model, tools, system_prompt=config["system_prompt"])
     workflow = build_workflow()
     run_config = {"configurable": {"agent": agent}}
 
