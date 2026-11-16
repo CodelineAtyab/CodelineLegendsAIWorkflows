@@ -9,6 +9,7 @@ from langchain_core.exceptions import ModelError
 from langchain_core.runnables import RunnableConfig
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_mcp_adapters.client import MultiServerMCPClient
+from langchain_mcp_adapters.sessions import StdioConnection
 from langchain_mcp_adapters.tools import load_mcp_tools
 from langgraph.errors import GraphRecursionError
 from langgraph.graph import END, START, StateGraph
@@ -19,7 +20,7 @@ logging.getLogger("langchain_google_genai._function_utils").setLevel(logging.ERR
 
 CONFIG_PATH = "test_plan.json"
 DEFAULT_MODEL = "gemini-3.8-flash"
-PLAYWRIGHT_MCP_SERVER = {
+PLAYWRIGHT_MCP_SERVER: StdioConnection = {
     "transport": "stdio",
     "command": "cmd",
     "args": ["/c", "npx", "-y", "@playwright/mcp@0.0.85", "--isolated", "--output-dir", "outputs"],
