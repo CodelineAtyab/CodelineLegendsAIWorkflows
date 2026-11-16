@@ -60,6 +60,14 @@ def check_result(state: TestState) -> str:
     return "fail"
 
 
+def record_pass(state: TestState) -> dict:
+    return {"passed": True}
+
+
+def record_fail(state: TestState) -> dict:
+    return {"passed": False}
+
+
 if __name__ == "__main__":
     load_dotenv()
     config = load_config(CONFIG_PATH)
