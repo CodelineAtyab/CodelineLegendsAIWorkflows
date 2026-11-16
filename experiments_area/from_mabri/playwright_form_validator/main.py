@@ -9,6 +9,7 @@ from langgraph.graph import END, START, StateGraph
 CONFIG_PATH = "test_plan.json"
 VERDICT_PREFIX = "VERDICT:"
 VALID_VERDICTS = ("valid", "invalid")
+AGENT_STEP_LIMIT = 50  # each tool call costs two graph steps (model + tool)
 
 
 def load_config(path):
@@ -45,7 +46,10 @@ def prepare_prompt(state: TestState) -> dict:
 
 async def run_agent(state: TestState, config: RunnableConfig) -> dict:
     agent = config["configurable"]["agent"]
-    result = await agent.ainvoke({"messages": [("user", state["instruction"])]})
+    result = await agent.ainvoke(
+        {"messages": [("user", state["instruction"])]},
+        config={"recursion_limit": AGENT_STEP_LIMIT},
+    )
     tools_used = [
         tool_call["name"]
         for message in result["messages"]
