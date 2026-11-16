@@ -7,11 +7,24 @@ answer on replay, so it must happen in an activity, whose result Temporal
 records once and then reuses.
 """
 
+import asyncio
+import os
+
 import httpx
 from temporalio import activity
 from temporalio.exceptions import ApplicationError
 
-SWAPI_BASE_URL = "https://swapi.dev/api"
+# Both settings below exist for the durability tests in the README, so the
+# tests need no code edits. Leave them unset for normal runs.
+#
+# SWAPI_BASE_URL: point it at a host that does not exist (for example
+# https://swapi.invalid/api) to break the search step and watch Temporal
+# retry it.
+SWAPI_BASE_URL = os.environ.get("SWAPI_BASE_URL", "https://swapi.dev/api")
+
+# SLOW_FILM_SECONDS: pause inside each film step, so there is time to kill
+# the worker half-way through the workflow.
+SLOW_FILM_SECONDS = float(os.environ.get("SLOW_FILM_SECONDS", "0"))
 
 # SWAPI is sometimes slow. A timeout turns a "hang forever" into an error
 # that Temporal's retry policy can act on.
@@ -95,6 +108,8 @@ async def get_film(url: str) -> str:
     records each title as soon as it arrives, so if the worker dies after
     film 3 of 4, only film 4 is fetched again.
     """
+    if SLOW_FILM_SECONDS:
+        await asyncio.sleep(SLOW_FILM_SECONDS)
     film = await fetch_json(url)
     return film["title"]
 

@@ -20,15 +20,19 @@ from temporalio.common import RetryPolicy
 with workflow.unsafe.imports_passed_through():
     from activities import find_character, get_film, get_homeworld, get_species
 
-# How Temporal retries a failed activity: wait 1s, then 2s, 4s, 8s (doubling,
-# capped at 30s), and give up after 5 attempts. This replaces the manual
-# retry loops we would otherwise write. Errors raised as non_retryable
-# (like CharacterNotFound) skip the retries entirely.
+# How Temporal retries a failed activity: wait 1s, then 2s, 4s, 8s, 16s, then
+# 30s (doubling, capped at 30s), and give up after 8 attempts. That is about
+# 90 seconds of retrying in total: long enough to ride out a short SWAPI
+# outage or to fix a problem while the workflow waits, short enough that a
+# real outage still fails in reasonable time. (Our first version used 5
+# attempts, only ~15s in total, too short to fix anything by hand.)
+# This replaces the manual retry loops we would otherwise write. Errors
+# raised as non_retryable (like CharacterNotFound) skip the retries entirely.
 RETRY_POLICY = RetryPolicy(
     initial_interval=timedelta(seconds=1),
     backoff_coefficient=2.0,
     maximum_interval=timedelta(seconds=30),
-    maximum_attempts=5,
+    maximum_attempts=8,
 )
 
 # The queue the worker listens on and the starter sends work to. Defined once
