@@ -1,4 +1,4 @@
-﻿[project]
+[project]
 name = "star-wars-temporal"
 version = "0.1.0"
 description = "Durable Star Wars character dossier built with Temporal (issue #295)"

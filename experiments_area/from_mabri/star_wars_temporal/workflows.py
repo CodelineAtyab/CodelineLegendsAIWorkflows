@@ -50,28 +50,41 @@ ACTIVITY_TIMEOUT = timedelta(seconds=15)
 class CharacterDossierWorkflow:
     @workflow.run
     async def run(self, name: str) -> dict:
-        # Shared options for every activity call below.
-        options = {
-            "start_to_close_timeout": ACTIVITY_TIMEOUT,
-            "retry_policy": RETRY_POLICY,
-        }
+        # Every call passes the same timeout and retry policy as explicit
+        # keyword arguments. (Packing them into a dict and using **options
+        # hides their types from mypy, which then cannot match
+        # execute_activity's typed signature, so CI failed.)
 
         # Step 1: everything else depends on this result.
-        character = await workflow.execute_activity(find_character, name, **options)
+        character = await workflow.execute_activity(
+            find_character,
+            name,
+            start_to_close_timeout=ACTIVITY_TIMEOUT,
+            retry_policy=RETRY_POLICY,
+        )
 
         # Step 2: follow the homeworld URL from step 1.
         homeworld = await workflow.execute_activity(
-            get_homeworld, character["homeworld_url"], **options
+            get_homeworld,
+            character["homeworld_url"],
+            start_to_close_timeout=ACTIVITY_TIMEOUT,
+            retry_policy=RETRY_POLICY,
         )
 
         # Step 3: one activity per film, one after another. Each finished
         # title is saved in the history, so a crash mid-way only repeats the
         # film that was in progress.
-        films = []
+        films: list[str] = []
         for film_url in character["film_urls"]:
-            films.append(await workflow.execute_activity(get_film, film_url, **options))
+            title = await workflow.execute_activity(
+                get_film,
+                film_url,
+                start_to_close_timeout=ACTIVITY_TIMEOUT,
+                retry_policy=RETRY_POLICY,
+            )
+            films.append(title)
 
-        dossier = {
+        dossier: dict[str, str | list[str]] = {
             "name": character["name"],
             "homeworld": homeworld,
             "films": films,
@@ -82,7 +95,10 @@ class CharacterDossierWorkflow:
         # the dossier for a human keeps the exact format from the issue.
         if character["species_urls"]:
             dossier["species"] = await workflow.execute_activity(
-                get_species, character["species_urls"][0], **options
+                get_species,
+                character["species_urls"][0],
+                start_to_close_timeout=ACTIVITY_TIMEOUT,
+                retry_policy=RETRY_POLICY,
             )
 
         return dossier

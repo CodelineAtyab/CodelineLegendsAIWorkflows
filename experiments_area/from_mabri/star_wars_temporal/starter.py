@@ -26,7 +26,7 @@ DEFAULT_NAME = "Luke Skywalker"
 KEY_ORDER = ["name", "homeworld", "films", "species"]
 
 
-def find_application_error(error: BaseException) -> ApplicationError | None:
+def find_application_error(error: BaseException | None) -> ApplicationError | None:
     """Walk down the chain of causes to the error our activity raised.
 
     A failed workflow arrives as WorkflowFailureError -> ActivityError ->
