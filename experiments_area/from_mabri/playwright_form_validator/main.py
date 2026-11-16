@@ -20,11 +20,7 @@ logging.getLogger("langchain_google_genai._function_utils").setLevel(logging.ERR
 
 CONFIG_PATH = "test_plan.json"
 DEFAULT_MODEL = "gemini-3.8-flash"
-PLAYWRIGHT_MCP_SERVER: StdioConnection = {
-    "transport": "stdio",
-    "command": "cmd",
-    "args": ["/c", "npx", "-y", "@playwright/mcp@0.0.85", "--isolated", "--output-dir", "outputs"],
-}
+PLAYWRIGHT_MCP_ARGS = ["/c", "npx", "-y", "@playwright/mcp@0.0.85", "--isolated", "--output-dir", "outputs"]
 VERDICT_PREFIX = "VERDICT:"
 VALID_VERDICTS = ("valid", "invalid")
 AGENT_STEP_LIMIT = 50  # each tool call costs two graph steps (model + tool)
@@ -32,6 +28,14 @@ AGENT_STEP_LIMIT = 50  # each tool call costs two graph steps (model + tool)
 # which makes a run look frozen once the free quota is used up.
 MODEL_MAX_RETRIES = 2
 MODEL_TIMEOUT_SECONDS = 60
+
+
+def playwright_mcp_server() -> StdioConnection:
+    """Stdio settings for Playwright MCP; HEADLESS=true in .env hides the browser window."""
+    args = list(PLAYWRIGHT_MCP_ARGS)
+    if os.getenv("HEADLESS", "false").lower() in ("1", "true", "yes"):
+        args.append("--headless")
+    return {"transport": "stdio", "command": "cmd", "args": args}
 
 
 def load_config(path):
@@ -143,7 +147,7 @@ async def main() -> None:
     if config is None:
         return
 
-    client = MultiServerMCPClient({"playwright": PLAYWRIGHT_MCP_SERVER})
+    client = MultiServerMCPClient({"playwright": playwright_mcp_server()})
     # One session = one Playwright server = one browser shared by every tool call.
     # client.get_tools() would start a new session (and browser) per tool call.
     async with client.session("playwright") as session:
