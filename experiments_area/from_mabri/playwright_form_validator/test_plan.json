@@ -44,7 +44,7 @@
     },
     {
       "name": "chat_201_characters",
-      "instruction": "Log in as demo_user with the password {DEMO_USER_PASSWORD}, go to the chat page and send exactly this 201-character message: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa Report whether the message was accepted.",
+      "instruction": "Log in as demo_user with the password {DEMO_USER_PASSWORD}, go to the chat page and send this exact message, copied character for character in one single type action (it is 201 characters long): Hello, I would like to book an appointment with Dr. Salim for next Tuesday morning. I have had a mild headache for three days and a slight fever since Sunday. Please call me back today, thank you, Ali. Report whether the message was accepted.",
       "expected": "invalid"
     },
     {
