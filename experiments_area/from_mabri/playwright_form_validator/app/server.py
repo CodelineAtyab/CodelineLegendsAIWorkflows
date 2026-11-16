@@ -75,16 +75,17 @@ def error(status_code: int, message: str) -> JSONResponse:
     return JSONResponse(status_code=status_code, content={"error": message})
 
 
-def authenticate(authorization: str | None) -> tuple[str | None, JSONResponse | None]:
+def authenticate(authorization: str | None) -> str | JSONResponse:
+    """Return the logged-in username, or the error response to send back."""
     credentials = parse_basic_auth(authorization)
     if credentials is None:
-        return None, error(401, MSG_INVALID)
+        return error(401, MSG_INVALID)
     username, password = credentials
     if not username or not password:
-        return None, error(400, MSG_REQUIRED)
+        return error(400, MSG_REQUIRED)
     if not credentials_are_valid(username, password):
-        return None, error(401, MSG_INVALID)
-    return username, None
+        return error(401, MSG_INVALID)
+    return username
 
 
 @app.get("/")
@@ -105,25 +106,25 @@ def favicon() -> Response:
 
 @app.post("/api/login")
 def login(authorization: str | None = Header(default=None)) -> JSONResponse:
-    username, failure = authenticate(authorization)
-    if failure:
-        return failure
+    username = authenticate(authorization)
+    if isinstance(username, JSONResponse):
+        return username
     return JSONResponse({"message": f"Welcome, {username}"})
 
 
 @app.get("/api/chat")
 def read_chat(authorization: str | None = Header(default=None)) -> JSONResponse:
-    _, failure = authenticate(authorization)
-    if failure:
-        return failure
+    username = authenticate(authorization)
+    if isinstance(username, JSONResponse):
+        return username
     return JSONResponse({"messages": chat_log})
 
 
 @app.post("/api/chat")
 def send_chat(chat: ChatMessage, authorization: str | None = Header(default=None)) -> JSONResponse:
-    username, failure = authenticate(authorization)
-    if failure:
-        return failure
+    username = authenticate(authorization)
+    if isinstance(username, JSONResponse):
+        return username
     text = chat.message.strip()
     if not text:
         return error(400, MSG_EMPTY)
