@@ -31,6 +31,11 @@ RETRY_POLICY = RetryPolicy(
     maximum_attempts=5,
 )
 
+# The queue the worker listens on and the starter sends work to. Defined once
+# here so the two scripts cannot drift apart: a typo in either name would
+# leave the workflow waiting forever with no worker to pick it up.
+TASK_QUEUE = "star-wars-dossier"
+
 # Upper bound for ONE attempt of an activity. A little above the 10s HTTP
 # timeout in activities.py, so httpx's own timeout normally fires first and
 # produces a clearer error message.
