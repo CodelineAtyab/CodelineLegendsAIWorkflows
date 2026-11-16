@@ -4,6 +4,7 @@ from typing import TypedDict
 
 from dotenv import load_dotenv
 from langchain_core.runnables import RunnableConfig
+from langgraph.graph import END, START, StateGraph
 
 CONFIG_PATH = "test_plan.json"
 VERDICT_PREFIX = "VERDICT:"
@@ -78,6 +79,27 @@ def record_pass(state: TestState) -> dict:
 
 def record_fail(state: TestState) -> dict:
     return {"passed": False}
+
+
+def build_workflow():
+    graph = StateGraph(TestState)
+    graph.add_node("prepare_prompt", prepare_prompt)
+    graph.add_node("run_agent", run_agent)
+    graph.add_node("parse_verdict", parse_verdict)
+    graph.add_node("record_pass", record_pass)
+    graph.add_node("record_fail", record_fail)
+
+    graph.add_edge(START, "prepare_prompt")
+    graph.add_edge("prepare_prompt", "run_agent")
+    graph.add_edge("run_agent", "parse_verdict")
+    graph.add_conditional_edges(
+        "parse_verdict",
+        check_result,
+        {"pass": "record_pass", "fail": "record_fail"},
+    )
+    graph.add_edge("record_pass", END)
+    graph.add_edge("record_fail", END)
+    return graph.compile()
 
 
 if __name__ == "__main__":
