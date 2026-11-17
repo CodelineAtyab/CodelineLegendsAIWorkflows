@@ -1,0 +1,61 @@
+# Local Temporal stack: Postgres (history storage) + Temporal server + Web UI.
+# Start:  docker compose up -d      Stop: docker compose down
+# Values like the DB password come from .env (git-ignored); see .env.example.
+
+services:
+  postgresql:
+    image: postgres:17-alpine
+    container_name: swt-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      # Named volume -> workflow history survives `docker compose down` / `up`.
+      # (Only `docker compose down -v` deletes it.)
+      - temporal-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      # Temporal must not start before Postgres accepts connections,
+      # otherwise its schema setup fails and you get "works on the second try".
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  temporal:
+    # auto-setup creates the Temporal schema in Postgres and registers the
+    # `default` namespace on first start - exactly what we need for local dev.
+    image: temporalio/auto-setup:1.29.1
+    container_name: swt-temporal
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    environment:
+      DB: postgres12
+      DB_PORT: 5432
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PWD: ${POSTGRES_PASSWORD}
+      POSTGRES_SEEDS: postgresql
+    ports:
+      - "7233:7233" # gRPC port used by worker.py and starter.py
+    healthcheck:
+      # The UI only makes sense once the frontend answers and `default` exists.
+      test: ["CMD-SHELL", "temporal operator namespace describe -n default --address $$(hostname -i):7233 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+
+  temporal-ui:
+    image: temporalio/ui:2.42.1
+    container_name: swt-temporal-ui
+    depends_on:
+      temporal:
+        condition: service_healthy
+    environment:
+      TEMPORAL_ADDRESS: temporal:7233
+      TEMPORAL_CORS_ORIGINS: http://localhost:3000
+    ports:
+      - "8080:8080" # http://localhost:8080
+
+volumes:
+  temporal-postgres-data:
