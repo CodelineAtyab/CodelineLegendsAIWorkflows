@@ -153,6 +153,7 @@ async def main() -> None:
     model = ChatOpenAI(
         model=os.environ.get("MODEL_NAME", DEFAULT_MODEL),
         base_url=os.environ.get("OPENAI_BASE_URL"),
+        model_kwargs={"parallel_tool_calls": False},
     )
     client = MultiServerMCPClient({"playwright": PLAYWRIGHT_SERVER})
 

@@ -1,6 +1,6 @@
 {
   "base_url": "http://localhost:8000",
-  "system_prompt": "You are a QA tester for a small web app. Use the browser tools you are given to carry out the user's instruction exactly as written, in as few steps as possible. Do not retry, do not try other inputs and do not fix the input. After the last action, take a page snapshot and read the message the page shows (the login result, the chat log or the chat error). Use 'valid' when the app accepted the input and 'invalid' when it rejected it. Finish with exactly one line in this format and nothing after it:\nVERDICT: valid|invalid | <message shown on the page>",
+  "system_prompt": "You are a QA tester for a small web app. Carry out the user's instruction exactly once with the browser tools, in as few steps as possible.\nImportant: opening a page or clicking does NOT show you the page (it only saves it to a file you cannot read). To see the page you must take a page snapshot.\n1. Open the page you need, then take a page snapshot.\n2. Fill all the fields the instruction mentions in one go, using the element refs from your latest snapshot (for example e3). Never guess CSS selectors or ids. Refs change every time the page changes, so only use refs from the most recent snapshot. Leave a field empty only when the instruction says so, and type the text exactly as given.\n3. Press the button once, then take one page snapshot and read the message the page shows (the login result, the chat log or the chat error).\nWhen the instruction says to log in first, do it the same way and check the snapshot shows the welcome message before you open the next page.\nDo not retry, do not try other inputs, do not fix the input, do not search the page for words and do not open new tabs. If something goes wrong, still answer with what the page shows.\nUse 'valid' when the app accepted the input and 'invalid' when it rejected it. Finish with exactly one line in this format and nothing after it:\nVERDICT: valid|invalid | <message shown on the page>",
   "cases": [
     {
       "name": "valid_login",
@@ -34,17 +34,17 @@
     },
     {
       "name": "valid_chat_message",
-      "instruction": "First log in as demo_user with password {demo_password}, then open the chat page at /chat. Send the message: Hello, I would like to book an appointment. Report whether the message was accepted.",
+      "instruction": "First log in on the login page at the base URL as demo_user with password {demo_password}, then open the chat page at /chat. Send the message: Hello, I would like to book an appointment. Report whether the message was accepted.",
       "expected": "valid"
     },
     {
       "name": "empty_chat_message",
-      "instruction": "First log in as demo_user with password {demo_password}, then open the chat page at /chat. Leave the message box empty and press the send button. Report whether the message was accepted.",
+      "instruction": "First log in on the login page at the base URL as demo_user with password {demo_password}, then open the chat page at /chat. Leave the message box empty and press the send button. Report whether the message was accepted.",
       "expected": "invalid"
     },
     {
       "name": "too_long_chat_message",
-      "instruction": "First log in as demo_user with password {demo_password}, then open the chat page at /chat. Type exactly this 201-character text into the message box and press the send button: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa Report whether the message was accepted.",
+      "instruction": "First log in on the login page at the base URL as demo_user with password {demo_password}, then open the chat page at /chat. Type exactly this 201-character text into the message box and press the send button: Hello doctor, I would like to book an appointment for next Sunday morning because I have had a bad headache and a mild fever for three days and I also need a refill of my usual allergy medicine please. Report whether the message was accepted.",
       "expected": "invalid"
     },
     {

@@ -6,20 +6,20 @@ Tool used: Claude Code with the Playwright MCP server (head mode), app running o
 
 | # | Username | Password | Message shown in `#login-result` | MCP tools used (in order) |
 |---|----------|----------|----------------------------------|---------------------------|
-| 1 | demo_user | (correct password) | | |
-| 2 | demo_user | wrong-password | | |
-| 3 | ghost_user | (correct password) | | |
-| 4 | (empty) | (correct password) | | |
-| 5 | demo_user | (empty) | | |
-| 6 | ' OR '1'='1 | anything | | |
+| 1 | demo_user | (correct password) | Welcome, demo_user | browser_navigate, browser_snapshot, browser_fill_form, browser_click, browser_snapshot |
+| 2 | demo_user | wrong-password | Invalid username or password | browser_navigate, browser_snapshot, browser_fill_form, browser_click, browser_snapshot |
+| 3 | ghost_user | (correct password) | Invalid username or password | browser_navigate, browser_snapshot, browser_fill_form, browser_click, browser_snapshot |
+| 4 | (empty) | (correct password) | Username and password are required | browser_navigate, browser_snapshot, browser_fill_form, browser_click, browser_snapshot |
+| 5 | demo_user | (empty) | Username and password are required | browser_navigate, browser_snapshot, browser_fill_form, browser_click, browser_snapshot |
+| 6 | ' OR '1'='1 | anything | Invalid username or password | browser_navigate, browser_snapshot, browser_fill_form, browser_click, browser_snapshot |
 
 ## Chat form (after logging in as demo_user)
 
 | # | Message | Result shown (`#chat-log` or `#chat-error`) | MCP tools used (in order) |
 |---|---------|---------------------------------------------|---------------------------|
-| 1 | Hello, I would like to book an appointment | | |
-| 2 | (empty) | | |
-| 3 | 201 times the letter a | | |
+| 1 | Hello, I would like to book an appointment | `#chat-log`: Hello, I would like to book an appointment | browser_navigate, browser_snapshot, browser_fill_form, browser_click, browser_snapshot, browser_navigate, browser_snapshot, browser_fill_form, browser_click, browser_snapshot |
+| 2 | (empty) | `#chat-error`: Message cannot be empty | browser_navigate, browser_snapshot, browser_fill_form, browser_click, browser_snapshot, browser_navigate, browser_snapshot, browser_click, browser_snapshot |
+| 3 | 201-character sentence | `#chat-error`: Message too long | browser_navigate, browser_snapshot, browser_fill_form, browser_click, browser_snapshot, browser_navigate, browser_snapshot, browser_fill_form, browser_click, browser_snapshot |
 
 ## What does the basic auth header contain?
 
