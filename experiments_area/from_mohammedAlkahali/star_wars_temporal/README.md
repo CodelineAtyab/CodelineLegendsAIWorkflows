@@ -65,27 +65,61 @@ I used **Claude Code** (an AI coding assistant) for this exercise. Summary of my
 
 ## Three things the AI got wrong or that I changed
 
-- TODO (Mohammed)
-- TODO (Mohammed)
-- TODO (Mohammed)
+- **The official Temporal docker-compose file did not meet the issue's
+  requirements.** It used an anonymous volume instead of a named one, had no
+  health checks, used plain `depends_on`, hard-coded the `temporal/temporal`
+  credentials, and added an extra admin-tools container and an exposed Postgres
+  port. I trimmed it down and fixed these points: a named volume, a Postgres
+  health check that Temporal waits for, and credentials read from `.env`.
+- **The dossier came back in the wrong order.** Temporal's JSON converter sorts
+  dict keys, so the result was `films`, `homeworld`, `name` instead of `name`,
+  `homeworld`, `films`. I changed `starter.py` to put the keys back in a
+  reader-friendly order before printing.
+- **My first retry test ran out of attempts.** With `maximum_attempts=8` the
+  retries only last about 2 minutes, and that was not enough time to fix the
+  code, so the workflow failed (`dossier-luke-skywalker-64bafd89`). I raised
+  `maximum_attempts` to 20 just for the test, then set it back to 8.
 
 ## What Temporal saved me from
 
-TODO (Mohammed, in my own words)
+<!-- Draft by Claude Code; reviewed and edited by Mohammed -->
+Without Temporal I would have had to write my own retry loop, with delays
+between tries and a maximum number of attempts. I would also have had to save
+the result of each step somewhere, so that a crash would not force me to start
+again from step 1. In my retry test, `get_homeworld` failed 17 times and
+succeeded on attempt 18, in the SAME workflow, without running the starter
+again. In my crash test, I killed the worker during `get_films`, and a new
+worker process finished it, while `find_character` and `get_homeworld` were not
+run again. My workflow code stays simple because Temporal handles the retries
+and remembers the progress for me.
 
 ## Durability tests
 
 ### Retry test
 
-TODO (Mohammed): notes on how I broke an activity, what the retries looked like,
-and how the workflow completed after the fix.
+Workflow: `dossier-luke-skywalker-08147233`
 
-<!-- Screenshot: activity retries (attempt count / last failure) in the Temporal UI -->
-<!-- Screenshot: same workflow Completed after the fix -->
+I broke `get_homeworld` on purpose by adding `"broken/"` to the URL, so SWAPI
+returned 404. I also raised `maximum_attempts` to 20 for this test only. In the
+Temporal UI, Pending Activities showed the attempt count of `get_homeworld`
+going up with the 404 error, while `find_character` had already completed once
+(attempt 1). Then I fixed the code and restarted only the worker, without
+running the starter again. The same workflow completed: `get_homeworld`
+succeeded on attempt 18. `find_character` was run by worker process 24416, and
+`get_homeworld` attempt 18 by process 28392. Total time: 7m 13s.
+
+Screenshots: see the pull request description.
 
 ### Worker-crash test
 
-TODO (Mohammed): notes on killing the worker mid-workflow and restarting it.
+Workflow: `dossier-luke-skywalker-86a05fb8`
 
-<!-- Screenshot: event history showing completed activities before the crash -->
-<!-- Screenshot: workflow Completed, with earlier activities not run again -->
+I added a temporary 20-second sleep in `get_films` to have time to crash it.
+4 seconds after `get_films` started, I killed the worker hard
+(`taskkill /F`, PID 25224), then started it again. Temporal timed out the lost
+attempt after 30 seconds, and `get_films` completed on attempt 2 on the new
+worker (PID 51604). `find_character` and `get_homeworld` show only one
+completion each (attempt 1), so they were not run again. The workflow
+completed in 34.8s.
+
+Screenshots: see the pull request description.
