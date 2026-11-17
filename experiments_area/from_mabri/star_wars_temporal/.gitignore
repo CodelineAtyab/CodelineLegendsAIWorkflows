@@ -1,0 +1,8 @@
+# Real credentials live here; only .env.example is committed.
+.env
+.venv/
+__pycache__/
+
+# The repo-root .gitignore ignores every dynamicconfig/ folder, but
+# docker-compose.yml mounts this one into Temporal, so it must be committed.
+!dynamicconfig/
