@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Clinic Login</title>
+</head>
+<body>
+  <h1>Clinic Login</h1>
+  <form id="login-form">
+    <label for="username">Username</label>
+    <input id="username" name="username" type="text" autocomplete="username">
+    <label for="password">Password</label>
+    <input id="password" name="password" type="password" autocomplete="current-password">
+    <button id="login-button" type="submit">Log in</button>
+  </form>
+  <p id="login-result" role="status"></p>
+  <a id="chat-link" href="/chat" hidden>Go to chat</a>
+
+  <script>
+    function toBase64(text) {
+      const bytes = new TextEncoder().encode(text);
+      return btoa(String.fromCharCode(...bytes));
+    }
+
+    document.getElementById("login-form").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Authorization": "Basic " + toBase64(username + ":" + password) },
+      });
+      const body = await response.json();
+      document.getElementById("login-result").textContent = body.message || body.error;
+      document.getElementById("chat-link").hidden = !response.ok;
+    });
+  </script>
+</body>
+</html>
