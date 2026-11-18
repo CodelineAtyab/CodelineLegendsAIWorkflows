@@ -3,6 +3,7 @@ import json
 import os
 from typing import Any, TypedDict
 
+from dotenv import load_dotenv
 from langchain.agents import create_agent
 from langchain_core.exceptions import ModelError
 from langchain_core.messages import AIMessage
@@ -114,6 +115,7 @@ def load_config(path: str) -> dict | None:
 
 async def main() -> None:
     """Load the config, give the Playwright MCP tools to the agent and run every case."""
+    load_dotenv()
     config = load_config(CONFIG_FILE)
     if config is None:
         return
