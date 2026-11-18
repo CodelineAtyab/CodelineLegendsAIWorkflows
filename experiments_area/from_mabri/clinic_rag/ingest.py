@@ -1,7 +1,7 @@
 from pathlib import Path
 from pypdf import PdfReader
 
-COLLECTION_NAME = "clinic-docs"
+COLLECTION_NAME = "clinic_docs"
 EMBEDDING_MODEL = "text-embedding-3-small"
 VECTOR_SIZE = 1536
 CHUNK_SIZE = 500
@@ -25,7 +25,7 @@ def split_into_chunks(text: str, chunk_size: int = CHUNK_SIZE, overlap: int = CH
     while start < len(text):
         end = min(start + chunk_size, len(text))
         chunks.append(text[start:end])
-        start += chunk_size - chunk_overlap
+        start += chunk_size - overlap
     return chunks
 
 
