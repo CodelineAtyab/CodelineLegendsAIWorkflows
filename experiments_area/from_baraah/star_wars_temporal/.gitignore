@@ -1,0 +1,9 @@
+# Keep database passwords private
+.env
+
+# Ignore Python virtual environment
+.venv/
+
+# Ignore Python cache files
+__pycache__/
+*.pyc

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Clinic login</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 420px; margin: 60px auto; padding: 0 16px; color: #1c2530; }
+    form { display: flex; flex-direction: column; gap: 12px; }
+    label { display: flex; flex-direction: column; gap: 4px; font-size: 14px; }
+    input { font: inherit; padding: 8px 10px; border: 1px solid #b9c3cd; border-radius: 6px; }
+    button { font: inherit; padding: 9px; border: 0; border-radius: 6px; background: #0f766e; color: #fff; cursor: pointer; }
+    #login-result { min-height: 1.5em; font-weight: 600; }
+    #login-result.ok { color: #15803d; }
+    #login-result.bad { color: #b91c1c; }
+  </style>
+</head>
+<body>
+  <h1>Clinic login</h1>
+  <!-- No "required" attributes on purpose: the server decides and the page shows its message. -->
+  <form id="login-form" novalidate>
+    <label>Username <input id="username" name="username" autocomplete="off"></label>
+    <label>Password <input id="password" name="password" type="password" autocomplete="off"></label>
+    <button id="login-button" type="submit">Log in</button>
+  </form>
+  <p id="login-result" role="status"></p>
+  <p id="chat-link-row" hidden><a id="chat-link" href="/chat">Go to chat</a></p>
+
+  <script>
+    function basicAuthHeader(username, password) {
+      const bytes = new TextEncoder().encode(`${username}:${password}`);
+      return "Basic " + btoa(String.fromCharCode(...bytes));
+    }
+
+    document.getElementById("login-form").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+      const result = document.getElementById("login-result");
+      const header = basicAuthHeader(username, password);
+
+      const response = await fetch("/api/login", { method: "POST", headers: { Authorization: header } });
+      const body = await response.json();
+
+      if (response.ok) {
+        sessionStorage.setItem("authHeader", header);
+        result.textContent = body.message;
+        result.className = "ok";
+        document.getElementById("chat-link-row").hidden = false;
+      } else {
+        sessionStorage.removeItem("authHeader");
+        result.textContent = body.error;
+        result.className = "bad";
+        document.getElementById("chat-link-row").hidden = true;
+      }
+    });
+  </script>
+</body>
+</html>
