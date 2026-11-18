@@ -1,0 +1,9 @@
+# Runtime settings Temporal reads at startup (the "dynamic config").
+# These two values come from Temporal's own Postgres development example.
+limit.maxIDLength:
+  - value: 255
+    constraints: {}
+# Dev only: refresh search attributes on every read so new ones show up at once.
+system.forceSearchAttributesCacheRefreshOnRead:
+  - value: true
+    constraints: {}
