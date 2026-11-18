@@ -1,0 +1,67 @@
+{
+  "base_url": "http://localhost:8000",
+  "model": "gpt-4.1-mini",
+  "recursion_limit": 50,
+  "mcp_server": {
+    "transport": "stdio",
+    "command": "npx",
+    "args": [
+      "-y",
+      "@playwright/mcp@latest",
+      "--isolated"
+    ]
+  },
+  "system_prompt": "You are a QA tester. Use the provided browser tools to test the goal at the base URL. The login page is exactly the base URL followed by /, and the chat page is /chat. There is no /login page. Each case is independent: submit that case's credentials even if a previous case logged in. Discover the controls yourself. Use one browser tool at a time; browser actions share one page. If a browser action fails, inspect the current page and recover before concluding. If a tool returns a link to a saved snapshot instead of page text, inspect the current live page with another browser tool. Judge acceptance or rejection from the visible page result; never infer it from the instruction. Do not repair deliberately invalid input. For chat tests authenticate first, then test the requested message. Stop after observing the result, using as few steps as possible. Your final answer must end with one plain text line in exactly one of these formats: VERDICT: valid | <message shown on the page> OR VERDICT: invalid | <message shown on the page> OR VERDICT: unknown | <reason the test could not be completed>. Choose valid only when the app visibly accepts the tested submission, and invalid only when the app visibly rejects that submission. A connection error, unavailable app, navigation failure, or incomplete test is not an input rejection: return VERDICT: unknown | <reason> in those situations. Never report valid or invalid without observing the tested form result. Do not put the verdict inside Markdown or omit its message. Never include passwords in your final answer.",
+  "cases": [
+    {
+      "name": "valid_login",
+      "instruction": "Test logging in as demo_user with password ${DEMO_PASSWORD}. Report whether login succeeds and the visible login message.",
+      "expected": "valid"
+    },
+    {
+      "name": "wrong_password",
+      "instruction": "Test logging in as demo_user with the deliberately incorrect password wrong-training-password. Report whether the credentials are accepted and the visible login message.",
+      "expected": "invalid"
+    },
+    {
+      "name": "unknown_username",
+      "instruction": "Test logging in as unknown_user with password ${DEMO_PASSWORD}. Report whether the credentials are accepted and the visible login message.",
+      "expected": "invalid"
+    },
+    {
+      "name": "empty_username",
+      "instruction": "Test logging in with the username empty and password ${DEMO_PASSWORD}. Report whether the form accepts this and the visible login message.",
+      "expected": "invalid"
+    },
+    {
+      "name": "empty_password",
+      "instruction": "Test logging in as demo_user with the password empty. Report whether the form accepts this and the visible login message.",
+      "expected": "invalid"
+    },
+    {
+      "name": "injection_username",
+      "instruction": "Test logging in with the literal username ' OR '1'='1 and password ${DEMO_PASSWORD}. Report whether these credentials are accepted and the visible login message.",
+      "expected": "invalid"
+    },
+    {
+      "name": "valid_chat",
+      "instruction": "Log in as demo_user with password ${DEMO_PASSWORD}, then test the chat form by sending Hello clinic. Report whether the message is accepted and the visible chat log entry.",
+      "expected": "valid"
+    },
+    {
+      "name": "empty_chat",
+      "instruction": "Log in as demo_user with password ${DEMO_PASSWORD}, then test sending an empty chat message. Report whether it is accepted and the visible chat error.",
+      "expected": "invalid"
+    },
+    {
+      "name": "long_chat",
+      "instruction": "Log in as demo_user with password ${DEMO_PASSWORD}, then test sending a chat message consisting of exactly 201 lowercase a characters. Report whether it is accepted and the visible chat error.",
+      "expected": "invalid"
+    },
+    {
+      "name": "deliberate_fail_demo",
+      "instruction": "Test logging in as demo_user with the deliberately incorrect password wrong-training-password. Report whether the credentials are accepted and the visible login message.",
+      "expected": "invalid"
+    }
+  ]
+}
