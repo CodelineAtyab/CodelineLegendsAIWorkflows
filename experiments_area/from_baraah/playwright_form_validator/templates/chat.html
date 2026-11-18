@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Training Chat</title></head>
+<body>
+  <main>
+    <h1>Training Chat</h1>
+    <form id="chat-form">
+      <label>Message <input id="chat-message" name="message"></label>
+      <button id="send-button" type="submit">Send</button>
+    </form>
+    <p id="chat-error" role="alert"></p>
+    <div id="chat-log" aria-live="polite"></div>
+  </main>
+  <script>
+    document.querySelector('#chat-form').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const input = document.querySelector('#chat-message');
+      const error = document.querySelector('#chat-error');
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: input.value })
+      });
+      const data = await response.json();
+      error.textContent = data.error || '';
+      if (data.message) {
+        const entry = document.createElement('p');
+        entry.textContent = data.message;
+        document.querySelector('#chat-log').appendChild(entry);
+        input.value = '';
+      }
+    });
+  </script>
+</body>
+</html>
