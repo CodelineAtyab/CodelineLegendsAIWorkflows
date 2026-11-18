@@ -19,7 +19,7 @@ async def main() -> None:
         workflows=[StarWarsDossier],
         activities=[find_character, get_homeworld, get_films],
     )
-    logging.info("Worker listening on task queue %s", TASK_QUEUE)
+    logging.getLogger(__name__).info("Worker listening on task queue %s", TASK_QUEUE)
     await worker.run()
 
 
