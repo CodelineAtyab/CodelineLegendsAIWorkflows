@@ -1,0 +1,10 @@
+[project]
+name = "star-wars-temporal"
+version = "0.1.0"
+description = "Durable Star Wars character dossier built with Temporal (issue #295)"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "httpx>=0.28.1",
+    "temporalio>=1.36.1",
+]

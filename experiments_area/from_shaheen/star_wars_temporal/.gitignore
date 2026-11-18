@@ -1,0 +1,2 @@
+# Real credentials for docker compose stay local; .env.example is the template.
+.env

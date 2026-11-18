@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Clinic chat</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 560px; margin: 60px auto; padding: 0 16px; color: #1c2530; }
+    form { display: flex; gap: 8px; }
+    textarea { flex: 1; font: inherit; padding: 8px 10px; border: 1px solid #b9c3cd; border-radius: 6px; min-height: 3em; }
+    button { font: inherit; padding: 9px 16px; border: 0; border-radius: 6px; background: #0f766e; color: #fff; cursor: pointer; }
+    #chat-log { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+    #chat-log li { background: #eef3f6; border-radius: 6px; padding: 6px 10px; word-break: break-word; }
+    #chat-error { min-height: 1.5em; color: #b91c1c; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <h1>Clinic chat</h1>
+  <p id="login-required" hidden>Please <a href="/">log in</a> first.</p>
+  <ul id="chat-log" aria-live="polite"></ul>
+  <!-- No maxlength on purpose: the server enforces the 200 character limit. -->
+  <form id="chat-form" novalidate>
+    <textarea id="chat-message" name="message" aria-label="Message"></textarea>
+    <button id="send-button" type="submit">Send</button>
+  </form>
+  <p id="chat-error" role="alert"></p>
+
+  <script>
+    const authHeader = sessionStorage.getItem("authHeader");
+    const chatLog = document.getElementById("chat-log");
+    const chatError = document.getElementById("chat-error");
+
+    function renderLog(messages) {
+      chatLog.replaceChildren(...messages.map(({ username, message }) => {
+        const item = document.createElement("li");
+        item.textContent = `${username}: ${message}`;
+        return item;
+      }));
+    }
+
+    async function callChatApi(options = {}) {
+      const response = await fetch("/api/chat", {
+        ...options,
+        headers: { Authorization: authHeader || "", "Content-Type": "application/json" },
+      });
+      return { ok: response.ok, body: await response.json() };
+    }
+
+    if (!authHeader) {
+      document.getElementById("login-required").hidden = false;
+    } else {
+      callChatApi().then(({ ok, body }) => { if (ok) renderLog(body.messages); });
+    }
+
+    document.getElementById("chat-form").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const input = document.getElementById("chat-message");
+      const { ok, body } = await callChatApi({ method: "POST", body: JSON.stringify({ message: input.value }) });
+      if (ok) {
+        chatError.textContent = "";
+        renderLog(body.messages);
+        input.value = "";
+      } else {
+        chatError.textContent = body.error;
+      }
+    });
+  </script>
+</body>
+</html>
