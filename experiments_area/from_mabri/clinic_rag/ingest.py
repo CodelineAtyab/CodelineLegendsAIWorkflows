@@ -25,6 +25,8 @@ def split_into_chunks(text: str, chunk_size: int = CHUNK_SIZE, overlap: int = CH
     while start < len(text):
         end = min(start + chunk_size, len(text))
         chunks.append(text[start:end])
+        if end == len(text):
+            break
         start += chunk_size - overlap
     return chunks
 
