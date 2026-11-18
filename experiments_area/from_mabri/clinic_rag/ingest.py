@@ -1,4 +1,8 @@
+from functools import cache
 from pathlib import Path
+
+from dotenv import load_dotenv
+from openai import OpenAI
 from pypdf import PdfReader
 
 COLLECTION_NAME = "clinic_docs"
@@ -29,5 +33,17 @@ def split_into_chunks(text: str, chunk_size: int = CHUNK_SIZE, overlap: int = CH
             break
         start += chunk_size - overlap
     return chunks
+
+
+@cache
+def get_openai_client() -> OpenAI:
+    load_dotenv()
+    return OpenAI()
+
+
+def embed_texts(chunks: list[str]) -> list[list[float]]:
+    """Turn each chunk into one embedding vector, in the same order."""
+    response = get_openai_client().embeddings.create(model=EMBEDDING_MODEL, input=chunks)
+    return [item.embedding for item in response.data]
 
 
