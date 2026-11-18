@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Clinic Chat</title>
+</head>
+<body>
+  <h1>Clinic Chat</h1>
+  <input id="chat-message" type="text" autocomplete="off">
+  <button id="send-button" type="button">Send</button>
+  <p id="chat-error"></p>
+  <ul id="chat-log"></ul>
+
+  <script>
+    const authHeader = sessionStorage.getItem("authHeader");
+    if (!authHeader) {
+      window.location.href = "/";
+    }
+
+    document.getElementById("send-button").addEventListener("click", async () => {
+      const input = document.getElementById("chat-message");
+      const error = document.getElementById("chat-error");
+
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Authorization": authHeader, "Content-Type": "application/json" },
+        body: JSON.stringify({ message: input.value }),
+      });
+      const body = await response.json();
+
+      if (response.ok) {
+        error.textContent = "";
+        const item = document.createElement("li");
+        item.textContent = body.message;
+        document.getElementById("chat-log").appendChild(item);
+        input.value = "";
+      } else if (response.status === 401) {
+        window.location.href = "/";
+      } else {
+        error.textContent = body.message;
+      }
+    });
+  </script>
+</body>
+</html>
