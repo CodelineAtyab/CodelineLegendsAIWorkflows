@@ -1,0 +1,66 @@
+{
+  "base_url": "http://localhost:8000",
+  "model": "gpt-4.1-mini",
+  "recursion_limit": 40,
+  "mcp_server": {
+    "transport": "stdio",
+    "command": "npx",
+    "args": [
+      "@playwright/mcp@latest",
+      "--headless"
+    ]
+  },
+  "system_prompt": "You are a QA tester for a small clinic web app. Use the browser tools you are given to carry out the instruction, and use as few steps as possible. Read the text the page actually shows after each action; never guess it. When you are done, finish with exactly one last line in this shape: VERDICT: valid|invalid | <message shown on the page>. Write valid when the action was accepted and invalid when the page rejected it. For an accepted chat message, the message part is the text that appears in the chat log.",
+  "cases": [
+    {
+      "name": "valid_login",
+      "instruction": "Open the login page and log in as demo_user with the password ${DEMO_USER_PASSWORD}. Report whether the login succeeded.",
+      "expected": "valid"
+    },
+    {
+      "name": "wrong_password",
+      "instruction": "Open the login page and log in as demo_user with the password not-the-right-password. Report whether the login succeeded.",
+      "expected": "invalid"
+    },
+    {
+      "name": "unknown_username",
+      "instruction": "Open the login page and log in as ghost_user with the password whatever123. Report whether the login succeeded.",
+      "expected": "invalid"
+    },
+    {
+      "name": "empty_username",
+      "instruction": "Open the login page, leave the username empty, enter the password ${DEMO_USER_PASSWORD} and try to log in. Report whether the login succeeded.",
+      "expected": "invalid"
+    },
+    {
+      "name": "empty_password",
+      "instruction": "Open the login page, enter the username demo_user, leave the password empty and try to log in. Report whether the login succeeded.",
+      "expected": "invalid"
+    },
+    {
+      "name": "injection_attempt",
+      "instruction": "Open the login page and try to log in with the username ' OR '1'='1 and the password ' OR '1'='1 (copy both exactly, including the quote characters). Report whether the login succeeded.",
+      "expected": "invalid"
+    },
+    {
+      "name": "valid_chat_message",
+      "instruction": "Log in as nurse_user with the password ${NURSE_USER_PASSWORD}, go to the chat page and send the message: Patient in room 4 is ready. Report whether the message was accepted.",
+      "expected": "valid"
+    },
+    {
+      "name": "empty_chat_message",
+      "instruction": "Log in as nurse_user with the password ${NURSE_USER_PASSWORD}, go to the chat page and press send without typing any message. Report whether the message was accepted.",
+      "expected": "invalid"
+    },
+    {
+      "name": "long_chat_message_201",
+      "instruction": "Log in as nurse_user with the password ${NURSE_USER_PASSWORD}, go to the chat page and send this exact message of 201 characters: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa . Report whether the message was accepted.",
+      "expected": "invalid"
+    },
+    {
+      "name": "deliberate_fail_demo",
+      "instruction": "Open the login page and log in as demo_user with the password not-the-right-password. Report whether the login succeeded.",
+      "expected": "valid"
+    }
+  ]
+}
