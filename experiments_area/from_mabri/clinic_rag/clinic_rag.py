@@ -1,4 +1,5 @@
 from functools import cache
+from pathlib import Path
 from typing import TypedDict
 
 from dotenv import load_dotenv
@@ -92,3 +93,17 @@ graph.add_edge("generate", END)
 graph.add_edge("no_answer", END)
 
 workflow = graph.compile()
+
+
+def save_graph_diagram() -> Path:
+    png_path = Path(__file__).with_suffix(".png")
+    png_path.write_bytes(workflow.get_graph().draw_mermaid_png())
+    return png_path
+
+
+def main() -> None:
+    print(f"Graph saved to {save_graph_diagram()}")
+
+
+if __name__ == "__main__":
+    main()
