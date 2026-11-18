@@ -1,0 +1,9 @@
+# Secrets and local state - never commit these.
+.env
+backups/
+*.dump
+*.dump.sha256
+data/
+.venv/
+__pycache__/
+*.py[cod]
