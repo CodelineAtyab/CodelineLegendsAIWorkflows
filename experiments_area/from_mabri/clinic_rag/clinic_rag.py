@@ -15,6 +15,12 @@ NO_ANSWER_MESSAGE = (
     "Sorry, I could not find that in our clinic documents. "
     "Please contact the clinic on 555-0142 and our staff will help you."
 )
+SYSTEM_PROMPT = (
+    "You are the booking assistant of Sunrise Family Clinic. "
+    "Answer the customer's question using only the clinic documents you are given. "
+    "Keep the answer short and friendly. "
+    f"If the documents do not contain the answer, reply exactly: {NO_ANSWER_MESSAGE}"
+)
 
 
 class ClinicState(TypedDict):
@@ -52,3 +58,17 @@ def decide_next_step(state: ClinicState) -> str:
     if state["chunks"]:
         return "generate"
     return "no_answer"
+
+
+def generate(state: ClinicState) -> ClinicState:
+    documents = "\n\n".join(state["chunks"])
+    response = get_openai_client().chat.completions.create(
+        model=CHAT_MODEL,
+        temperature=0,
+        messages=[
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": f"Clinic documents:\n{documents}\n\nCustomer question: {state['question']}"},
+        ],
+    )
+    state["answer"] = response.choices[0].message.content
+    return state
