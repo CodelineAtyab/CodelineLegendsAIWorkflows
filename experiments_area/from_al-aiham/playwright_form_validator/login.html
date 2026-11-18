@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Training login</title>
+</head>
+<body>
+  <h1>Login</h1>
+  <form id="login-form" novalidate>
+    <p><label for="username">Username</label> <input id="username" name="username" required autocomplete="username"></p>
+    <p><label for="password">Password</label> <input id="password" name="password" type="password" required autocomplete="current-password"></p>
+    <button id="login-button" type="submit">Log in</button>
+  </form>
+  <p id="login-result" role="status"></p>
+  <a id="chat-link" href="/chat" hidden>Open chat</a>
+  <script>
+    document.getElementById("login-form").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value;
+      const bytes = new TextEncoder().encode(`${username}:${password}`);
+      const credentials = btoa(Array.from(bytes, (byte) => String.fromCharCode(byte)).join(""));
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: {Authorization: `Basic ${credentials}`}
+      });
+      const result = await response.json();
+      document.getElementById("login-result").textContent = result.message;
+      document.getElementById("chat-link").hidden = !response.ok;
+    });
+  </script>
+</body>
+</html>

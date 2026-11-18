@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Training chat</title>
+</head>
+<body>
+  <h1>Chat</h1>
+  <form id="chat-form" novalidate>
+    <p><label for="chat-message">Message (up to 200 characters)</label></p>
+    <textarea id="chat-message" name="message" required></textarea>
+    <button id="send-button" type="submit">Send</button>
+  </form>
+  <p id="chat-error" role="alert"></p>
+  <div id="chat-log" role="log"></div>
+  <script>
+    document.getElementById("chat-form").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const field = document.getElementById("chat-message");
+      const message = field.value;
+      const error = document.getElementById("chat-error");
+      error.textContent = "";
+      if (!message.trim()) {
+        error.textContent = "Message cannot be empty";
+        return;
+      }
+      if (Array.from(message).length > 200) {
+        error.textContent = "Message too long";
+        return;
+      }
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({message})
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        error.textContent = result.message;
+        return;
+      }
+      const entry = document.createElement("p");
+      entry.textContent = result.message;
+      document.getElementById("chat-log").append(entry);
+      field.value = "";
+    });
+  </script>
+</body>
+</html>
