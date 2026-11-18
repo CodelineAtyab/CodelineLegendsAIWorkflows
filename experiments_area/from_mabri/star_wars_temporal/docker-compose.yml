@@ -1,0 +1,77 @@
+# Local Temporal stack for the Star Wars dossier (issue #295).
+#
+#   docker compose up -d     -> start Postgres, Temporal server and the Web UI
+#   docker compose down      -> stop them (workflow history is KEPT in the volume)
+#   docker compose down -v   -> stop them AND wipe the history volume
+#
+# Values like ${POSTGRES_USER} come from the git-ignored .env file
+# (copy .env.example to .env first). Keeping them out of this file means
+# the compose file can be committed without leaking credentials.
+
+services:
+  postgresql:
+    image: postgres:${POSTGRESQL_VERSION}
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      # Named volume (not an anonymous one) so `docker compose down` / `up`
+      # keeps every workflow's history. Temporal's durability is only as
+      # durable as the database underneath it.
+      - temporal_pg_data:/var/lib/postgresql/data
+    # Health check so Temporal starts only once Postgres actually accepts
+    # connections, not just once the container process exists. Without it,
+    # startup "works on the second try".
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  temporal:
+    # auto-setup = the Temporal server plus a startup script that creates the
+    # database schema and registers the `default` namespace on first boot.
+    # Right for local learning; production uses temporalio/server with the
+    # schema managed separately.
+    image: temporalio/auto-setup:${TEMPORAL_VERSION}
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    environment:
+      # "postgres12" is the name of Temporal's SQL plugin for Postgres 12 and
+      # newer, so it is correct for Postgres 16 too.
+      DB: postgres12
+      DB_PORT: 5432
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PWD: ${POSTGRES_PASSWORD}
+      # The Postgres host, reached by its compose service name.
+      POSTGRES_SEEDS: postgresql
+      DYNAMIC_CONFIG_FILE_PATH: config/dynamicconfig/development-sql.yaml
+    volumes:
+      - ./dynamicconfig:/etc/temporal/config/dynamicconfig
+    ports:
+      # gRPC frontend: worker.py and starter.py connect to localhost:7233.
+      - "7233:7233"
+    # Temporal ships no healthcheck. This one uses the bundled CLI to ask for
+    # the default namespace, which only succeeds after auto-setup has
+    # finished, so the UI waits for a fully ready server.
+    healthcheck:
+      test: ["CMD", "temporal", "operator", "namespace", "describe", "-n", "default", "--address", "temporal:7233"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 10s
+
+  temporal-ui:
+    image: temporalio/ui:${TEMPORAL_UI_VERSION}
+    depends_on:
+      temporal:
+        condition: service_healthy
+    environment:
+      TEMPORAL_ADDRESS: temporal:7233
+      TEMPORAL_CORS_ORIGINS: http://localhost:3000
+    ports:
+      - "8080:8080"
+
+volumes:
+  temporal_pg_data:
