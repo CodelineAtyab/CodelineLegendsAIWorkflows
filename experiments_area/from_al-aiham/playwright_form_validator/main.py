@@ -1,8 +1,8 @@
 import asyncio
 import json
 import os
-from pathlib import Path
 import re
+from pathlib import Path
 from string import Template
 from typing import Literal, TypedDict
 
@@ -116,10 +116,14 @@ async def run_cases(workflow, plan: dict) -> None:
     print(f"{passed}/{len(plan['cases'])} passed")
 
 
+def load_test_plan() -> dict:
+    with open(Path(__file__).with_name("test_plan.json"), encoding="utf-8") as file:
+        return json.load(file)
+
+
 async def main() -> None:
     try:
-        with open(Path(__file__).with_name("test_plan.json"), encoding="utf-8") as file:
-            plan = json.load(file)
+        plan = await asyncio.to_thread(load_test_plan)
     except FileNotFoundError:
         print("Config not found: put test_plan.json beside main.py.")
         return

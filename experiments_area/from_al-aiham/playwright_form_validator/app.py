@@ -1,17 +1,16 @@
 import base64
 import binascii
-from contextlib import closing
 import hashlib
 import hmac
+import json
+import os
+import secrets
+import sqlite3
+from contextlib import closing
 from http import HTTPStatus
 from http.cookies import CookieError, SimpleCookie
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-import json
-import os
 from pathlib import Path
-import secrets
-import sqlite3
-
 
 PROJECT_DIR = Path(__file__).resolve().parent
 DATABASE = PROJECT_DIR / "users.db"
