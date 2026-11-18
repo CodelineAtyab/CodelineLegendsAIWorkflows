@@ -1,0 +1,14 @@
+# Secrets: real credentials live only in .env on your machine, never in git.
+# .env.example (committed) documents which variables are needed.
+.env
+
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
