@@ -1,0 +1,9 @@
+[project]
+name = "langgraph-video-scenarios"
+version = "0.1.0"
+description = "Plain-Python LangGraph video scenarios for issue 257"
+requires-python = ">=3.14"
+dependencies = [
+    "grandalf",
+    "langgraph",
+]
