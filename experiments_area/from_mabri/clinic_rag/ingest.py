@@ -26,16 +26,29 @@ def load_pdf_text(file_path: Path) -> str:
     return text
 
 
-def split_into_chunks(text: str, chunk_size: int = CHUNK_SIZE, overlap: int = CHUNK_OVERLAP) -> list:
-    """Split text into chunks of specified size with overlap."""
+def find_last_space(text: str, start: int, end: int) -> int:
+    """Index of the last space or line break in text[start:end], or -1 if there is none."""
+    return max(text.rfind(" ", start, end), text.rfind("\n", start, end))
+
+
+def split_into_chunks(text: str, chunk_size: int = CHUNK_SIZE, overlap: int = CHUNK_OVERLAP) -> list[str]:
+    """Split text into overlapping chunks, cutting between words whenever possible."""
     chunks = []
     start = 0
     while start < len(text):
         end = min(start + chunk_size, len(text))
-        chunks.append(text[start:end])
+        if end < len(text):
+            space = find_last_space(text, start + overlap + 1, end)
+            if space != -1:
+                end = space
+        chunk = text[start:end].strip()
+        if chunk:
+            chunks.append(chunk)
         if end == len(text):
             break
-        start += chunk_size - overlap
+        next_start = end - overlap
+        space = find_last_space(text, start + 1, next_start)
+        start = space + 1 if space != -1 else next_start
     return chunks
 
 
