@@ -1,0 +1,14 @@
+[project]
+name = "chat-sessions"
+version = "0.1.0"
+description = "A terminal chat application with JSON session memory"
+requires-python = ">=3.14"
+dependencies = [
+    "openai>=3.31.0",
+    "python-dotenv>=1.2.4",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]

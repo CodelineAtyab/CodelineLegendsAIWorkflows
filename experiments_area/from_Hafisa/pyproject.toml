@@ -11,4 +11,8 @@ dependencies = [
 [tool.uv.workspace]
 members = [
     "api_explorer",
+    "travel_time",
 ]
+
+[tool.mypy]
+explicit_package_bases = true

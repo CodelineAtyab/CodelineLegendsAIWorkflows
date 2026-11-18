@@ -1,0 +1,35 @@
+services:
+  api:
+    # Build the image from the Dockerfile in this folder
+    build: .
+    # host:container, so the API is reachable at http://localhost:8000
+    ports:
+      - "8000:8000"
+    # The host is "db" (the service name), resolved by Compose's network DNS
+    environment:
+      DATABASE_URL: postgresql://app:app@db:5432/app
+    # Start only after Postgres passes its healthcheck, not just after its container starts
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    # Official PostgreSQL image, pinned to a major version
+    image: postgres:17
+    # Read by the postgres image on first start to create the database and user
+    environment:
+      POSTGRES_DB: app
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+    # Named volume keeps the data when the container is removed
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    # Reports "healthy" once Postgres accepts connections
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d app"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:

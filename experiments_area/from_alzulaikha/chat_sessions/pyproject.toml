@@ -1,0 +1,20 @@
+[project]
+name = "chat-sessions"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "alzulaikha", email = "alzulaikha1992@gmail.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "openai>=3.31.0",
+    "python-dotenv>=1.2.4",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["app"]

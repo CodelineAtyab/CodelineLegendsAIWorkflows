@@ -1,0 +1,179 @@
+{
+  "name": "Docker Mini App (API)",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "health",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        224,
+        224
+      ],
+      "id": "d5953b51-f9c7-44d6-bc28-5bf7f7ff929a",
+      "name": "GET /health",
+      "webhookId": "22c4a160-7673-4924-835f-8fc494cd38b4"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"status\": \"healthy\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        384,
+        224
+      ],
+      "id": "63c44ccf-df10-4f2a-9349-9bc391390658",
+      "name": "Respond health"
+    },
+    {
+      "parameters": {
+        "path": "home",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        48,
+        0
+      ],
+      "id": "e054597c-ae49-4cd4-9de0-6022afc9db56",
+      "name": "GET /home",
+      "webhookId": "62649ae7-ffe7-4859-bd9e-d3684dc49c5c"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"message\": \"Hello from Docker!\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        208,
+        0
+      ],
+      "id": "73127032-ec30-49dc-873e-906079afe367",
+      "name": "Respond home"
+    },
+    {
+      "parameters": {
+        "path": "visits",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        32,
+        432
+      ],
+      "id": "202e6cd0-e633-4b63-a762-0d7ce5880275",
+      "name": "GET /visits",
+      "webhookId": "3e624705-865a-4e5e-a614-04d2271f5e11"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH new_visit AS (INSERT INTO visits DEFAULT VALUES RETURNING id)\nSELECT COUNT(*)::int + 1 AS visits FROM visits;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        256,
+        432
+      ],
+      "id": "d8c021f4-b2b9-426b-9770-e8f9a23a2ff1",
+      "name": "Insert visit + count",
+      "credentials": {
+        "postgres": {
+          "id": "cOaFz5PZ8iaSzCnv",
+          "name": "Mini App Postgres"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"visits\": $json.visits } }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        496,
+        432
+      ],
+      "id": "b63cbf89-bd5a-4293-baac-2615c68d4f51",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "GET /health": {
+      "main": [
+        [
+          {
+            "node": "Respond health",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET /home": {
+      "main": [
+        [
+          {
+            "node": "Respond home",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET /visits": {
+      "main": [
+        [
+          {
+            "node": "Insert visit + count",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert visit + count": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "b2fc137c-5861-42d0-95c9-696013cf0fd6",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "631fffaed5ee763ea63730b920bca878d3b771b62f05acd679b58895202ac48a"
+  },
+  "nodeGroups": [],
+  "id": "Ounll63av034HGVy",
+  "tags": []
+}

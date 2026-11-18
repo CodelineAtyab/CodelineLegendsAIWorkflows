@@ -1,43 +1,67 @@
+
+from typing import Any
+
 import requests
 
 
-def read_api_key():
+# Reads API key from a text file.
+def read_api_key() -> str:
     with open("api_key.txt", "r") as file:
         return file.read().strip()
 
 
-def get_travel_data(source, destination, api_key):
-    url = "https://maps.googleapis.com/maps/api/distancematrix/json"
+# Sends the request to Google Routes API.
+def get_travel_data(
+    source: str,
+    destination: str,
+    api_key: str,
+) -> dict:
+    url = "https://routes.googleapis.com/directions/v2:computeRoutes"
 
-    params = {
-        "origins": source,
-        "destinations": destination,
-        "departure_time": "now",
-        "key": api_key,
+    headers = {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": api_key,
+        "X-Goog-FieldMask": "routes.duration",
     }
 
-    response = requests.get(url, params=params, timeout=10)
+    body: dict[str, Any] = {
+        "origin": {"address": source},
+        "destination": {"address": destination},
+        "travelMode": "DRIVE",
+        "routingPreference": "TRAFFIC_AWARE",
+    }
+
+    response = requests.post(
+    url,
+    headers=headers,
+    json=body,
+    timeout=10,
+    )
     response.raise_for_status()
     return response.json()
 
 
-def format_time(seconds):
-    minutes = round(seconds / 60)
-    hours = minutes // 60
-    minutes = minutes % 60
+# Converts seconds into hours and minutes.
+def format_time(seconds: float) -> str:
+    total_minutes = round(seconds / 60)
+    hours = total_minutes // 60
+    minutes = total_minutes % 60
 
-    if hours == 0:
-        return f"{minutes} minutes"
+    parts = []
 
-    hour_text = "hour" if hours == 1 else "hours"
+    if hours > 0:
+        hour_text = "hour" if hours == 1 else "hours"
+        parts.append(f"{hours} {hour_text}")
 
-    if minutes == 0:
-        return f"{hours} {hour_text}"
+    if minutes > 0 or hours == 0:
+        minute_text = "minute" if minutes == 1 else "minutes"
+        parts.append(f"{minutes} {minute_text}")
 
-    return f"{hours} {hour_text} {minutes} minutes"
+    return " ".join(parts)
 
 
-def main():
+# Controls the main program.
+def main() -> None:
     try:
         key = read_api_key()
         source = input("Enter the source location: ")
@@ -45,20 +69,17 @@ def main():
 
         data = get_travel_data(source, destination, key)
 
-        if data.get("status") != "OK":
-            raise ValueError(data.get("error_message", data.get("status")))
+        routes = data.get("routes", [])
 
-        route = data.get("rows")[0].get("elements")[0]
+        if not routes:
+            raise ValueError("No route found.")
 
-        if route.get("status") != "OK":
-            raise ValueError(route.get("status"))
+        duration = routes[0].get("duration")
 
-        duration = route.get("duration_in_traffic")
+        if not duration:
+            raise ValueError("Travel duration is unavailable.")
 
-        if not duration or "value" not in duration:
-            raise ValueError("Traffic duration is unavailable")
-
-        seconds = duration["value"]
+        seconds = float(duration[:-1])
         travel_time = format_time(seconds)
 
         print(

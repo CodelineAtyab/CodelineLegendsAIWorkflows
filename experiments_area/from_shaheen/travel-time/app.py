@@ -1,94 +1,84 @@
+from pathlib import Path
+
 import requests
+
+API_KEY_FILE = Path(__file__).with_name("api_key_file.txt")
+ROUTES_URL = "https://routes.googleapis.com/directions/v2:computeRoutes"
 
 
 def get_api_key():
-    with open("api_key_file.txt", "r") as file:
-        return file.read().strip()
+    return API_KEY_FILE.read_text(encoding="utf-8").strip()
 
 
-def get_api_key_respon(source, destination):
-    try:
-        api_key = get_api_key()
-
-        url = "https://maps.googleapis.com/maps/api/distancematrix/json"
-
-        params = {
-            "origins": source,
-            "destinations": destination,
-            "mode": "driving",
-            "departure_time": "now",
-            "traffic_model": "best_guess",
-            "key": api_key,
-        }
-
-        response = requests.get(url, params=params, timeout=30)
-        response.raise_for_status()
-
-        return response.json()
-
-    except requests.RequestException as e:
-        print(f"Could not get the travel time: {e}")
-        return None
-
-    except OSError as e:
-        print(f"Could not read the API key: {e}")
-        return None
+def get_route_response(source, destination):
+    api_key = get_api_key()
+    response = requests.post(
+        ROUTES_URL,
+        json={
+            "origin": {"address": source},
+            "destination": {"address": destination},
+            "travelMode": "DRIVE",
+            "routingPreference": "TRAFFIC_AWARE",
+        },
+        headers={
+            "X-Goog-Api-Key": api_key,
+            "X-Goog-FieldMask": "routes.duration",
+        },
+        timeout=30,
+    )
+    return response.json()
 
 
 def get_travel_time(data):
-    try:
-        if data.get("status") != "OK":
-            print(
-                "Could not get the travel time:",
-                data.get("error_message", data.get("status", "API error")),
-            )
-            return None
+    duration = data["routes"][0]["duration"]
+    seconds = float(duration[:-1])
+    total_minutes = round(seconds / 60)
+    hours, minutes = divmod(total_minutes, 60)
 
-        elements = data["rows"][0]["elements"][0]
+    minute_text = "minute" if minutes == 1 else "minutes"
 
-        if elements.get("status") != "OK":
-            print("Could not get the travel time:", elements.get("status"))
-            return None
+    if hours == 0:
+        return f"{minutes} {minute_text}"
 
-        seconds = elements["duration_in_traffic"]["value"]
+    hour_text = "hour" if hours == 1 else "hours"
 
-        total_minutes = (seconds + 30) // 60
+    if minutes == 0:
+        return f"{hours} {hour_text}"
 
-        hours, minutes = divmod(total_minutes, 60)
-
-        if hours == 0:
-            return f"{minutes} minutes"
-
-        hour_text = "hour" if hours == 1 else "hours"
-
-        if minutes == 0:
-            return f"{hours} {hour_text}"
-
-        return f"{hours} {hour_text} {minutes} minutes"
-
-    except (KeyError, IndexError, TypeError, ValueError) as e:
-        print(f"Could not get the travel time: {e}")
-        return None
+    return f"{hours} {hour_text} {minutes} {minute_text}"
 
 
 def main():
     source = input("Enter the source: ").strip()
     destination = input("Enter the destination: ").strip()
 
-    data = get_api_key_respon(source, destination)
-
-    if data is None:
+    if not source or not destination:
+        print("Please enter both a source and a destination.")
         return
 
-    travel_time = get_travel_time(data)
+    try:
+        data = get_route_response(source, destination)
 
-    if travel_time is None:
-        return
+        if "error" in data:
+            print(f"Could not get the travel time: {data['error']['message']}")
+        elif not data.get("routes"):
+            print("Could not get the travel time: no driving route was found")
+        else:
+            travel_time = get_travel_time(data)
+            print(
+                f"Driving from {source} to {destination} "
+                f"takes about {travel_time} with current traffic."
+            )
 
-    print(
-        f"Driving from {source} to {destination} "
-        f"takes about {travel_time} with current traffic."
-    )
+    except (
+        OSError,
+        requests.RequestException,
+        KeyError,
+        IndexError,
+        TypeError,
+        ValueError,
+    ) as error:
+        print(f"Could not get the travel time: {error}")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,6 @@
+
+.env
+sessions/
+sessions.json
+.venv/
+.vscode/
