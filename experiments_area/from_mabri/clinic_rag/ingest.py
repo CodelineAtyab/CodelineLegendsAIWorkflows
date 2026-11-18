@@ -76,3 +76,19 @@ def store_chunks(chunks: list[str], vectors: list[list[float]], source: str) -> 
     return len(points)
 
 
+def main() -> None:
+    client = get_qdrant_client()
+    if client.collection_exists(COLLECTION_NAME):
+        client.delete_collection(COLLECTION_NAME)
+
+    for pdf_path in sorted(PDF_DIR.glob("*.pdf")):
+        chunks = split_into_chunks(load_pdf_text(pdf_path))
+        vectors = embed_texts(chunks)
+        stored = store_chunks(chunks, vectors, pdf_path.name)
+        print(f"{pdf_path.name}: {stored} chunks stored")
+
+
+if __name__ == "__main__":
+    main()
+
+
