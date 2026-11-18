@@ -46,3 +46,9 @@ def retrieve(state: ClinicState) -> ClinicState:
     ).points
     state["chunks"] = [f"[{hit.payload['source']}] {hit.payload['text']}" for hit in hits]
     return state
+
+
+def decide_next_step(state: ClinicState) -> str:
+    if state["chunks"]:
+        return "generate"
+    return "no_answer"
