@@ -84,7 +84,10 @@ def seed_users() -> None:
         connection.execute(
             "CREATE TABLE IF NOT EXISTS users (username TEXT PRIMARY KEY, salt BLOB, password_hash BLOB)"
         )
-        for username, variable in [("demo_user", "DEMO_PASSWORD"), ("nurse_user", "NURSE_PASSWORD")]:
+        for username, variable in [
+            ("demo_user", "DEMO_PASSWORD"),
+            ("nurse_user", "NURSE_PASSWORD"),
+        ]:
             salt = os.urandom(16)
             connection.execute(
                 "INSERT OR REPLACE INTO users VALUES (?, ?, ?)",
@@ -107,8 +110,10 @@ def check_login(username: str, password: str) -> bool:
 def read_basic_auth(header: str) -> tuple[str, str]:
     """Split an `Authorization: Basic ...` header into username and password."""
     try:
-        decoded = base64.b64decode(header.removeprefix("Basic "), validate=True).decode()
-    except (binascii.Error, UnicodeDecodeError):
+        decoded = base64.b64decode(
+            header.removeprefix("Basic "), validate=True
+        ).decode()
+    except binascii.Error, UnicodeDecodeError:
         return "", ""
     username, _, password = decoded.partition(":")
     return username, password
@@ -117,7 +122,9 @@ def read_basic_auth(header: str) -> tuple[str, str]:
 class Handler(BaseHTTPRequestHandler):
     """Serve the login page, the chat page and their two form endpoints."""
 
-    def send_text(self, status: int, text: str, content_type: str = "text/plain", cookie: str = "") -> None:
+    def send_text(
+        self, status: int, text: str, content_type: str = "text/plain", cookie: str = ""
+    ) -> None:
         """Send a response with the given status, body text and optional cookie."""
         body = text.encode()
         self.send_response(status)
@@ -155,7 +162,9 @@ class Handler(BaseHTTPRequestHandler):
             elif check_login(username, password):
                 token = secrets.token_hex(16)
                 SESSIONS[token] = username
-                self.send_text(200, f"Welcome, {username}", cookie=f"session={token}; HttpOnly")
+                self.send_text(
+                    200, f"Welcome, {username}", cookie=f"session={token}; HttpOnly"
+                )
             else:
                 self.send_text(401, "Invalid username or password")
         elif self.path == "/send" and self.logged_in():
@@ -173,7 +182,9 @@ class Handler(BaseHTTPRequestHandler):
 
 if __name__ == "__main__":
     if "DEMO_PASSWORD" not in os.environ or "NURSE_PASSWORD" not in os.environ:
-        raise SystemExit("Set the DEMO_PASSWORD and NURSE_PASSWORD environment variables first.")
+        raise SystemExit(
+            "Set the DEMO_PASSWORD and NURSE_PASSWORD environment variables first."
+        )
     seed_users()
     print("App running on http://localhost:8000 (Ctrl+C to stop)")
     ThreadingHTTPServer(("localhost", 8000), Handler).serve_forever()
