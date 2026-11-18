@@ -1,0 +1,282 @@
+<title>Clinic RAG Blueprint</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column; a wide blueprint diagram with a details panel beside it (stacks on phones), then steps and run commands. */
+:root {
+  --bg: #f5f8f8;
+  --surface: #ffffff;
+  --ink: #12302e;
+  --muted: #557270;
+  --line: #c9d8d7;
+  --accent: #0f7c74;
+  --accent-soft: #dcefed;
+  --graph: #3f5bd1;
+  --graph-soft: #e3e8fb;
+  --warn: #a2620a;
+  --warn-soft: #fbeed8;
+  --ok: #2f7d3a;
+  --ok-soft: #e0f1e2;
+  --code-bg: #eaf1f1;
+  --font-display: "Instrument Sans", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Instrument Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0e1a1a; --surface: #152525; --ink: #e2eeed; --muted: #93b0ae; --line: #2d4645;
+  --accent: #4cc3b8; --accent-soft: #173a38; --graph: #94a8ff; --graph-soft: #1f2a4f;
+  --warn: #f0b45c; --warn-soft: #3a2c14; --ok: #79cf85; --ok-soft: #173321; --code-bg: #1b3030;
+  color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0e1a1a; --surface: #152525; --ink: #e2eeed; --muted: #93b0ae; --line: #2d4645;
+  --accent: #4cc3b8; --accent-soft: #173a38; --graph: #94a8ff; --graph-soft: #1f2a4f;
+  --warn: #f0b45c; --warn-soft: #3a2c14; --ok: #79cf85; --ok-soft: #173321; --code-bg: #1b3030;
+  color-scheme: dark; }
+
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.6; }
+.wrap { max-width: 1080px; margin: 0 auto; padding-block: 32px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 40px; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; line-height: 1.2; }
+h1 { font-size: clamp(26px, 4vw, 36px); font-weight: 700; }
+h2 { font-size: 22px; font-weight: 700; }
+h3 { font-size: 16px; font-weight: 600; }
+p { margin: 0; max-width: 68ch; }
+.eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+header { display: grid; gap: 10px; }
+.lede { color: var(--muted); }
+code, kbd { font-family: var(--font-mono); font-size: .9em; background: var(--code-bg); padding: 1px 5px; border-radius: 4px; }
+section { display: grid; gap: 16px; min-width: 0; }
+
+/* Diagram */
+.board { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; align-items: start; }
+@media (max-width: 860px) { .board { grid-template-columns: 1fr; } }
+.diagram { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; overflow-x: auto; }
+.diagram svg { display: block; width: 100%; min-width: 720px; height: auto; }
+.lane-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em; fill: var(--muted); }
+.node { cursor: pointer; outline: none; }
+.node rect, .node path.shape, .node ellipse { fill: var(--surface); stroke: var(--line); stroke-width: 1.5; transition: fill .15s, stroke .15s; }
+.node.ingest rect { stroke: var(--accent); }
+.node.graph rect, .node.graph path.shape { stroke: var(--graph); }
+.node.store rect, .node.store ellipse, .node.store path.shape { stroke: var(--accent); fill: var(--accent-soft); }
+.node text { font-family: var(--font-mono); font-size: 12.5px; fill: var(--ink); pointer-events: none; }
+.node text.sub { font-size: 10.5px; fill: var(--muted); }
+.node:hover rect, .node:hover path.shape, .node:focus-visible rect, .node:focus-visible path.shape { fill: var(--accent-soft); }
+.node.graph:hover rect, .node.graph:hover path.shape, .node.graph:focus-visible rect, .node.graph:focus-visible path.shape { fill: var(--graph-soft); }
+.node.active rect, .node.active path.shape, .node.active ellipse { stroke-width: 3; }
+.node:focus-visible rect, .node:focus-visible path.shape { stroke-dasharray: 4 3; }
+.edge { fill: none; stroke: var(--muted); stroke-width: 1.5; }
+.edge.dash { stroke-dasharray: 5 4; stroke: var(--accent); }
+.edge-label { font-family: var(--font-mono); font-size: 10.5px; fill: var(--graph); }
+.arrowhead { fill: var(--muted); }
+.arrowhead.acc { fill: var(--accent); }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px; display: grid; gap: 10px; min-width: 0; }
+.panel dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font-size: 13.5px; }
+.panel dt { color: var(--muted); font-family: var(--font-mono); font-size: 12px; padding-top: 2px; }
+.panel dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.hint { font-size: 13px; color: var(--muted); }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; color: var(--muted); }
+.legend span::before { content: ""; display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; border: 2px solid var(--c); }
+
+/* Steps */
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.step { display: grid; grid-template-columns: 7.5em minmax(0, 1fr); gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; align-items: start; }
+@media (max-width: 520px) { .step { grid-template-columns: 1fr; gap: 6px; } }
+.step-body { display: grid; gap: 4px; min-width: 0; }
+.step-body p { font-size: 14px; color: var(--muted); }
+.chip { font-family: var(--font-mono); font-size: 11px; letter-spacing: .04em; padding: 3px 8px; border-radius: 99px; justify-self: start; white-space: nowrap; }
+.chip.done { background: var(--ok-soft); color: var(--ok); }
+.chip.next { background: var(--accent-soft); color: var(--accent); }
+.chip.wait { background: var(--warn-soft); color: var(--warn); }
+.chip.later { background: var(--code-bg); color: var(--muted); }
+
+/* Run */
+.run { display: grid; gap: 22px; }
+.run-block { display: grid; gap: 8px; min-width: 0; }
+.term { font-family: var(--font-mono); font-size: 11.5px; color: var(--graph); letter-spacing: .04em; text-transform: uppercase; }
+.cmd { position: relative; background: var(--code-bg); border-radius: 8px; border: 1px solid var(--line); }
+.cmd pre { margin: 0; padding: 12px 84px 12px 14px; overflow-x: auto; font-family: var(--font-mono); font-size: 13px; line-height: 1.55; }
+.cmd button { position: absolute; top: 8px; right: 8px; font: 500 12px var(--font-mono); color: var(--accent); background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+.cmd button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.expect { font-size: 13.5px; color: var(--muted); }
+.expect pre { margin: 6px 0 0; padding: 10px 14px; background: var(--surface); border: 1px dashed var(--line); border-radius: 8px; overflow-x: auto; font-family: var(--font-mono); font-size: 12.5px; color: var(--ink); }
+.note { padding: 12px 14px; border-radius: 8px; background: var(--warn-soft); color: var(--ink); font-size: 14px; border: 1px solid var(--line); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Issue #306 · Sunrise Family Clinic (sample data)</div>
+    <h1>Clinic RAG Blueprint</h1>
+    <p class="lede">A customer asks the clinic a question. We find the most similar text chunks from the clinic's PDFs in Qdrant, and <code>gpt-4.1-mini</code> answers using only those chunks. Ingestion runs once to fill Qdrant; the LangGraph workflow runs once per question.</p>
+  </header>
+
+  <section aria-labelledby="h-diagram">
+    <h2 id="h-diagram">Components and data flow</h2>
+    <div class="legend">
+      <span style="--c: var(--accent)">ingest.py functions</span>
+      <span style="--c: var(--graph)">clinic_rag.py graph nodes</span>
+      <span style="--c: var(--muted)">inputs and outputs</span>
+    </div>
+    <div class="board">
+      <div class="diagram">
+        <svg viewBox="0 0 900 400" role="img" aria-label="Ingestion pipeline on top filling Qdrant; LangGraph answer workflow below reading from Qdrant">
+          <defs>
+            <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrowhead" d="M0,0 L10,5 L0,10 z"/></marker>
+            <marker id="ahacc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrowhead acc" d="M0,0 L10,5 L0,10 z"/></marker>
+          </defs>
+          <text class="lane-label" x="20" y="26">INGEST · uv run ingest.py · once</text>
+          <text class="lane-label" x="20" y="252">ANSWER · uv run clinic_rag.py · per question</text>
+
+          <!-- ingest edges -->
+          <path class="edge" d="M120 68 H143" marker-end="url(#ah)"/>
+          <path class="edge" d="M265 68 H288" marker-end="url(#ah)"/>
+          <path class="edge" d="M430 68 H453" marker-end="url(#ah)"/>
+          <path class="edge" d="M580 68 H603" marker-end="url(#ah)"/>
+          <path class="edge" d="M730 68 H820 V146" marker-end="url(#ah)"/>
+
+          <!-- answer edges -->
+          <path class="edge" d="M120 328 H148" marker-end="url(#ah)"/>
+          <path class="edge" d="M270 328 H288" marker-end="url(#ah)"/>
+          <path class="edge" d="M330 306 V289 H398" marker-end="url(#ah)"/>
+          <path class="edge" d="M330 350 V373 H398" marker-end="url(#ah)"/>
+          <text class="edge-label" x="338" y="282">"generate"</text>
+          <text class="edge-label" x="338" y="390">"no_answer"</text>
+          <path class="edge" d="M530 289 H550 V320 H568" marker-end="url(#ah)"/>
+          <path class="edge" d="M530 373 H550 V336 H568" marker-end="url(#ah)"/>
+          <path class="edge" d="M640 328 H678" marker-end="url(#ah)"/>
+          <path class="edge dash" d="M210 300 V190 H758" marker-end="url(#ahacc)"/>
+          <text class="edge-label" x="400" y="182" style="fill: var(--accent)">question vector → top 3 chunks</text>
+
+          <g class="node io" tabindex="0" data-id="pdfs"><rect x="20" y="40" width="100" height="56" rx="6"/><text x="70" y="64" text-anchor="middle">sample_pdfs/</text><text class="sub" x="70" y="81" text-anchor="middle">3 PDFs</text></g>
+          <g class="node ingest" tabindex="0" data-id="load"><rect x="145" y="40" width="120" height="56" rx="6"/><text x="205" y="64" text-anchor="middle">load_pdf_text</text><text class="sub" x="205" y="81" text-anchor="middle">pypdf</text></g>
+          <g class="node ingest" tabindex="0" data-id="split"><rect x="290" y="40" width="140" height="56" rx="6"/><text x="360" y="64" text-anchor="middle">split_into_chunks</text><text class="sub" x="360" y="81" text-anchor="middle">500 / 100 overlap</text></g>
+          <g class="node ingest" tabindex="0" data-id="embed"><rect x="455" y="40" width="125" height="56" rx="6"/><text x="517" y="64" text-anchor="middle">embed_texts</text><text class="sub" x="517" y="81" text-anchor="middle">OpenAI embeddings</text></g>
+          <g class="node ingest" tabindex="0" data-id="store"><rect x="605" y="40" width="125" height="56" rx="6"/><text x="667" y="64" text-anchor="middle">store_chunks</text><text class="sub" x="667" y="81" text-anchor="middle">upsert points</text></g>
+
+          <g class="node store" tabindex="0" data-id="qdrant">
+            <path class="shape" d="M760 160 A60 12 0 0 1 880 160 V220 A60 12 0 0 1 760 220 Z"/>
+            <ellipse cx="820" cy="160" rx="60" ry="12"/>
+            <text x="820" y="196" text-anchor="middle">Qdrant</text><text class="sub" x="820" y="212" text-anchor="middle">clinic_docs</text>
+          </g>
+
+          <g class="node io" tabindex="0" data-id="question"><rect x="20" y="300" width="100" height="56" rx="6"/><text x="70" y="324" text-anchor="middle">question</text><text class="sub" x="70" y="341" text-anchor="middle">invoke({...})</text></g>
+          <g class="node graph" tabindex="0" data-id="retrieve"><rect x="150" y="300" width="120" height="56" rx="6"/><text x="210" y="324" text-anchor="middle">retrieve</text><text class="sub" x="210" y="341" text-anchor="middle">writes chunks</text></g>
+          <g class="node graph" tabindex="0" data-id="decide"><path class="shape" d="M330 306 L370 328 L330 350 L290 328 Z"/><text x="330" y="332" text-anchor="middle" style="font-size:11px">decide</text></g>
+          <g class="node graph" tabindex="0" data-id="generate"><rect x="400" y="262" width="130" height="54" rx="6"/><text x="465" y="285" text-anchor="middle">generate</text><text class="sub" x="465" y="302" text-anchor="middle">gpt-4.1-mini</text></g>
+          <g class="node graph" tabindex="0" data-id="no_answer"><rect x="400" y="346" width="130" height="54" rx="6"/><text x="465" y="369" text-anchor="middle">no_answer</text><text class="sub" x="465" y="386" text-anchor="middle">polite fallback</text></g>
+          <g class="node graph" tabindex="0" data-id="end"><rect x="570" y="304" width="70" height="48" rx="24"/><text x="605" y="332" text-anchor="middle">END</text></g>
+          <g class="node io" tabindex="0" data-id="result"><rect x="680" y="300" width="200" height="56" rx="6"/><text x="780" y="324" text-anchor="middle">printed final state</text><text class="sub" x="780" y="341" text-anchor="middle">question · chunks · answer</text></g>
+        </svg>
+      </div>
+      <aside class="panel" aria-live="polite" id="panel">
+        <div class="eyebrow" id="p-kind">Click a box</div>
+        <h3 id="p-title">Pick any component</h3>
+        <p class="hint" id="p-text">Each box in the diagram is one function, graph node, or data store. Click or tab to it to see what it reads, what it writes, and which step of the work builds it.</p>
+        <dl id="p-dl"></dl>
+      </aside>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-steps">
+    <h2 id="h-steps">Step-by-step workflow</h2>
+    <p class="lede">You type the code in <code>ingest.py</code> and <code>clinic_rag.py</code> (the issue's rule). Claude sets things up, gives hints for one step at a time, and reviews each one.</p>
+    <ol class="steps">
+      <li class="step"><span class="chip done">done</span><div class="step-body"><h3>0 · Setup</h3><p>Branch <code>feature/306-mabri-clinic-rag-langgraph</code>, uv project, dependencies, <code>.env.example</code>, 3 sample PDFs, Qdrant running in Docker.</p></div></li>
+      <li class="step"><span class="chip next">next · no key</span><div class="step-body"><h3>1.1–1.3 · Constants, load_pdf_text, split_into_chunks</h3><p>Read each PDF's text and cut it into overlapping 500-character chunks. Check: a 1,200-character text gives 3 chunks.</p></div></li>
+      <li class="step"><span class="chip wait">needs API key</span><div class="step-body"><h3>1.4–1.6 · embed_texts, store_chunks, main</h3><p>Turn each chunk into a 1536-number vector, upsert into <code>clinic_docs</code>, print <code>opening_hours.pdf: N chunks stored</code>.</p></div></li>
+      <li class="step"><span class="chip later">later</span><div class="step-body"><h3>2.1–2.8 · State, nodes, wiring, diagram</h3><p>TypedDict state, the retrieve / generate / no_answer nodes, the decider, StateGraph wiring, compile, and <code>clinic_rag.png</code>. You can draw the graph before the key arrives.</p></div></li>
+      <li class="step"><span class="chip later">later</span><div class="step-body"><h3>2.9 · Five questions</h3><p>Friday hours, walk-ins, cancelling, a price, and car insurance (which should take the no_answer path). Tune <code>RELEVANCE_THRESHOLD</code> using the real scores.</p></div></li>
+      <li class="step"><span class="chip later">later</span><div class="step-body"><h3>3 · README, review, PR</h3><p>Write the README with your real answers, check that no key is staged, commit, and open a PR with <code>Closes #306</code>.</p></div></li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="h-run">
+    <h2 id="h-run">How to run</h2>
+    <div class="note">Everything runs in PowerShell from <code>experiments_area\from_mabri\clinic_rag</code>. You need Docker Desktop running and an OpenAI key from Atyab. The key goes only in <code>.env</code>, which git ignores.</div>
+    <div class="run">
+      <div class="run-block">
+        <h3>One-time setup</h3>
+        <div class="term">Terminal 1 · project folder</div>
+        <div class="cmd"><pre>cd experiments_area\from_mabri\clinic_rag
+uv sync
+Copy-Item .env.example .env</pre><button type="button">Copy</button></div>
+        <p class="expect">Then open <code>.env</code> and replace <code>your-key-here</code> with the real key. Never paste it anywhere else.</p>
+      </div>
+      <div class="run-block">
+        <h3>1 · Start Qdrant</h3>
+        <div class="term">Terminal 1</div>
+        <div class="cmd"><pre>docker run -d --name clinic-qdrant -p 6333:6333 -v qdrant_storage:/qdrant/storage qdrant/qdrant</pre><button type="button">Copy</button></div>
+        <div class="expect">Already created? Use <code>docker start clinic-qdrant</code>. Check it at <a href="http://localhost:6333/dashboard">localhost:6333/dashboard</a>.</div>
+      </div>
+      <div class="run-block">
+        <h3>2 · Ingest the PDFs (once, or after changing a PDF)</h3>
+        <div class="term">Terminal 1</div>
+        <div class="cmd"><pre>uv run ingest.py</pre><button type="button">Copy</button></div>
+        <div class="expect">Expected output (counts depend on your chunk size):<pre>booking_policy.pdf: 3 chunks stored
+opening_hours.pdf: 2 chunks stored
+services_and_prices.pdf: 2 chunks stored</pre></div>
+      </div>
+      <div class="run-block">
+        <h3>3 · Ask the questions</h3>
+        <div class="term">Terminal 1</div>
+        <div class="cmd"><pre>uv run clinic_rag.py</pre><button type="button">Copy</button></div>
+        <div class="expect">Expected: <code>clinic_rag.png</code> is saved, then one dict for each question.<pre>{'question': 'What time do you open on Friday?',
+ 'chunks': ['... Friday: the clinic is open from 2:00 PM to 9:00 PM ...'],
+ 'answer': 'On Friday we open at 2:00 PM and close at 9:00 PM.'}
+{'question': 'Do you sell car insurance?', 'chunks': [],
+ 'answer': 'Sorry, I could not find that in our documents. Please contact the clinic ...'}</pre></div>
+      </div>
+      <div class="run-block">
+        <h3>Stop and clean up</h3>
+        <div class="term">Terminal 1</div>
+        <div class="cmd"><pre>docker stop clinic-qdrant
+docker rm clinic-qdrant
+docker volume rm qdrant_storage</pre><button type="button">Copy</button></div>
+        <p class="expect">Run only the first line to pause. The last line deletes the stored vectors, so you would need to run ingestion again.</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+const INFO = {
+  pdfs: { kind: "Input", title: "sample_pdfs/", text: "Three made-up clinic documents: opening hours, services and prices, and the booking and cancellation policy.", dl: [["Files", "opening_hours.pdf, services_and_prices.pdf, booking_policy.pdf"], ["Built in", "Step 0 (done)"]] },
+  load: { kind: "ingest.py function", title: "load_pdf_text(path)", text: "Opens one PDF with pypdf's PdfReader and joins the text of every page into one string.", dl: [["Reads", "a PDF path"], ["Returns", "str"], ["Built in", "Step 1.2 · no key"]] },
+  split: { kind: "ingest.py function", title: "split_into_chunks(text, chunk_size, overlap)", text: "Cuts the text into windows of CHUNK_SIZE characters. Each window starts CHUNK_SIZE − OVERLAP after the previous one, so a sentence cut at the edge still appears whole in one chunk.", dl: [["Reads", "text, 500, 100"], ["Returns", "list[str]"], ["Check", "1,200 chars → starts 0, 400, 800 → 3 chunks"], ["Built in", "Step 1.3 · no key"]] },
+  embed: { kind: "ingest.py function", title: "embed_texts(chunks)", text: "Sends all the chunks to OpenAI in one request and gets back one vector per chunk.", dl: [["Model", "text-embedding-3-small"], ["Returns", "list of 1536-number vectors"], ["Check", "len(vectors) == len(chunks)"], ["Built in", "Step 1.4 · needs key"]] },
+  store: { kind: "ingest.py function", title: "store_chunks(chunks, vectors, source)", text: "Upserts one Qdrant point per chunk. The point holds the vector, and its payload keeps the original text and the PDF file name.", dl: [["Writes", "points into clinic_docs"], ["Payload", "{text, source}"], ["Built in", "Step 1.5 · needs key"]] },
+  qdrant: { kind: "Data store", title: "Qdrant · clinic_docs", text: "A vector database in Docker on port 6333. Ingestion writes points here; the retrieve node searches for the points whose vectors are closest to the question's vector (cosine similarity).", dl: [["Vector size", "1536, cosine"], ["Dashboard", "localhost:6333/dashboard"], ["Runs in", "docker container clinic-qdrant"]] },
+  question: { kind: "Input", title: "workflow.invoke({\"question\": ...})", text: "The starting state. LangGraph passes it from START into the first node.", dl: [["State keys", "question, chunks, answer"], ["Built in", "Step 2.9"]] },
+  retrieve: { kind: "Graph node", title: "retrieve", text: "Embeds the question with the same model as ingestion, then asks Qdrant for the TOP_K most similar chunks above RELEVANCE_THRESHOLD.", dl: [["Reads", "question"], ["Writes", "chunks"], ["Edge in", "add_edge(START, \"retrieve\")"], ["Built in", "Step 2.3"]] },
+  decide: { kind: "Decider function", title: "decide_next_step(state)", text: "This isn't a node. add_conditional_edges calls it after retrieve and uses the label it returns to choose the next node.", dl: [["Returns", "\"generate\" if chunks else \"no_answer\""], ["Mapping", "{\"generate\": \"generate\", \"no_answer\": \"no_answer\"}"], ["Built in", "Steps 2.4 and 2.7"]] },
+  generate: { kind: "Graph node", title: "generate", text: "Sends the question and the retrieved chunks to the chat model with an instruction to answer only from those chunks.", dl: [["Model", "gpt-4.1-mini"], ["Reads", "question, chunks"], ["Writes", "answer"], ["Built in", "Step 2.5"]] },
+  no_answer: { kind: "Graph node", title: "no_answer", text: "Runs when nothing relevant was found. It writes a fixed, polite message without calling the model.", dl: [["Reads", "nothing"], ["Writes", "answer"], ["Built in", "Step 2.6"]] },
+  end: { kind: "Graph end", title: "END", text: "Both branches go here with add_edge(..., END). invoke then returns the final state.", dl: [["Edges in", "generate → END, no_answer → END"]] },
+  result: { kind: "Output", title: "Printed final state", text: "The plain dict returned by workflow.invoke. A reviewer can read chunks to see what the answer was based on.", dl: [["Keys", "question, chunks, answer"], ["Also saved", "clinic_rag.png from draw_mermaid_png()"]] },
+};
+const nodes = document.querySelectorAll(".node");
+function show(id) {
+  const d = INFO[id]; if (!d) return;
+  nodes.forEach(n => n.classList.toggle("active", n.dataset.id === id));
+  document.getElementById("p-kind").textContent = d.kind;
+  document.getElementById("p-title").textContent = d.title;
+  document.getElementById("p-text").textContent = d.text;
+  const dl = document.getElementById("p-dl"); dl.replaceChildren();
+  d.dl.forEach(([k, v]) => { const dt = document.createElement("dt"); dt.textContent = k; const dd = document.createElement("dd"); dd.textContent = v; dl.append(dt, dd); });
+}
+nodes.forEach(n => {
+  n.addEventListener("click", () => show(n.dataset.id));
+  n.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); show(n.dataset.id); } });
+});
+show("retrieve");
+document.querySelectorAll(".cmd button").forEach(btn => {
+  btn.addEventListener("click", async () => {
+    const pre = btn.parentElement.querySelector("pre");
+    try { await navigator.clipboard.writeText(pre.textContent); btn.textContent = "Copied"; }
+    catch { const r = document.createRange(); r.selectNodeContents(pre); const s = getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent = "Selected"; }
+    setTimeout(() => (btn.textContent = "Copy"), 1500);
+  });
+});
+</script>
