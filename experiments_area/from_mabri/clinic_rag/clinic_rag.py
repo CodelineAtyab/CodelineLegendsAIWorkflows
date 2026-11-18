@@ -72,3 +72,8 @@ def generate(state: ClinicState) -> ClinicState:
     )
     state["answer"] = response.choices[0].message.content
     return state
+
+
+def no_answer(state: ClinicState) -> ClinicState:
+    state["answer"] = NO_ANSWER_MESSAGE
+    return state
