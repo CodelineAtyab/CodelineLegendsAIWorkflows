@@ -2,6 +2,7 @@ from functools import cache
 from typing import TypedDict
 
 from dotenv import load_dotenv
+from langgraph.graph import END, START, StateGraph
 from openai import OpenAI
 from qdrant_client import QdrantClient
 
@@ -77,3 +78,17 @@ def generate(state: ClinicState) -> ClinicState:
 def no_answer(state: ClinicState) -> ClinicState:
     state["answer"] = NO_ANSWER_MESSAGE
     return state
+
+
+graph = StateGraph(ClinicState)
+
+graph.add_node("retrieve", retrieve)
+graph.add_node("generate", generate)
+graph.add_node("no_answer", no_answer)
+
+graph.add_edge(START, "retrieve")
+graph.add_conditional_edges("retrieve", decide_next_step, {"generate": "generate", "no_answer": "no_answer"})
+graph.add_edge("generate", END)
+graph.add_edge("no_answer", END)
+
+workflow = graph.compile()
