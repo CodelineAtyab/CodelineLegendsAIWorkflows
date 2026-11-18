@@ -1,11 +1,15 @@
+import uuid
 from functools import cache
 from pathlib import Path
 
 from dotenv import load_dotenv
 from openai import OpenAI
 from pypdf import PdfReader
+from qdrant_client import QdrantClient
+from qdrant_client.models import Distance, PointStruct, VectorParams
 
 COLLECTION_NAME = "clinic_docs"
+QDRANT_URL = "http://localhost:6333"
 EMBEDDING_MODEL = "text-embedding-3-small"
 VECTOR_SIZE = 1536
 CHUNK_SIZE = 500
@@ -45,5 +49,30 @@ def embed_texts(chunks: list[str]) -> list[list[float]]:
     """Turn each chunk into one embedding vector, in the same order."""
     response = get_openai_client().embeddings.create(model=EMBEDDING_MODEL, input=chunks)
     return [item.embedding for item in response.data]
+
+
+@cache
+def get_qdrant_client() -> QdrantClient:
+    return QdrantClient(url=QDRANT_URL)
+
+
+def store_chunks(chunks: list[str], vectors: list[list[float]], source: str) -> int:
+    """Save each chunk and its vector in Qdrant, tagged with the PDF file name."""
+    client = get_qdrant_client()
+    if not client.collection_exists(COLLECTION_NAME):
+        client.create_collection(
+            collection_name=COLLECTION_NAME,
+            vectors_config=VectorParams(size=VECTOR_SIZE, distance=Distance.COSINE),
+        )
+    points = [
+        PointStruct(
+            id=str(uuid.uuid5(uuid.NAMESPACE_URL, f"{source}#{index}")),
+            vector=vector,
+            payload={"text": chunk, "source": source},
+        )
+        for index, (chunk, vector) in enumerate(zip(chunks, vectors, strict=True))
+    ]
+    client.upsert(collection_name=COLLECTION_NAME, points=points)
+    return len(points)
 
 
