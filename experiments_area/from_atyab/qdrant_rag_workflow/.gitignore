@@ -1,0 +1,16 @@
+# Local secrets - never commit.
+.env
+
+# Qdrant data written by docker/docker-compose.yml.
+docker/qdrant_storage/
+
+# PDFs and their `_`-prefixed processed copies.
+data/
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
