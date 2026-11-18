@@ -95,3 +95,13 @@ These notes can be copied into the PR description with `Closes #295`.
 
 Temporary fault injection and verification scripts stay in ignored `.cache/`;
 the submitted worker and activities contain no test switches or artificial delays.
+
+
+
+
+
+
+
+docker compose up -d
+uv run worker.py
+uv run starter.py "Luke Skywalker"
