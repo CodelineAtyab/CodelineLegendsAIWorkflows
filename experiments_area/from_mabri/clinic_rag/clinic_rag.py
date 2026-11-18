@@ -1,5 +1,6 @@
 from functools import cache
 from pathlib import Path
+from pprint import pprint
 from typing import TypedDict
 
 from dotenv import load_dotenv
@@ -17,6 +18,13 @@ NO_ANSWER_MESSAGE = (
     "Sorry, I could not find that in our clinic documents. "
     "Please contact the clinic on 555-0142 and our staff will help you."
 )
+TEST_QUESTIONS = [
+    "What time do you open on Friday?",
+    "Do you accept walk-ins?",
+    "How do I cancel an appointment?",
+    "How much is a dental check-up?",
+    "Do you sell car insurance?",
+]
 SYSTEM_PROMPT = (
     "You are the booking assistant of Sunrise Family Clinic. "
     "Answer the customer's question using only the clinic documents you are given. "
@@ -103,6 +111,9 @@ def save_graph_diagram() -> Path:
 
 def main() -> None:
     print(f"Graph saved to {save_graph_diagram()}")
+    for question in TEST_QUESTIONS:
+        print()
+        pprint(workflow.invoke({"question": question, "chunks": [], "answer": ""}), width=100)
 
 
 if __name__ == "__main__":
