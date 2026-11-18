@@ -1,0 +1,11 @@
+# Keep worker and starter dependencies together so they execute the same workflow code.
+[project]
+name = "star-wars-temporal"
+version = "0.1.0"
+description = "Build a Star Wars dossier with durable Temporal activities"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "httpx>=0.28.1",
+    "temporalio>=1.36.1",
+]

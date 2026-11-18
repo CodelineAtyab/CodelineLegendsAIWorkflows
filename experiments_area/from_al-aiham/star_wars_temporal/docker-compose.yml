@@ -1,0 +1,56 @@
+# Isolate this exercise's containers and database volume from other class projects.
+name: laaag21-star-wars-temporal
+
+services:
+  postgres:
+    image: postgres:16.11-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: temporal
+    volumes:
+      # Workflow history must survive container replacement and compose down/up.
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d temporal"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  temporal:
+    image: temporalio/auto-setup:1.29.1
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # postgres12 is Temporal's driver name; it also supports PostgreSQL 16.
+      DB: postgres12
+      DB_PORT: "5432"
+      POSTGRES_SEEDS: postgres
+      POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER in .env}
+      POSTGRES_PWD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      TEMPORAL_ADDRESS: temporal:7233
+      DEFAULT_NAMESPACE: default
+      SKIP_ADD_CUSTOM_SEARCH_ATTRIBUTES: "true"
+    ports:
+      - "127.0.0.1:7233:7233"
+    healthcheck:
+      # A listening port alone does not prove that namespace initialization finished.
+      test: ["CMD", "temporal", "operator", "namespace", "describe", "--namespace", "default", "--address", "temporal:7233"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+  temporal-ui:
+    image: temporalio/ui:2.34.0
+    depends_on:
+      temporal:
+        condition: service_healthy
+    environment:
+      TEMPORAL_ADDRESS: temporal:7233
+    ports:
+      - "127.0.0.1:8080:8080"
+
+volumes:
+  postgres_data:
