@@ -1,0 +1,12 @@
+[project]
+name = "mcp-servers"
+version = "0.1.0"
+description = "Clinic MCP server and client practice project"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "fastmcp>=4.1.7",
+]
+
+[tool.uv]
+override-dependencies = ["cryptography>=45.0.1,<49"]
