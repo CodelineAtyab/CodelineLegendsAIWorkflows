@@ -60,7 +60,7 @@ def retrieve(state: ClinicState) -> ClinicState:
         score_threshold=RELEVANCE_THRESHOLD,
         with_payload=True,
     ).points
-    state["chunks"] = [f"[{hit.payload['source']}] {hit.payload['text']}" for hit in hits]
+    state["chunks"] = [f"[{hit.payload['source']}] {hit.payload['text']}" for hit in hits if hit.payload]
     return state
 
 
@@ -80,7 +80,7 @@ def generate(state: ClinicState) -> ClinicState:
             {"role": "user", "content": f"Clinic documents:\n{documents}\n\nCustomer question: {state['question']}"},
         ],
     )
-    state["answer"] = response.choices[0].message.content
+    state["answer"] = response.choices[0].message.content or NO_ANSWER_MESSAGE
     return state
 
 
