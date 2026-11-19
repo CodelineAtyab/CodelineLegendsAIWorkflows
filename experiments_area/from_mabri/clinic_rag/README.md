@@ -90,15 +90,17 @@ Run only the first line to pause. The last line deletes the stored vectors.
 
 ## Test questions and answers
 
-> TODO: fill in from the first real run of `uv run clinic_rag.py` (waiting for the OpenAI API key).
+Real answers from `uv run clinic_rag.py` (`gpt-4.1-mini`, `RELEVANCE_THRESHOLD = 0.3`). "Top score" is the best cosine similarity Qdrant returned for the question.
 
-| # | Question | Expected source | Branch | Answer |
+| # | Question | Top score (source) | Branch | Answer |
 |---|---|---|---|---|
-| 1 | What time do you open on Friday? | `opening_hours.pdf` | generate | _pending_ |
-| 2 | Do you accept walk-ins? | `booking_policy.pdf` | generate | _pending_ |
-| 3 | How do I cancel an appointment? | `booking_policy.pdf` | generate | _pending_ |
-| 4 | How much is a dental check-up? | `services_and_prices.pdf` | generate | _pending_ |
-| 5 | Do you sell car insurance? | none | no_answer | _pending_ |
+| 1 | What time do you open on Friday? | 0.40 (`opening_hours.pdf`) | generate | On Friday, Sunrise Family Clinic opens at 2:00 PM. |
+| 2 | Do you accept walk-ins? | 0.44 (`booking_policy.pdf`) | generate | Yes, we accept walk-in patients, but those with appointments are seen first. On Saturdays, the clinic only accepts walk-ins. |
+| 3 | How do I cancel an appointment? | 0.58 (`booking_policy.pdf`) | generate | You can cancel your appointment through the app or website under My Appointments, or by calling the clinic. Please make sure to cancel at least 24 hours before your appointment to avoid a fee. |
+| 4 | How much is a dental check-up? | 0.47 (`services_and_prices.pdf`) | generate | A dental check-up and cleaning at Sunrise Family Clinic costs 45 GVD. |
+| 5 | Do you sell car insurance? | 0.23 (below threshold) | no_answer | Sorry, I could not find that in our clinic documents. Please contact the clinic on 555-0142 and our staff will help you. |
+
+**Why 0.3:** the lowest best score for a real clinic question was 0.40 (Friday) and the highest score for the unanswerable question was 0.23, so 0.3 sits in the gap between them.
 
 ## Settings
 
