@@ -1,0 +1,12 @@
+# Qdrant for the clinic_rag project.
+#
+# Start:      docker compose up -d
+# Stop:       docker compose down
+# Dashboard:  http://localhost:6333/dashboard
+services:
+  qdrant:
+    image: qdrant/qdrant:v1.20.2
+    ports:
+      - "127.0.0.1:6333:6333"
+    volumes:
+      - ./qdrant_storage:/qdrant/storage
