@@ -20,7 +20,6 @@ All clinic data in `sample_pdfs/` is made up (the fictional "Sunrise Family Clin
 | `clinic_rag.png` | Diagram of the graph, saved by `clinic_rag.py` |
 | `sample_pdfs/` | `opening_hours.pdf`, `services_and_prices.pdf`, `booking_policy.pdf` |
 | `.env.example` | Template for the API key (the real `.env` is ignored by git) |
-| `docs/clinic_rag_design.html` | Interactive design page: data flow, steps, how to run |
 
 ## The graph
 
