@@ -1,0 +1,14 @@
+# Qdrant vector database for the clinic RAG project.
+# Start: docker compose up -d    Stop: docker compose down    Also delete vectors: docker compose down -v
+services:
+  qdrant:
+    image: qdrant/qdrant:v1.20.2
+    container_name: clinic-qdrant
+    ports:
+      - "127.0.0.1:6333:6333"
+    volumes:
+      - qdrant_storage:/qdrant/storage
+
+volumes:
+  qdrant_storage:
+    name: qdrant_storage
