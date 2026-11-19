@@ -111,7 +111,7 @@ All settings are named constants at the top of each script:
 | `COLLECTION_NAME` | `clinic_docs` | both scripts |
 | `CHUNK_SIZE` / `CHUNK_OVERLAP` | 500 / 100 characters | `ingest.py` |
 | `TOP_K` | 3 | `clinic_rag.py` |
-| `RELEVANCE_THRESHOLD` | 0.4 (cosine similarity) | `clinic_rag.py` |
+| `RELEVANCE_THRESHOLD` | 0.3 (cosine similarity; tuned from real scores) | `clinic_rag.py` |
 
 ## Troubleshooting
 
