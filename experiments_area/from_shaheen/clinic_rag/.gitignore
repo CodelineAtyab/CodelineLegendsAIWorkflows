@@ -1,0 +1,9 @@
+# Local secrets, never commit.
+.env
+
+# Qdrant data written by docker-compose.yml.
+qdrant_storage/
+
+# Python
+.venv/
+__pycache__/
