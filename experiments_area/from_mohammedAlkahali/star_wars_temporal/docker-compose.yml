@@ -1,0 +1,80 @@
+# Local Temporal stack: Postgres (Temporal's database) + Temporal server + Web UI.
+# Based on the official https://github.com/temporalio/docker-compose
+# (docker-compose-postgres.yml), trimmed down to what this project needs.
+#
+# Why exact image versions instead of "latest"?
+#   "latest" can change any day. A new version could break the setup or behave
+#   differently on a teammate's machine. Pinned versions mean everyone runs the
+#   exact same stack, today and in six months.
+#
+# Credentials come from the .env file (Docker Compose reads it automatically).
+# The ":?" syntax makes Compose stop with a clear error if a value is missing,
+# instead of starting Postgres with an empty password.
+
+services:
+  postgresql:
+    image: postgres:16.10
+    container_name: temporal-postgresql
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?set POSTGRES_USER in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    volumes:
+      # A NAMED volume keeps the database (and so all workflow history) when the
+      # container is removed, e.g. after "docker compose down". Only
+      # "docker compose down -v" deletes it.
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      # pg_isready asks Postgres "are you accepting connections yet?".
+      # A container being "started" does not mean the database is ready.
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    # No "ports:" here on purpose: only Temporal needs to talk to Postgres, and
+    # it does so inside the Docker network. Not exposing 5432 also avoids a
+    # clash with any Postgres already installed on your machine.
+
+  temporal:
+    # auto-setup creates the database tables and the "default" namespace on
+    # first start, so we don't have to run any setup commands by hand.
+    image: temporalio/auto-setup:1.29.1
+    container_name: temporal
+    depends_on:
+      postgresql:
+        # Wait until the health check passes, not just until the container
+        # starts. Otherwise Temporal may try to connect too early and crash.
+        condition: service_healthy
+    environment:
+      - DB=postgres12            # the driver name Temporal uses for Postgres 12+
+      - DB_PORT=5432
+      - POSTGRES_USER=${POSTGRES_USER:?set POSTGRES_USER in .env}
+      - POSTGRES_PWD=${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      - POSTGRES_SEEDS=postgresql   # the Postgres service name on the Docker network
+      - DEFAULT_NAMESPACE=default
+    healthcheck:
+      # Ask the server itself if it is serving. "Container running" only means
+      # the process started; this checks Temporal can actually answer requests.
+      test: ["CMD", "temporal", "operator", "cluster", "health", "--address", "temporal:7233"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    ports:
+      # 7233 is the gRPC port our Python worker and starter connect to.
+      - "7233:7233"
+
+  temporal-ui:
+    image: temporalio/ui:2.34.0
+    container_name: temporal-ui
+    depends_on:
+      temporal:
+        # Start the UI only when Temporal is really answering.
+        condition: service_healthy
+    environment:
+      - TEMPORAL_ADDRESS=temporal:7233
+    ports:
+      # Open http://localhost:8080 to see workflows, activities and retries.
+      - "8080:8080"
+
+volumes:
+  postgres-data:
