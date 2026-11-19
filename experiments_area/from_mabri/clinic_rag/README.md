@@ -19,6 +19,7 @@ All clinic data in `sample_pdfs/` is made up (the fictional "Sunrise Family Clin
 | `clinic_rag.py` | LangGraph workflow: `retrieve` → (decider) → `generate` with `gpt-4.1-mini`, or `no_answer`; runs 5 test questions |
 | `clinic_rag.png` | Diagram of the graph, saved by `clinic_rag.py` |
 | `sample_pdfs/` | `opening_hours.pdf`, `services_and_prices.pdf`, `booking_policy.pdf` |
+| `compose.yaml` | Runs Qdrant `v1.20.2` locally (port 6333, only on this machine) |
 | `.env.example` | Template for the API key (the real `.env` is ignored by git) |
 
 ## The graph
@@ -49,10 +50,10 @@ Open `.env` and replace `your-key-here` with your OpenAI key. Never commit `.env
 ### 2. Start Qdrant locally
 
 ```powershell
-docker run -d --name clinic-qdrant -p 6333:6333 -v qdrant_storage:/qdrant/storage qdrant/qdrant
+docker compose up -d
 ```
 
-If the container already exists, use `docker start clinic-qdrant` instead. Dashboard: http://localhost:6333/dashboard
+Expected: `Container clinic-qdrant Started`. Check it with `docker compose ps`. Dashboard: http://localhost:6333/dashboard
 
 ### 3. Load the PDFs into Qdrant
 
@@ -81,12 +82,14 @@ It saves `clinic_rag.png`, then prints the final state (`question`, `chunks`, `a
 ### 5. Stop and clean up
 
 ```powershell
-docker stop clinic-qdrant
-docker rm clinic-qdrant
-docker volume rm qdrant_storage
+docker compose down
 ```
 
-Run only the first line to pause. The last line deletes the stored vectors.
+This stops and removes the container but keeps the stored vectors, so the next `docker compose up -d` still has them. To also delete the vectors:
+
+```powershell
+docker compose down -v
+```
 
 ## Test questions and answers
 
@@ -120,7 +123,8 @@ All settings are named constants at the top of each script:
 | Problem | Fix |
 |---|---|
 | `OpenAIError: Missing credentials` | `.env` is missing or still has `your-key-here` |
-| `Connection refused` on port 6333 | Qdrant isn't running: `docker start clinic-qdrant` |
+| `Connection refused` on port 6333 | Qdrant isn't running: `docker compose up -d` |
+| `port is already allocated` on 6333 | Another Qdrant container is using the port: `docker ps`, then stop it |
 | `Collection clinic_docs not found` | Run `uv run ingest.py` before `clinic_rag.py` |
 | An answer looks made up | Print `chunks` first: usually retrieval is the problem, not the model |
 | A clinic question gets the no-answer message | `RELEVANCE_THRESHOLD` is too high for that question; lower it slightly |
