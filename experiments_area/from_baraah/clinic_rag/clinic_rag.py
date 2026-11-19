@@ -29,7 +29,7 @@ class ClinicState(TypedDict):
 
 
 # Node 1: Retrieve relevant PDF chunks
-def retrieve(state: ClinicState) -> dict:
+def retrieve(state: ClinicState) -> ClinicState:
     question = state["question"]
 
     # Convert question into an embedding
@@ -59,7 +59,8 @@ def retrieve(state: ClinicState) -> dict:
         if isinstance(text, str):
             chunks.append(text)
 
-    return {"chunks": chunks}
+    state["chunks"] = chunks
+    return state
 
 
 # Decide which node runs next
@@ -73,7 +74,7 @@ def decide_next(
 
 
 # Node 2: Generate answer using OpenAI
-def generate(state: ClinicState) -> dict:
+def generate(state: ClinicState) -> ClinicState:
     question = state["question"]
     context = "\n\n".join(state["chunks"])
 
@@ -103,18 +104,21 @@ def generate(state: ClinicState) -> dict:
 
     answer = response.choices[0].message.content or ""
 
-    return {"answer": answer}
+    state["answer"] = answer
+    return state
 
 
 # Node 3: Return fallback answer
-def no_answer(state: ClinicState) -> dict:
-    return {
-        "answer": (
-            "Sorry, I could not find this information "
-            "in our clinic documents. "
-            "Please contact the clinic for assistance."
-        )
-    }
+
+def no_answer(state: ClinicState) -> ClinicState:
+    state["answer"] = (
+        "Sorry, I could not find this information "
+        "in our clinic documents. "
+        "Please contact the clinic for assistance."
+    )
+
+    return state
+
 
 
 # Build LangGraph workflow
