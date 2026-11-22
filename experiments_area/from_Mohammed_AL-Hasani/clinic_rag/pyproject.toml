@@ -1,0 +1,14 @@
+[project]
+name = "clinic-rag"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "grandalf>=0.8",
+    "langgraph>=1.2.22",
+    "openai>=3.55.0",
+    "pypdf>=7.1.0",
+    "python-dotenv>=1.2.4",
+    "qdrant-client>=1.20.0",
+]
