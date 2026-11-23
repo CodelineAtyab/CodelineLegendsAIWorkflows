@@ -1,0 +1,6 @@
+# Local credentials and runtime files must not enter the exercise submission.
+.env
+.cache/
+.venv/
+__pycache__/
+*.py[cod]
