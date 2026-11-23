@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Clinic Login</title>
+</head>
+<body>
+  <h1>Clinic Login</h1>
+  <form id="login-form" onsubmit="return false;">
+    <label>Username <input id="username" type="text" autocomplete="off"></label><br>
+    <label>Password <input id="password" type="password" autocomplete="off"></label><br>
+    <button id="login-button" type="button">Log in</button>
+  </form>
+  <p id="login-result"></p>
+  <a id="chat-link" href="/chat" hidden>Go to chat</a>
+
+  <script>
+    function basicAuthHeader(username, password) {
+      const bytes = new TextEncoder().encode(username + ":" + password);
+      const binary = Array.from(bytes, (byte) => String.fromCharCode(byte)).join("");
+      return "Basic " + btoa(binary);
+    }
+
+    document.getElementById("login-button").addEventListener("click", async () => {
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+      const result = document.getElementById("login-result");
+      const header = basicAuthHeader(username, password);
+
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Authorization": header },
+      });
+      const body = await response.json();
+      result.textContent = body.message;
+
+      if (response.ok) {
+        sessionStorage.setItem("authHeader", header);
+        document.getElementById("chat-link").hidden = false;
+      } else {
+        sessionStorage.removeItem("authHeader");
+        document.getElementById("chat-link").hidden = true;
+      }
+    });
+  </script>
+</body>
+</html>

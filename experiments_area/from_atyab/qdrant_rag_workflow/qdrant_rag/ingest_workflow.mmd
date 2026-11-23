@@ -1,0 +1,27 @@
+---
+config:
+  flowchart:
+    curve: linear
+---
+graph TD;
+	__start__([<p>__start__</p>]):::first
+	prepare_collection(prepare_collection)
+	discover(discover)
+	next_file(next_file)
+	load_and_chunk(load_and_chunk)
+	upsert(upsert)
+	mark_processed(mark_processed)
+	report(report)
+	__end__([<p>__end__</p>]):::last
+	__start__ --> prepare_collection;
+	discover --> next_file;
+	load_and_chunk --> upsert;
+	mark_processed --> next_file;
+	next_file -.-> load_and_chunk;
+	next_file -.-> report;
+	prepare_collection --> discover;
+	upsert --> mark_processed;
+	report --> __end__;
+	classDef default fill:#f2f0ff,line-height:1.2
+	classDef first fill-opacity:0
+	classDef last fill:#bfb6fc
