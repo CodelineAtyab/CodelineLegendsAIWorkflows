@@ -1,0 +1,35 @@
+# Qdrant for the qdrant_rag_workflow demo.
+#
+# Start this before the Python application:
+#   docker compose -f docker/docker-compose.yml up -d
+#
+# Data lives in ./qdrant_storage (gitignored). `down -v` is not needed to wipe
+# vectors - pass `--recreate` to the ingest workflow instead.
+name: ${COMPOSE_PROJECT_NAME:-qdrant-rag-workflow}
+
+services:
+  qdrant:
+    image: qdrant/qdrant:${QDRANT_VERSION:-v1.20.2}
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${QDRANT_HTTP_PORT:-6333}:6333"
+      - "127.0.0.1:${QDRANT_GRPC_PORT:-6334}:6334"
+    volumes:
+      - ./qdrant_storage:/qdrant/storage
+    environment:
+      QDRANT__SERVICE__HTTP_PORT: 6333
+      QDRANT__SERVICE__GRPC_PORT: 6334
+      QDRANT__LOG_LEVEL: INFO
+    healthcheck:
+      # The official image ships no curl/wget; this is a plain TCP probe.
+      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/127.0.0.1/6333' || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+    stop_grace_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
