@@ -1,0 +1,12 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "servers": {
+      "playwright": {
+        "type": "local",
+        "command": ["npx.cmd", "-y", "@playwright/mcp", "--browser", "chromium"],
+        "enabled": true
+      }
+    }
+  }
+}

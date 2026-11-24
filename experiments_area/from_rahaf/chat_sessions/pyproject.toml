@@ -1,0 +1,13 @@
+[project]
+name = "chat-sessions"
+version = "0.1.0"
+description = "A terminal chat app with named, persistent sessions"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "openai>=3.31.0",
+    "python-dotenv>=1.2.4",
+]
+
+[tool.uv]
+package = false
