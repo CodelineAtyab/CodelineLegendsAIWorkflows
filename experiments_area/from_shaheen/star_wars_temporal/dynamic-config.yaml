@@ -1,0 +1,7 @@
+# Temporal server settings that can change without a rebuild ("dynamic config").
+# The server refuses to start without this file.
+# Postgres stores IDs in 255-character columns, so Temporal must reject longer
+# workflow IDs itself instead of failing later inside the database.
+limit.maxIDLength:
+  - value: 255
+    constraints: {}

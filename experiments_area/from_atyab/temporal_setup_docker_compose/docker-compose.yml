@@ -1,0 +1,171 @@
+# Temporal Server + PostgreSQL.
+#
+# Reliable single-host setup:
+#   - schema is created/migrated by a one-shot admin-tools job (idempotent)
+#   - server + UI wait on real healthchecks
+#   - data lives in a named volume, images are pinned to exact versions
+#
+# Usage:
+#   cp sample.env .env    # then edit the password
+#   docker compose up -d
+
+name: ${COMPOSE_PROJECT_NAME:-temporal}
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  postgres:
+    image: postgres:${POSTGRES_VERSION:-17-alpine}
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER must be set}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-temporal}
+      # Used only when initializing an empty data directory.
+      POSTGRES_INITDB_ARGS: --data-checksums --encoding=UTF8
+      PGDATA: /var/lib/postgresql/data/pgdata
+      TZ: ${TZ:-UTC}
+    command:
+      - postgres
+      - -c
+      - max_connections=${POSTGRES_MAX_CONNECTIONS:-200}
+      - -c
+      - shared_buffers=${POSTGRES_SHARED_BUFFERS:-512MB}
+      - -c
+      - wal_compression=on
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} -h 127.0.0.1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+    stop_grace_period: 1m
+    logging: *default-logging
+    networks:
+      - temporal
+
+  # One-shot: create the temporal + temporal_visibility databases and apply
+  # schema migrations. Safe to re-run, including during version upgrades.
+  temporal-schema-setup:
+    image: temporalio/admin-tools:${TEMPORAL_ADMINTOOLS_VERSION:-1.32.2}
+    restart: on-failure:5
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB: postgres12
+      DB_PORT: "5432"
+      POSTGRES_SEEDS: postgres
+      POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER must be set}
+      POSTGRES_PWD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}
+      SQL_PASSWORD: ${POSTGRES_PASSWORD}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      DBNAME: ${POSTGRES_DB:-temporal}
+      VISIBILITY_DBNAME: ${POSTGRES_VISIBILITY_DB:-temporal_visibility}
+      TZ: ${TZ:-UTC}
+    volumes:
+      - ./docker/scripts:/scripts:ro
+    entrypoint: ["/bin/sh", "/scripts/setup-postgres.sh"]
+    logging: *default-logging
+    networks:
+      - temporal
+
+  # Temporal Server: frontend, history, matching and worker in one process.
+  temporal:
+    image: temporalio/server:${TEMPORAL_VERSION:-1.32.2}
+    restart: unless-stopped
+    init: true
+    depends_on:
+      postgres:
+        condition: service_healthy
+      temporal-schema-setup:
+        condition: service_completed_successfully
+    environment:
+      DB: postgres12
+      DB_PORT: "5432"
+      POSTGRES_SEEDS: postgres
+      POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER must be set}
+      POSTGRES_PWD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}
+      DBNAME: ${POSTGRES_DB:-temporal}
+      VISIBILITY_DBNAME: ${POSTGRES_VISIBILITY_DB:-temporal_visibility}
+      BIND_ON_IP: 0.0.0.0
+      NUM_HISTORY_SHARDS: ${TEMPORAL_NUM_HISTORY_SHARDS:-512}
+      DYNAMIC_CONFIG_FILE_PATH: /etc/temporal/config/dynamicconfig/docker.yaml
+      LOG_LEVEL: ${TEMPORAL_LOG_LEVEL:-info}
+      LOG_OUTPUT: json
+      TZ: ${TZ:-UTC}
+    ports:
+      - "127.0.0.1:${TEMPORAL_GRPC_PORT:-7233}:7233"
+    volumes:
+      - ./docker/dynamicconfig:/etc/temporal/config/dynamicconfig:ro
+    healthcheck:
+      test: ["CMD", "nc", "-z", "127.0.0.1", "7233"]
+      interval: 5s
+      timeout: 3s
+      retries: 40
+      start_period: 30s
+    stop_grace_period: 1m
+    logging: *default-logging
+    networks:
+      - temporal
+
+  # One-shot: create the default namespace (and any extras) with retention.
+  # Existing namespaces are left untouched.
+  temporal-namespace-setup:
+    image: temporalio/admin-tools:${TEMPORAL_ADMINTOOLS_VERSION:-1.32.2}
+    restart: on-failure:5
+    depends_on:
+      temporal:
+        condition: service_healthy
+    environment:
+      TEMPORAL_ADDRESS: temporal:7233
+      TEMPORAL_CLI_ADDRESS: temporal:7233
+      DEFAULT_NAMESPACE: ${TEMPORAL_DEFAULT_NAMESPACE:-default}
+      NAMESPACE_RETENTION: ${TEMPORAL_NAMESPACE_RETENTION:-7d}
+      EXTRA_NAMESPACES: ${TEMPORAL_EXTRA_NAMESPACES:-}
+      TZ: ${TZ:-UTC}
+    volumes:
+      - ./docker/scripts:/scripts:ro
+    entrypoint: ["/bin/sh", "/scripts/create-namespaces.sh"]
+    logging: *default-logging
+    networks:
+      - temporal
+
+  temporal-ui:
+    image: temporalio/ui:${TEMPORAL_UI_VERSION:-2.56.4}
+    restart: unless-stopped
+    init: true
+    depends_on:
+      temporal:
+        condition: service_healthy
+    environment:
+      TEMPORAL_ADDRESS: temporal:7233
+      TEMPORAL_CORS_ORIGINS: ${TEMPORAL_UI_CORS_ORIGINS:-http://localhost:8080}
+      TEMPORAL_DEFAULT_NAMESPACE: ${TEMPORAL_DEFAULT_NAMESPACE:-default}
+      TZ: ${TZ:-UTC}
+    ports:
+      - "127.0.0.1:${TEMPORAL_UI_PORT:-8080}:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:8080/ || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    logging: *default-logging
+    networks:
+      - temporal
+
+networks:
+  temporal:
+    driver: bridge
+
+volumes:
+  postgres-data:
+    name: ${COMPOSE_PROJECT_NAME:-temporal}-postgres-data

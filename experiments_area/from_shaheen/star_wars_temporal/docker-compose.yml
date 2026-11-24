@@ -1,0 +1,106 @@
+# Local Temporal stack for the Star Wars dossier workflow.
+# Temporal stores every workflow's history in Postgres. That stored history is
+# what lets a workflow resume after a crash instead of starting from step 1.
+# Credentials come from .env (git-ignored). Copy .env.example to .env first.
+
+services:
+  postgresql:
+    image: postgres:16
+    environment:
+      # ":?" stops compose with a clear message if .env is missing,
+      # instead of starting Postgres with an empty password.
+      POSTGRES_USER: ${POSTGRES_USER:?set POSTGRES_USER in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    volumes:
+      # Named volume, so "docker compose down" and "up" keep workflow history.
+      - temporal-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      # Check over TCP (-h 127.0.0.1): on first start Postgres runs a temporary
+      # socket-only server while it initialises, and a socket check would
+      # report "ready" too early.
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # One-shot job: creates Temporal's two databases and their tables, then exits.
+  # The supported temporalio/server image no longer does this by itself.
+  temporal-schema-setup:
+    image: temporalio/admin-tools:1.32.2
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    environment:
+      SQL_PASSWORD: ${POSTGRES_PASSWORD}
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -eu
+        ARGS="--plugin postgres12 --ep postgresql -p 5432 -u ${POSTGRES_USER}"
+        temporal-sql-tool $$ARGS --db temporal create
+        temporal-sql-tool $$ARGS --db temporal setup-schema -v 0.0
+        temporal-sql-tool $$ARGS --db temporal update-schema -d /etc/temporal/schema/postgresql/v12/temporal/versioned
+        temporal-sql-tool $$ARGS --db temporal_visibility create
+        temporal-sql-tool $$ARGS --db temporal_visibility setup-schema -v 0.0
+        temporal-sql-tool $$ARGS --db temporal_visibility update-schema -d /etc/temporal/schema/postgresql/v12/visibility/versioned
+
+  temporal:
+    image: temporalio/server:1.32.2
+    depends_on:
+      # Start only after the tables exist, otherwise the server crashes on boot.
+      temporal-schema-setup:
+        condition: service_completed_successfully
+    environment:
+      DB: postgres12
+      DB_PORT: 5432
+      POSTGRES_SEEDS: postgresql
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PWD: ${POSTGRES_PASSWORD}
+      BIND_ON_IP: 0.0.0.0
+      DYNAMIC_CONFIG_FILE_PATH: config/dynamicconfig/development-sql.yaml
+    volumes:
+      # The server won't start without a dynamic config file. It lives in the
+      # project root because the repo's .gitignore ignores "dynamicconfig/".
+      - ./dynamic-config.yaml:/etc/temporal/config/dynamicconfig/development-sql.yaml:ro
+    ports:
+      # The Python worker and starter connect to Temporal on this port.
+      - "7233:7233"
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "7233"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 30s
+
+  # One-shot job: creates the "default" namespace the worker and UI use.
+  # It waits until the server answers, and skips creation if it already exists.
+  temporal-create-namespace:
+    image: temporalio/admin-tools:1.32.2
+    depends_on:
+      temporal:
+        condition: service_healthy
+    environment:
+      TEMPORAL_ADDRESS: temporal:7233
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        until temporal operator cluster health; do sleep 2; done
+        if temporal operator namespace describe -n default > /dev/null 2>&1; then
+          echo "Namespace default already exists"
+        else
+          temporal operator namespace create -n default
+        fi
+
+  temporal-ui:
+    image: temporalio/ui:2.56.1
+    depends_on:
+      # Wait for the namespace, so the UI shows "default" as soon as it opens.
+      temporal-create-namespace:
+        condition: service_completed_successfully
+    environment:
+      TEMPORAL_ADDRESS: temporal:7233
+    ports:
+      - "8080:8080"
+
+volumes:
+  temporal-postgres-data:

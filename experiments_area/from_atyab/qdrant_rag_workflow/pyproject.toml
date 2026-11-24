@@ -1,0 +1,22 @@
+[project]
+name = "qdrant-rag-workflow"
+version = "0.1.0"
+description = "Two LangGraph demos: ingest PDFs into Qdrant, then answer questions from them"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "langchain-openai>=1.8.1",
+    "langchain-qdrant>=1.1.0",
+    "langchain-text-splitters>=1.1.3",
+    "langgraph>=1.2.22",
+    "pypdf>=7.1.0",
+    "python-dotenv>=1.2.4",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py314"
+
+[tool.ruff.lint]
+# Keep the defaults (pyflakes + a few pycodestyle rules) and add import order.
+select = ["E4", "E7", "E9", "F", "I"]
