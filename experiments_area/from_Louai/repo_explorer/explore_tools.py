@@ -19,7 +19,7 @@ async def main():
     async with client:
         tools = await client.list_tools()
         tool_names = [tool.name for tool in tools]
-        print("tools:", tool_names)
+        print("Tools:", tool_names)
 
         issues_result = await client.call_tool(
             "list_issues",
@@ -32,7 +32,8 @@ async def main():
             },
         )
         print("list_issues ->", issues_result.structured_content)
+
+
 if __name__ == "__main__":
     asyncio.run(main())
-
 

@@ -12,8 +12,6 @@ public GitHub repository by calling the GitHub MCP server.
 | `repo_graph.py` | Step 3: LangGraph workflow with classify + conditional branching |
 | `repo_graph.png` | Diagram saved by `draw_mermaid_png()` |
 
-The three `.py` files start empty on purpose. Type them yourself.
-
 ## Setup
 
 Python 3.14, dependencies already installed with `uv`.
@@ -34,23 +32,39 @@ Python 3.14, dependencies already installed with `uv`.
    uv sync
    ```
 
-3. Select `.venv/bin/python` as the interpreter in VS Code
-   (`Python: Select Interpreter` -> `./.venv`).
+3. Select the `.venv` interpreter in VS Code (`Python: Select Interpreter` -> `./.venv`).
 
 ## Run
 
+Run from inside this folder, so `load_dotenv()` finds `.env`:
+
 ```bash
-uv run explore_tools.py
-uv run repo_graph.py
+uv run explore_tools.py   # lists the GitHub MCP tools and calls list_issues
+uv run github_tools.py    # tests the two helpers on their own
+uv run repo_graph.py      # saves repo_graph.png and runs the 4 questions
 ```
+
+## How it works
+
+`classify` sets `kind` from the question (plain Python, no LLM). The decider
+`route_by_kind` returns that `kind`, and `add_conditional_edges` maps it to one of
+three nodes: `show_issues`, `show_commits` or `help_reply`. The first two call the
+helpers in `github_tools.py`, which use the FastMCP client in four steps:
+connect, list tools, call a tool, read the result.
+
+Note: the GitHub MCP server expects `owner` and `repo` as extra request headers, and
+the client only adds them after `list_tools()` has read the schema. That is why each
+helper calls `list_tools()` before `call_tool()`.
+
+![Workflow diagram](repo_graph.png)
 
 ## My four questions and answers
 
-Fill this in after your first successful run.
+From the run on 2026-11-26 against `CodelineAtyab/CodelineLegendsAIWorkflows`:
 
 | Question | Branch | Answer |
 | --- | --- | --- |
-| Show open issues | issues | |
-| What are the latest commits? | commits | |
-| Any new issue today? | issues | |
-| Hello | help | |
+| Show open issues | issues | `#315 Beginner Practice: Repo Explorer ...`, `#314 Clinic Assistant v2 ...`, `#306 Clinic Booking Assistant ...`, `#175 ...`, `#142 ...` |
+| What are the latest commits? | commits | `1133f4e Added QDRANT docker compose and 2 langgraph worklfows for RAG`, `f5e941b Added License`, `fca5469 Added Docker Compose to Spin up Temporal`, `40c8d3f ...`, `9607e3e ...` |
+| Any new issue today? | issues | Same five open issues as above |
+| Hello | help | `Ask me about issues or commits.` |
