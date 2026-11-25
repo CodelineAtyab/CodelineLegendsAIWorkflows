@@ -7,17 +7,32 @@ from fastmcp import Client
 GITHUB_MCP_URL = "https://api.githubcopilot.com/mcp/"
 REPO_OWNER = "CodelineAtyab"
 REPO_NAME = "CodelineLegendsAIWorkflows"
+MAX_ITEMS = 5
 
 load_dotenv()
 GITHUB_TOKEN = os.environ["GITHUB_TOKEN"]
 
 
 async def main():
-    claint = claint(GITHUB_MCP_URL, auth=GITHUB_TOKEN)
+    client = Client(GITHUB_MCP_URL, auth=GITHUB_TOKEN)
 
-    async with claint:
-        print("Connected:", claint.is_connected())
+    async with client:
+        tools = await client.list_tools()
+        tool_names = [tool.name for tool in tools]
+        print("tools:", tool_names)
 
-        if __name__ == "__main__":
-            asyncio.run(main())
-            
+        issues_result = await client.call_tool(
+            "list_issues",
+            {
+                "owner": REPO_OWNER,
+                "repo": REPO_NAME,
+                "state": "OPEN",
+                "perPage": MAX_ITEMS,
+                "fields": ["number", "title"],
+            },
+        )
+        print("list_issues ->", issues_result.structured_content)
+if __name__ == "__main__":
+    asyncio.run(main())
+
+
