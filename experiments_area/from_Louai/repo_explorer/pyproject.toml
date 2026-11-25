@@ -1,0 +1,12 @@
+[project]
+name = "repo-explorer"
+version = "0.1.0"
+description = "LangGraph branching workflow that reads GitHub data through the GitHub MCP server"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "fastmcp>=4.2.5",
+    "grandalf>=0.8",
+    "langgraph>=1.2.24",
+    "python-dotenv>=1.2.4",
+]
